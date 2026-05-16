@@ -60,6 +60,11 @@ C:\Users\<you>\.codex\skills\
 
 After copying, restart Codex so it reloads global skills.
 
+## Development
+
+- [Contributing guide](CONTRIBUTING.md)
+- [MIT License](LICENSE)
+
 ## Usage
 
 Invoke the skills in chat with prompts such as:
