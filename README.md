@@ -6,6 +6,10 @@ Custom skills for Codex, focused on competition-driven research workflows.
 
 ## Included skills
 
+### `brt`
+
+The Behavior / Review / Test workflow skill. It acts as a pre-implementation gate for turning vague behavior changes into explicit examples, review lenses, acceptance criteria, and test intentions before code changes begin.
+
 ### `competition-research-lifecycle`
 
 An end-to-end workflow skill for research competitions and benchmark-style projects. It covers:
@@ -32,6 +36,10 @@ A paper-readiness skill for checking whether every important claim in a draft ca
 ## Structure
 
 ```text
+brt/
+  SKILL.md
+  agents/
+  references/
 competition-research-lifecycle/
   SKILL.md
   REFERENCE.md

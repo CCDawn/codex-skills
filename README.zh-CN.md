@@ -4,6 +4,10 @@
 
 ## 当前包含的 skill
 
+### `brt`
+
+这是 Behavior / Review / Test 工作流 skill。它的作用是在真正开始实现之前，把模糊的功能想法收束成清晰的行为定义、评审视角、验收标准和测试意图。
+
 ### `competition-research-lifecycle`
 
 这是一个覆盖竞赛科研全周期的主流程 skill，包含：
@@ -36,6 +40,10 @@
 ## 仓库结构
 
 ```text
+brt/
+  SKILL.md
+  agents/
+  references/
 competition-research-lifecycle/
   SKILL.md
   REFERENCE.md
