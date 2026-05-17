@@ -37,12 +37,22 @@ When those signals are present:
 
 Do not interrupt tiny one-off questions or trivial read-only tasks just to bootstrap memory.
 
+## Explicit initialization prompts
+
+When the user wants a one-time setup, accept direct prompts such as:
+
+- `Initialize project memory for this repo`
+- `Use agent-html-memory to initialize project memory for this backend project`
+- `Bootstrap persistent memory for this codebase`
+
+Treat those prompts as explicit permission to run the setup workflow immediately.
+
 ## Continuous improvement
 
 Treat real usage as feedback for the skill itself.
 
 - When this skill causes repeated friction, update the skill instead of only working around the friction in one project.
-- Improve the smallest reusable layer that would help the next session: `SKILL.md`, command wrappers, Python scripts, templates, or references.
+- Improve the smallest reusable layer that would help the next session: `SKILL.md`, Python scripts, templates, or references.
 - Record meaningful improvements in `IMPROVEMENT.md`.
 - Prefer changes that reduce repeated manual steps, tighten agent behavior, or make project memory more reliable.
 

@@ -2,8 +2,6 @@
 
 这是一个面向 Codex 的多-skill 仓库，重点服务于竞赛型科研工作流、实现前行为治理，以及项目记忆维护。
 
-本仓库附带的 slash command 统一保留在 `dawn-*` 命名空间下。
-
 ## 当前包含的 skill
 
 ### `brt`
@@ -44,11 +42,7 @@
 
 这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它会保留结构化记忆数据、生成 HTML 总览页，并维护一个便于人和 agent 回到上下文的索引页。
 
-这个 skill 还附带一个可选的本地 Codex plugin 命令：
-
-- `/dawn-memory-init`
-
-这个命令负责做一次性的项目记忆初始化，后续的持续维护再交还给 skill 本身。
+你可以直接在对话里用自然语言让 Codex 初始化项目记忆，或者显式要求使用这个 skill。初始化完成后，后续维护继续交给 skill 本身。
 
 ## 仓库结构
 
@@ -74,10 +68,6 @@ literature-evidence-synthesis/
 paper-claim-traceability/
   SKILL.md
   EXAMPLES.md
-plugins/
-  dawn-commands/
-    .codex-plugin/
-    commands/
 scripts/
   install_codex_library.py
 ```
@@ -93,19 +83,12 @@ python scripts/install_codex_library.py
 这条命令会：
 
 - 把仓库里的所有 skill 复制到 `~/.codex/skills/`
-- 把附带的本地 plugin 安装到 `~/.codex/plugins/`
-- 在有 plugin 时自动更新 `~/.agents/plugins/marketplace.json`
+- 清理这个仓库历史上附带过的旧 plugin 残留
 
 如果只想安装部分 skill，可以这样：
 
 ```bash
 python scripts/install_codex_library.py --skill brt --skill agent-html-memory
-```
-
-如果这次不想安装 plugin，可以这样：
-
-```bash
-python scripts/install_codex_library.py --skip-plugins
 ```
 
 如果你更喜欢手动安装，也可以把对应 skill 文件夹复制到你的 Codex 全局 skills 目录：
@@ -122,8 +105,6 @@ C:\Users\<你自己的用户名>\.codex\skills\
 
 复制完成后，重启 Codex 桌面端，让它重新加载全局 skills。
 
-如果还安装了本地 plugin，重启后还需要在 Codex 的 `Local Plugins` 里安装或启用 `Dawn Commands`。
-
 ## 使用方式
 
 在 Codex 聊天里可以直接这样触发：
@@ -132,4 +113,4 @@ C:\Users\<你自己的用户名>\.codex\skills\
 - `用 literature-evidence-synthesis 把这些论文整理成文献矩阵`
 - `用 paper-claim-traceability 检查这篇论文初稿的证据链`
 - `帮我给这个仓库初始化项目记忆`
-- `/dawn-memory-init frontend`
+- `使用 agent-html-memory 把这个仓库按 frontend 项目初始化项目记忆`
