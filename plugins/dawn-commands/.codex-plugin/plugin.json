@@ -1,7 +1,7 @@
 {
-  "name": "agent-html-memory-commands",
+  "name": "dawn-commands",
   "version": "0.1.0",
-  "description": "Slash commands for initializing project memory in Codex and handing off ongoing maintenance to the agent-html-memory skill.",
+  "description": "Dawn-prefixed slash commands for Codex skills in this repository.",
   "author": {
     "name": "CCDawn"
   },
@@ -9,15 +9,16 @@
   "repository": "https://github.com/CCDawn/codex-skills",
   "license": "MIT",
   "keywords": [
+    "dawn",
     "project-memory",
     "slash-command",
     "codex",
     "init"
   ],
   "interface": {
-    "displayName": "Project Memory Commands",
-    "shortDescription": "Slash commands for project memory setup",
-    "longDescription": "Provides a manual slash command to initialize project memory in the current project. After initialization, the installed agent-html-memory skill keeps memory synchronized during later development work.",
+    "displayName": "Dawn Commands",
+    "shortDescription": "Dawn-prefixed commands for this skill library",
+    "longDescription": "Provides the Dawn command namespace for this repository. Commands such as /dawn-memory-init offer explicit entrypoints, while the underlying skills handle ongoing work after setup.",
     "developerName": "CCDawn",
     "category": "Engineering",
     "capabilities": [
@@ -29,8 +30,8 @@
     "privacyPolicyURL": "https://github.com/CCDawn/codex-skills",
     "termsOfServiceURL": "https://github.com/CCDawn/codex-skills",
     "defaultPrompt": [
-      "/memory-init frontend",
-      "/memory-init backend"
+      "/dawn-memory-init frontend",
+      "/dawn-memory-init backend"
     ],
     "brandColor": "#2F6FEB",
     "screenshots": []

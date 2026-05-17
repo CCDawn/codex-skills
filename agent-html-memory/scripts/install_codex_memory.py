@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 SKILL_NAME = "agent-html-memory"
-PLUGIN_NAME = "agent-html-memory-commands"
+PLUGIN_NAME = "dawn-commands"
 
 
 def copy_tree(src: Path, dst: Path) -> None:
@@ -95,7 +95,7 @@ def main() -> int:
     print(f"  {codex_plugin_dst}")
     print("Updated marketplace:")
     print(f"  {marketplace_path}")
-    print("Restart Codex, then install/enable 'Project Memory Commands' from Local Plugins if needed.")
+    print("Restart Codex, then install/enable 'Dawn Commands' from Local Plugins if needed.")
     return 0
 
 

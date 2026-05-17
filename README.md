@@ -1,6 +1,8 @@
-# Codex Skills Library
+# Dawn Codex Skills Library
 
 Custom skills for Codex, with a focus on competition-driven research workflows, behavior-gated implementation, and persistent project memory.
+
+The `dawn-*` slash-command namespace is reserved for commands shipped by this repository.
 
 [中文说明](README.zh-CN.md)
 
@@ -39,7 +41,7 @@ A persistent project-memory skill for creating and maintaining `.docs/project-me
 
 This skill ships with an optional Codex local plugin command:
 
-- `/memory-init`
+- `/dawn-memory-init`
 
 That slash command initializes project memory once, then hands ongoing maintenance back to the skill during later development sessions.
 
@@ -67,7 +69,7 @@ paper-claim-traceability/
   SKILL.md
   EXAMPLES.md
 plugins/
-  agent-html-memory-commands/
+  dawn-commands/
     .codex-plugin/
     commands/
 scripts/
@@ -114,7 +116,7 @@ C:\Users\<you>\.codex\skills\
 
 After copying, restart Codex so it reloads global skills.
 
-If you installed bundled plugins, restart Codex and then install or enable them from `Local Plugins` in the app if needed.
+If you installed bundled plugins, restart Codex and then install or enable `Dawn Commands` from `Local Plugins` in the app if needed.
 
 ## Development
 
@@ -131,4 +133,4 @@ Invoke the skills in chat with prompts such as:
 - `Use literature-evidence-synthesis to turn these papers into a literature matrix`
 - `Use paper-claim-traceability to review this draft before submission`
 - `Initialize project memory for this repo`
-- `/memory-init frontend`
+- `/dawn-memory-init frontend`

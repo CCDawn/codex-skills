@@ -4,7 +4,7 @@ argument-hint: [project-type]
 allowed-tools: [Read, Glob, Grep, Bash, Write, Edit]
 ---
 
-# Project Memory Init
+# Dawn Memory Init
 
 Initialize persistent project memory for the current repository and make it part of normal development flow.
 
@@ -50,7 +50,7 @@ node <user-home>/.codex/skills/agent-html-memory/bin/agent-html-memory-init.js <
 ## Example usage
 
 ```text
-/memory-init
-/memory-init frontend
-/memory-init backend
+/dawn-memory-init
+/dawn-memory-init frontend
+/dawn-memory-init backend
 ```

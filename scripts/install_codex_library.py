@@ -3,6 +3,10 @@ import json
 import shutil
 from pathlib import Path
 
+DEPRECATED_PLUGIN_NAMES = {
+    "agent-html-memory-commands",
+}
+
 
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.exists():
@@ -67,6 +71,11 @@ def upsert_plugin_entry(data: dict, plugin_name: str) -> None:
         plugins.append(entry)
 
 
+def remove_plugin_entry(data: dict, plugin_name: str) -> None:
+    plugins = data.get("plugins", [])
+    data["plugins"] = [plugin for plugin in plugins if plugin.get("name") != plugin_name]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Install this Codex multi-skill library into the current user's Codex directories.")
     parser.add_argument(
@@ -118,6 +127,12 @@ def main() -> int:
         marketplace = load_marketplace(marketplace_path)
         marketplace.setdefault("name", "local")
         marketplace.setdefault("interface", {}).setdefault("displayName", "Local Plugins")
+
+        for deprecated_name in sorted(DEPRECATED_PLUGIN_NAMES):
+            deprecated_path = plugin_dest_root / deprecated_name
+            if deprecated_path.exists():
+                shutil.rmtree(deprecated_path)
+            remove_plugin_entry(marketplace, deprecated_name)
 
         for plugin_path in discover_plugins(repo_root):
             destination = plugin_dest_root / plugin_path.name
