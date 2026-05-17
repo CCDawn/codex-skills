@@ -24,6 +24,7 @@
 - 提交打包
 
 它把 `brt` 视为流程治理层，用来定义每个阶段的目标、评审点和验收标准。
+现在它还附带更明确的阶段响应格式、phase reference，以及可直接复用的 artifact 模板。
 
 ### `literature-evidence-synthesis`
 
@@ -66,6 +67,7 @@ competition-research-lifecycle/
   SKILL.md
   REFERENCE.md
   EXAMPLES.md
+  TEMPLATES.md
 literature-evidence-synthesis/
   SKILL.md
   EXAMPLES.md

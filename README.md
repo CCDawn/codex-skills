@@ -26,6 +26,7 @@ An end-to-end workflow skill for research competitions and benchmark-style proje
 - submission packaging
 
 This skill treats `brt` as a governance layer for defining phase goals, review points, and acceptance checks.
+It now ships with a reference guide, a tighter response contract, and copy-ready phase templates.
 
 ### `literature-evidence-synthesis`
 
@@ -62,6 +63,7 @@ competition-research-lifecycle/
   SKILL.md
   REFERENCE.md
   EXAMPLES.md
+  TEMPLATES.md
 literature-evidence-synthesis/
   SKILL.md
   EXAMPLES.md
