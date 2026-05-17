@@ -40,7 +40,7 @@
 
 ### `agent-html-memory`
 
-这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它会保留结构化记忆数据、生成 HTML 总览页，并维护一个便于人和 agent 回到上下文的索引页。
+这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它现在支持按职责拆分的多会话共享 lane（保存在 `.docs/project-memory/lanes/`），生成会聚合这些 lane 的 HTML 总览页，并在项目根目录生成一个 `PROJECT_MEMORY.html` 快捷入口。
 
 你可以直接在对话里用自然语言让 Codex 初始化项目记忆，或者显式要求使用这个 skill。初始化完成后，后续维护继续交给 skill 本身。
 

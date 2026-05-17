@@ -31,6 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("project_root", help="Path to the target project root.")
     parser.add_argument("--title", required=True, help="Short title for the captured note.")
     parser.add_argument("--details", required=True, help="The raw finding, observation, or breadcrumb to record.")
+    parser.add_argument("--lane", default=None, help="Optional responsibility lane hint, such as backend-auth.")
     parser.add_argument("--modules", default=None, help="Comma-separated related modules.")
     parser.add_argument("--issues", default=None, help="Comma-separated related issues.")
     parser.add_argument("--decisions", default=None, help="Comma-separated related decisions.")
@@ -48,6 +49,8 @@ def main() -> int:
         "title": args.title,
         "details": args.details,
     }
+    if args.lane:
+        capture["laneId"] = args.lane
     mappings = {
         "relatedModules": csv_or_none(args.modules),
         "relatedIssues": csv_or_none(args.issues),

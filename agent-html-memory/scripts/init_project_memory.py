@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import argparse
-import json
-from datetime import datetime, timezone
 from pathlib import Path
 
-from render_overview import render_html, render_index
+from memory_model import ensure_directories, utc_now, write_json
+from render_overview import refresh_outputs
 
 
 SECTION_PRESETS = {
     "general": [
         "summary",
+        "lanes",
         "progress",
         "modules",
         "decisions",
@@ -21,6 +21,7 @@ SECTION_PRESETS = {
     ],
     "frontend": [
         "summary",
+        "lanes",
         "progress",
         "modules",
         "issues",
@@ -31,6 +32,7 @@ SECTION_PRESETS = {
     ],
     "backend": [
         "summary",
+        "lanes",
         "progress",
         "modules",
         "decisions",
@@ -41,6 +43,7 @@ SECTION_PRESETS = {
     ],
     "automation": [
         "summary",
+        "lanes",
         "progress",
         "issues",
         "todos",
@@ -51,6 +54,7 @@ SECTION_PRESETS = {
     ],
     "research": [
         "summary",
+        "lanes",
         "progress",
         "techNotes",
         "issues",
@@ -84,10 +88,6 @@ LABEL_PRESETS = {
 }
 
 
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
-
 def build_memory(project_name: str, project_type: str) -> dict:
     now = utc_now()
     return {
@@ -95,49 +95,33 @@ def build_memory(project_name: str, project_type: str) -> dict:
             "name": project_name,
             "type": project_type,
             "root": ".",
-            "memoryVersion": 1,
+            "memoryVersion": 2,
         },
         "summary": {
-            "currentPhase": "Setup",
+            "currentPhase": "Shared memory active",
             "health": "green",
-            "focus": "Initialize project memory",
+            "focus": "See active lanes",
             "lastUpdated": now,
         },
         "progress": {
             "percent": 0,
-            "status": "Not started",
+            "status": "Memory ready",
             "milestones": [
                 {
-                    "title": "Project memory initialized",
+                    "title": "Shared HTML memory initialized",
                     "status": "done",
-                    "note": "Base dashboard and structured files created.",
+                    "note": "Created global memory shell, lanes directory, overview, and root shortcut.",
                 }
             ],
         },
-        "modules": [],
-        "decisions": [],
-        "issues": [],
-        "todos": [
-            {
-                "title": "Fill in project summary",
-                "status": "open",
-                "owner": "agent",
-                "notes": "Replace setup placeholders after first real task.",
-            }
-        ],
-        "techNotes": [
-            {
-                "title": "Memory system",
-                "body": "Source of truth lives in memory.json. overview.html is generated and should be refreshed after updates.",
-            }
-        ],
         "recentUpdates": [
             {
                 "timestamp": now,
-                "title": "Initialized project memory",
-                "details": "Created memory.json, profile.json, overview.html, INDEX.md, inbox.json, and archive scaffolding.",
+                "title": "Initialized shared project memory",
+                "details": "Created memory.json, profile.json, overview.html, INDEX.md, inbox.json, lanes/, archive/, and PROJECT_MEMORY.html.",
             }
         ],
+        "lanes": [],
     }
 
 
@@ -197,26 +181,16 @@ def inject_agents_rules(project_root: Path) -> None:
 def main() -> int:
     args = parse_args()
     project_root = Path(args.project_root).resolve()
-    memory_dir = project_root / ".docs" / "project-memory"
-    memory_dir.mkdir(parents=True, exist_ok=True)
-    archive_dir = memory_dir / "archive"
-    archive_dir.mkdir(exist_ok=True)
+    memory_dir, _ = ensure_directories(project_root)
 
     project_name = args.project_name or project_root.name
     memory = build_memory(project_name, args.project_type)
     profile = build_profile(args.project_type)
 
-    memory_path = memory_dir / "memory.json"
-    profile_path = memory_dir / "profile.json"
-    overview_path = memory_dir / "overview.html"
-    inbox_path = memory_dir / "inbox.json"
-    index_path = memory_dir / "INDEX.md"
-
-    memory_path.write_text(json.dumps(memory, indent=2) + "\n", encoding="utf-8")
-    profile_path.write_text(json.dumps(profile, indent=2) + "\n", encoding="utf-8")
-    inbox_path.write_text(json.dumps({"captures": []}, indent=2) + "\n", encoding="utf-8")
-    overview_path.write_text(render_html(memory, profile), encoding="utf-8")
-    index_path.write_text(render_index(memory, profile), encoding="utf-8")
+    write_json(memory_dir / "memory.json", memory)
+    write_json(memory_dir / "profile.json", profile)
+    write_json(memory_dir / "inbox.json", {"captures": []})
+    refresh_outputs(project_root, memory, profile)
     if not args.skip_agents_rules:
         inject_agents_rules(project_root)
 

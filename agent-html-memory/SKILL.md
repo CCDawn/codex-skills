@@ -11,9 +11,9 @@ Create a project-local memory system under `.docs/project-memory/` and keep it c
 
 Treat project memory maintenance as part of the definition of done.
 
-- Before meaningful development, read `INDEX.md`, `memory.json`, and `profile.json`.
+- Before meaningful development, read `INDEX.md`, `memory.json`, `profile.json`, and any lane files relevant to the current responsibility.
 - During development, place raw findings in `inbox.json` when needed.
-- After meaningful development, update `memory.json` and run the sync command.
+- After meaningful development, update only the current lane file plus the global recent-updates feed, then run the sync command.
 - Do not end a task with stale project memory unless the user explicitly says to skip it.
 
 If the repository contains `.docs/project-memory/`, assume this skill is active even when the user did not mention it by name.
@@ -69,15 +69,18 @@ Maintain these files inside the target project:
   overview.html
   INDEX.md
   inbox.json
+  lanes/
   archive/
 ```
 
-- `memory.json` is the source of truth for agent-written project memory.
+- `memory.json` is the shared shell for project-level metadata, lane index data, and global `recentUpdates`.
 - `profile.json` is the project adaptation layer.
 - `overview.html` is a generated static dashboard for humans.
 - `INDEX.md` is the quick navigation entry for both humans and agents.
 - `inbox.json` is a staging area for quick capture during ongoing work.
+- `lanes/*.json` are the per-responsibility memory files that individual sessions should maintain.
 - `archive/` stores historical items moved out of the active dashboard.
+- `PROJECT_MEMORY.html` lives at the project root as the stable human-facing shortcut into the dashboard.
 
 Do not treat `overview.html` as the primary editable artifact unless the user explicitly asks for a one-off manual page.
 
@@ -101,12 +104,13 @@ After a meaningful task, update the memory system in this order:
 
 1. Read `.docs/project-memory/memory.json` and `.docs/project-memory/profile.json`.
 2. Read `inbox.json` when the task involved quick captures or unresolved notes.
-3. Update only the sections affected by the latest work.
-4. Append a short entry to `recentUpdates`.
-5. When there is a real behavior or architecture decision, append a `decisions` item.
-6. When there is a new blocker or investigation thread, append or update an `issues` item.
-7. Add or preserve cross-references such as related modules, issues, decisions, or files.
-8. Re-render `overview.html` and refresh `INDEX.md` with `python <this-skill>/scripts/render_overview.py <project-root>`.
+3. Resolve the current responsibility lane, such as `backend-auth` or `frontend-dashboard`.
+4. Update only that lane file unless the user explicitly asks for broader edits.
+5. Append a short entry to global `recentUpdates`.
+6. When there is a real behavior or architecture decision, append a `decisions` item inside the current lane.
+7. When there is a new blocker or investigation thread, append or update an `issues` item inside the current lane.
+8. Add or preserve cross-references such as related modules, issues, decisions, or files.
+9. Re-render `overview.html`, refresh `INDEX.md`, and refresh the root `PROJECT_MEMORY.html` shortcut with `python <this-skill>/scripts/render_overview.py <project-root>`.
 
 Prefer preserving existing history. Do not rewrite old entries just to make them prettier.
 
@@ -114,14 +118,14 @@ Prefer preserving existing history. Do not rewrite old entries just to make them
 
 Keep the memory high signal. Favor compact factual notes over narration.
 
-- `summary`: current phase, health, focus, last updated
+- `summary`: shared shell metadata, not a free-form scratchpad for every session
 - `progress`: completion summary and milestones
-- `modules`: feature or subsystem status with notes
-- `decisions`: context, decision, impact
-- `issues`: status, severity, impact, next step
-- `todos`: next actions with owner and status when known
-- `techNotes`: key implementation details worth reloading later
-- `recentUpdates`: chronological short log of meaningful work
+- `modules`: feature or subsystem status with notes inside the current lane
+- `decisions`: context, decision, impact inside the current lane
+- `issues`: status, severity, impact, next step inside the current lane
+- `todos`: next actions with owner and status when known inside the current lane
+- `techNotes`: key implementation details worth reloading later inside the current lane
+- `recentUpdates`: chronological short log of meaningful work at the global level, with lane references
 
 Use lightweight cross-references when entries are related:
 
@@ -154,7 +158,7 @@ Use `inbox.json` for quick capture during a task when information is too raw to 
 Maintain `INDEX.md` as a compact navigation page.
 
 - Show the current project type, last updated time, and active files.
-- Link to `overview.html`, `memory.json`, `profile.json`, `inbox.json`, and `archive/`.
+- Link to `overview.html`, `memory.json`, `profile.json`, `inbox.json`, `lanes/`, `archive/`, and `PROJECT_MEMORY.html`.
 - Summarize counts for modules, open issues, decisions, todos, and recent updates.
 
 This file helps both humans and agents re-enter the project quickly.
@@ -188,8 +192,10 @@ After updating memory:
 1. Run the renderer.
 2. Open the generated `overview.html` in a browser when practical, or at minimum inspect the file contents.
 3. Check that the latest task appears in `recentUpdates`.
-4. Check that any changed modules, todos, or issues are reflected in the HTML.
-5. Check that `INDEX.md` reflects the latest counts and file links.
+4. Check that the active lane shows the latest owner, focus, and update time.
+5. Check that any changed modules, todos, or issues are reflected in the HTML under the correct lane.
+6. Check that `INDEX.md` reflects the latest counts and file links.
+7. Check that the project-root `PROJECT_MEMORY.html` opens the overview.
 
 ## Commands
 
@@ -198,9 +204,9 @@ Replace `<skill-root>` with this skill folder path.
 ```bash
 python <skill-root>/scripts/init_project_memory.py <project-root> --project-type frontend
 python <skill-root>/scripts/render_overview.py <project-root>
-python <skill-root>/scripts/sync_project_memory.py <project-root> --focus "What changed" --update "Short summary of this task"
-python <skill-root>/scripts/capture_note.py <project-root> --title "Observation" --details "What you noticed"
+python <skill-root>/scripts/sync_project_memory.py <project-root> --lane backend-auth --focus "What changed" --update "Short summary of this task"
+python <skill-root>/scripts/capture_note.py <project-root> --lane backend-auth --title "Observation" --details "What you noticed"
 agent-html-memory-init <project-root> --project-type frontend
-agent-html-memory-sync <project-root> --focus "What changed" --update "Short summary of this task"
-agent-html-memory-capture <project-root> --title "Observation" --details "What you noticed"
+agent-html-memory-sync <project-root> --lane backend-auth --focus "What changed" --update "Short summary of this task"
+agent-html-memory-capture <project-root> --lane backend-auth --title "Observation" --details "What you noticed"
 ```

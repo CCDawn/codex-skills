@@ -1,13 +1,23 @@
 from __future__ import annotations
 
 import argparse
-import json
 from html import escape
 from pathlib import Path
+
+from memory_model import (
+    aggregate_items,
+    list_lanes,
+    load_json,
+    project_memory_dir,
+    update_memory_lane_index,
+    write_json,
+    write_shortcut,
+)
 
 
 SECTION_TITLES = {
     "summary": "Current Status",
+    "lanes": "Work Lanes",
     "progress": "Progress",
     "modules": "Modules",
     "decisions": "Key Decisions",
@@ -18,18 +28,14 @@ SECTION_TITLES = {
 }
 
 
-def load_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def render_index(memory: dict, profile: dict) -> str:
+def render_index(memory: dict, profile: dict, lanes: list[dict]) -> str:
     project = memory.get("project", {})
     summary = memory.get("summary", {})
-    modules = len(memory.get("modules", []))
-    open_issues = len([item for item in memory.get("issues", []) if item.get("status") != "resolved"])
-    decisions = len(memory.get("decisions", []))
-    todos = len([item for item in memory.get("todos", []) if item.get("status") != "done"])
-    updates = len(memory.get("recentUpdates", []))
+    modules = len(aggregate_items(memory, lanes, "modules"))
+    open_issues = len([item for item in aggregate_items(memory, lanes, "issues") if item.get("status") != "resolved"])
+    decisions = len(aggregate_items(memory, lanes, "decisions"))
+    todos = len([item for item in aggregate_items(memory, lanes, "todos") if item.get("status") != "done"])
+    updates = len(aggregate_items(memory, lanes, "recentUpdates"))
     return f"""# Project Memory Index
 
 ## Overview
@@ -37,6 +43,7 @@ def render_index(memory: dict, profile: dict) -> str:
 - Project: {project.get("name", "Unknown")}
 - Type: {project.get("type", profile.get("projectType", "general"))}
 - Last updated: {summary.get("lastUpdated", "Unknown")}
+- Work lanes: {len(lanes)}
 
 ## Files
 
@@ -44,12 +51,15 @@ def render_index(memory: dict, profile: dict) -> str:
 - [memory.json](./memory.json)
 - [profile.json](./profile.json)
 - [inbox.json](./inbox.json)
+- [lanes/](./lanes/)
 - [archive/](./archive/)
+- [../../PROJECT_MEMORY.html](../../PROJECT_MEMORY.html)
 
 ## Active Counts
 
 | Section | Count |
 |---|---:|
+| Work lanes | {len(lanes)} |
 | Modules | {modules} |
 | Open issues | {open_issues} |
 | Decisions | {decisions} |
@@ -58,9 +68,9 @@ def render_index(memory: dict, profile: dict) -> str:
 
 ## Focus
 
-- Current phase: {summary.get("currentPhase", "Unknown")}
-- Current focus: {summary.get("focus", "Unknown")}
-- Health: {summary.get("health", "unknown")}
+- Current phase: {summary.get("currentPhase", "Shared memory active")}
+- Current focus: {summary.get("focus", "See active lanes")}
+- Health: {summary.get("health", "green")}
 """
 
 
@@ -97,7 +107,7 @@ def html_page(title: str, body: str) -> str:
       color: var(--text);
     }}
     .page {{
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 24px;
     }}
@@ -207,6 +217,38 @@ def html_page(title: str, body: str) -> str:
       height: 100%;
       background: linear-gradient(90deg, #22d3ee 0%, #3b82f6 100%);
     }}
+    .lane-grid {{
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }}
+    .lane-card {{
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(31, 41, 55, 0.7);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+    }}
+    .lane-card h3 {{
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }}
+    .lane-card .meta {{
+      font-size: 12px;
+    }}
+    .counts {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }}
+    .count-chip {{
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--muted);
+      font-size: 12px;
+    }}
     .footer {{
       margin-top: 24px;
       color: var(--muted);
@@ -225,9 +267,9 @@ def html_page(title: str, body: str) -> str:
 
 def render_summary(memory: dict) -> str:
     summary = memory.get("summary", {})
-    phase = escape(summary.get("currentPhase", "Unknown"))
-    focus = escape(summary.get("focus", ""))
-    health = escape(summary.get("health", "unknown"))
+    phase = escape(summary.get("currentPhase", "Shared memory active"))
+    focus = escape(summary.get("focus", "See active lanes"))
+    health = escape(summary.get("health", "green"))
     updated = escape(summary.get("lastUpdated", ""))
     return f"""
     <section>
@@ -270,6 +312,47 @@ def render_progress(memory: dict) -> str:
     """
 
 
+def render_lanes(memory: dict) -> str:
+    lanes = memory.get("lanes", [])
+    if not lanes:
+        return """
+        <section>
+          <h2>Work Lanes</h2>
+          <p class="muted">No work lanes recorded yet.</p>
+        </section>
+        """
+    cards = []
+    for lane in lanes:
+        cards.append(
+            f"""
+            <div class="lane-card">
+              <h3>{escape(lane.get("title", "Untitled Lane"))}</h3>
+              <div class="meta">
+                <span>Lane: {escape(lane.get("id", ""))}</span>
+                <span>Owner: {escape(lane.get("owner", "shared-session"))}</span>
+                <span>Updated: {escape(lane.get("lastUpdated", ""))}</span>
+              </div>
+              <div class="kv" style="margin-top: 10px;">
+                <div><strong>Focus</strong><span>{escape(lane.get("focus", "")) or "Unspecified"}</span></div>
+                <div><strong>Phase</strong><span>{escape(lane.get("phase", "Active"))}</span></div>
+                <div><strong>Health</strong><span class="status {escape(lane.get("health", "green"))}">{escape(lane.get("health", "green"))}</span></div>
+              </div>
+              <div class="counts">
+                <span class="count-chip">Open todos: {lane.get("openTodos", 0)}</span>
+                <span class="count-chip">Open issues: {lane.get("openIssues", 0)}</span>
+                <span class="count-chip">Updates: {lane.get("updates", 0)}</span>
+              </div>
+            </div>
+            """
+        )
+    return f"""
+    <section style="grid-column: 1 / -1;">
+      <h2>Work Lanes</h2>
+      <div class="lane-grid">{''.join(cards)}</div>
+    </section>
+    """
+
+
 def render_named_items(items: list[dict], empty_text: str, fields: list[tuple[str, str]]) -> str:
     if not items:
         return f'<p class="muted">{escape(empty_text)}</p>'
@@ -277,11 +360,13 @@ def render_named_items(items: list[dict], empty_text: str, fields: list[tuple[st
     for item in items:
         title = escape(item.get("title") or item.get("name") or "Untitled")
         details = []
+        lane_title = item.get("laneTitle")
+        if lane_title:
+            details.append(f"<div><strong>Lane</strong><span>{escape(str(lane_title))}</span></div>")
         for key, label in fields:
             value = item.get(key)
             if value:
-                details.append(f"<strong>{escape(label)}</strong><span>{escape(str(value))}</span>")
-        detail_html = "".join(f"<div>{part}</div>" for part in details)
+                details.append(f"<div><strong>{escape(label)}</strong><span>{escape(str(value))}</span></div>")
         related_bits = []
         for key, label in [
             ("relatedModules", "Modules"),
@@ -293,15 +378,16 @@ def render_named_items(items: list[dict], empty_text: str, fields: list[tuple[st
             if value:
                 joined = ", ".join(str(part) for part in value)
                 related_bits.append(f"<div><strong>{escape(label)}</strong><span>{escape(joined)}</span></div>")
-        related_html = "".join(related_bits)
-        rendered.append(f'<div class="item"><h3>{title}</h3><div class="kv">{detail_html}{related_html}</div></div>')
+        rendered.append(f'<div class="item"><h3>{title}</h3><div class="kv">{"".join(details)}{"".join(related_bits)}</div></div>')
     return "".join(rendered)
 
 
-def render_section(section: str, memory: dict, profile: dict) -> str:
+def render_section(section: str, memory: dict, profile: dict, lanes: list[dict]) -> str:
     title = escape(label_for(section, profile))
     if section == "summary":
         return render_summary(memory)
+    if section == "lanes":
+        return render_lanes(memory)
     if section == "progress":
         return render_progress(memory)
     mapping = {
@@ -313,7 +399,7 @@ def render_section(section: str, memory: dict, profile: dict) -> str:
         "recentUpdates": ("No updates recorded.", [("timestamp", "Time"), ("details", "Details")]),
     }
     empty_text, fields = mapping[section]
-    content = render_named_items(memory.get(section, []), empty_text, fields)
+    content = render_named_items(aggregate_items(memory, lanes, section), empty_text, fields)
     return f"""
     <section>
       <h2>{title}</h2>
@@ -322,12 +408,12 @@ def render_section(section: str, memory: dict, profile: dict) -> str:
     """
 
 
-def render_html(memory: dict, profile: dict) -> str:
+def render_html(memory: dict, profile: dict, lanes: list[dict]) -> str:
     project = memory.get("project", {})
     summary = memory.get("summary", {})
     title = project.get("name", "Project Memory")
     project_type = project.get("type", profile.get("projectType", "general"))
-    focus = escape(summary.get("focus", ""))
+    focus = escape(summary.get("focus", "See active lanes"))
     hero = f"""
     <header class="hero">
       <div>
@@ -335,23 +421,42 @@ def render_html(memory: dict, profile: dict) -> str:
         <div class="meta">
           <span>Project type: {escape(str(project_type))}</span>
           <span>Memory version: {escape(str(project.get("memoryVersion", 1)))}</span>
+          <span>Shared lanes: {len(lanes)}</span>
         </div>
       </div>
       <div class="chips">
         <span class="chip">Static HTML overview</span>
-        <span class="chip">Structured agent memory</span>
-        <span class="chip">Current focus: {focus or "Unspecified"}</span>
+        <span class="chip">Shared multi-session memory</span>
+        <span class="chip">Current focus: {focus or "See active lanes"}</span>
       </div>
     </header>
     """
     sections = profile.get("sections", list(SECTION_TITLES))
-    body_sections = "".join(render_section(section, memory, profile) for section in sections if section in SECTION_TITLES)
+    ordered = []
+    if "summary" not in sections:
+        ordered.append("summary")
+    if "lanes" not in sections:
+        ordered.append("lanes")
+    ordered.extend(section for section in sections if section in SECTION_TITLES and section not in {"summary", "lanes"})
+    body_sections = "".join(render_section(section, memory, profile, lanes) for section in ["summary", "lanes", *ordered] if section in SECTION_TITLES)
     footer = """
     <div class="footer">
-      Generated from .docs/project-memory/memory.json and profile.json.
+      Generated from .docs/project-memory/memory.json, profile.json, and per-lane JSON files. Open PROJECT_MEMORY.html from the project root for the stable shortcut.
     </div>
     """
     return html_page(title, hero + f'<div class="grid">{body_sections}</div>' + footer)
+
+
+def refresh_outputs(project_root: Path, memory: dict | None = None, profile: dict | None = None) -> tuple[dict, dict, list[dict]]:
+    memory_dir = project_memory_dir(project_root)
+    memory = memory or load_json(memory_dir / "memory.json")
+    profile = profile or load_json(memory_dir / "profile.json")
+    lanes = list_lanes(project_root)
+    update_memory_lane_index(memory, lanes)
+    (memory_dir / "overview.html").write_text(render_html(memory, profile, lanes), encoding="utf-8")
+    (memory_dir / "INDEX.md").write_text(render_index(memory, profile, lanes), encoding="utf-8")
+    write_shortcut(project_root, memory.get("project", {}).get("name", project_root.name))
+    return memory, profile, lanes
 
 
 def parse_args() -> argparse.Namespace:
@@ -363,12 +468,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     project_root = Path(args.project_root).resolve()
-    memory_dir = project_root / ".docs" / "project-memory"
-    memory = load_json(memory_dir / "memory.json")
-    profile = load_json(memory_dir / "profile.json")
-    output = render_html(memory, profile)
-    (memory_dir / "overview.html").write_text(output, encoding="utf-8")
-    (memory_dir / "INDEX.md").write_text(render_index(memory, profile), encoding="utf-8")
+    memory_dir = project_memory_dir(project_root)
+    memory, _, _ = refresh_outputs(project_root)
+    write_json(memory_dir / "memory.json", memory)
     print(f"Rendered {memory_dir / 'overview.html'}")
     return 0
 

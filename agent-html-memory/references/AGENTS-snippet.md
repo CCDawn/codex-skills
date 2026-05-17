@@ -11,17 +11,20 @@ Add this block to the target repository `AGENTS.md` so every agent session treat
   - `.docs/project-memory/INDEX.md`
   - `.docs/project-memory/memory.json`
   - `.docs/project-memory/profile.json`
+  - any lane files in `.docs/project-memory/lanes/` that are relevant to the current responsibility
 
 - During development, store raw findings, partial observations, and unresolved breadcrumbs in:
   - `.docs/project-memory/inbox.json`
 
 - After completing any meaningful development task, update:
-  - `.docs/project-memory/memory.json`
+  - the current lane file in `.docs/project-memory/lanes/`
+  - `.docs/project-memory/memory.json` only for shared metadata and global recent updates
   - `.docs/project-memory/INDEX.md`
   - `.docs/project-memory/overview.html`
+  - `PROJECT_MEMORY.html` at the project root
 
 - Rebuild project memory with:
-  - `python <skill-root>/scripts/sync_project_memory.py <project-root> --focus "<current focus>" --update "<what changed>"`
+  - `python <skill-root>/scripts/sync_project_memory.py <project-root> --lane "<stable-responsibility-id>" --focus "<current focus>" --update "<what changed>"`
 
 - When active memory becomes noisy, move old resolved items into:
   - `.docs/project-memory/archive/`

@@ -1,34 +1,38 @@
 from __future__ import annotations
 
 import argparse
-import json
-from datetime import datetime, timezone
 from pathlib import Path
 
-from render_overview import load_json, render_html, render_index
-
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
-
-def write_json(path: Path, data: dict) -> None:
-    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+from memory_model import (
+    ensure_directories,
+    ensure_lane,
+    load_json,
+    load_lane,
+    save_lane,
+    slugify_lane,
+    titleize_lane,
+    utc_now,
+    write_json,
+)
+from render_overview import refresh_outputs
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Sync project memory after meaningful development work.")
     parser.add_argument("project_root", help="Path to the target project root.")
-    parser.add_argument("--focus", default=None, help="Optional current focus to store in summary.focus.")
-    parser.add_argument("--phase", default=None, help="Optional current phase to store in summary.currentPhase.")
-    parser.add_argument("--health", default=None, choices=["green", "yellow", "red"], help="Optional summary health.")
+    parser.add_argument("--lane", default=None, help="Stable lane id for the responsibility area, such as backend-auth.")
+    parser.add_argument("--lane-title", default=None, help="Optional human-readable lane title.")
+    parser.add_argument("--owner", default=None, help="Optional current session or owner label.")
+    parser.add_argument("--focus", default=None, help="Current lane focus.")
+    parser.add_argument("--phase", default=None, help="Current lane phase.")
+    parser.add_argument("--health", default=None, choices=["green", "yellow", "red"], help="Current lane health.")
     parser.add_argument("--update", default=None, help="Short recent update summary for this task.")
     parser.add_argument("--capture-title", default=None, help="Optional inbox capture title to promote.")
-    parser.add_argument("--promote-captures", action="store_true", help="Promote all inbox captures into recent updates and clear inbox.")
+    parser.add_argument("--promote-captures", action="store_true", help="Promote all inbox captures into the current lane and clear inbox.")
     return parser.parse_args()
 
 
-def promote_capture_to_update(capture: dict) -> dict:
+def promote_capture_to_update(capture: dict, lane: dict) -> dict:
     timestamp = capture.get("timestamp") or utc_now()
     title = capture.get("title") or "Promoted inbox capture"
     details = capture.get("details") or capture.get("body") or ""
@@ -36,6 +40,8 @@ def promote_capture_to_update(capture: dict) -> dict:
         "timestamp": timestamp,
         "title": title,
         "details": details,
+        "laneId": lane["id"],
+        "laneTitle": lane["title"],
     }
     for key in ("relatedModules", "relatedIssues", "relatedDecisions", "relatedFiles"):
         if capture.get(key):
@@ -43,36 +49,59 @@ def promote_capture_to_update(capture: dict) -> dict:
     return promoted
 
 
+def resolve_lane_id(args: argparse.Namespace) -> str:
+    seed = args.lane or args.focus or args.update or "general-work"
+    return slugify_lane(seed)
+
+
 def sync_memory(project_root: Path, args: argparse.Namespace) -> None:
+    ensure_directories(project_root)
     memory_dir = project_root / ".docs" / "project-memory"
     memory_path = memory_dir / "memory.json"
     profile_path = memory_dir / "profile.json"
     inbox_path = memory_dir / "inbox.json"
-    overview_path = memory_dir / "overview.html"
-    index_path = memory_dir / "INDEX.md"
 
     memory = load_json(memory_path)
     profile = load_json(profile_path)
-    inbox = load_json(inbox_path) if inbox_path.exists() else {"captures": []}
+    inbox = load_json(inbox_path, {"captures": []})
 
-    summary = memory.setdefault("summary", {})
+    lane_id = resolve_lane_id(args)
+    lane_title = args.lane_title or (titleize_lane(lane_id) if args.lane or args.focus or args.update else "General Work")
+    lane = ensure_lane(project_root, lane_id, title=lane_title, owner=args.owner, focus=args.focus)
+    if (project_root / ".docs" / "project-memory" / "lanes" / f"{lane_id}.json").exists():
+        lane = load_lane(project_root, lane_id)
+        lane = ensure_lane(project_root, lane_id, title=lane_title, owner=args.owner, focus=args.focus)
+
     now = utc_now()
-    summary["lastUpdated"] = now
+    lane["lastUpdated"] = now
+    if args.owner:
+        lane["owner"] = args.owner
     if args.focus:
-        summary["focus"] = args.focus
+        lane["focus"] = args.focus
     if args.phase:
-        summary["currentPhase"] = args.phase
+        lane["phase"] = args.phase
     if args.health:
-        summary["health"] = args.health
+        lane["health"] = args.health
 
-    recent_updates = memory.setdefault("recentUpdates", [])
+    recent_updates = lane.setdefault("recentUpdates", [])
+    global_recent = memory.setdefault("recentUpdates", [])
     if args.update:
-        recent_updates.insert(
+        lane_update = {
+            "timestamp": now,
+            "title": args.update,
+            "details": args.update,
+            "laneId": lane["id"],
+            "laneTitle": lane["title"],
+        }
+        recent_updates.insert(0, lane_update)
+        global_recent.insert(
             0,
             {
                 "timestamp": now,
                 "title": args.update,
                 "details": args.update,
+                "laneId": lane["id"],
+                "laneTitle": lane["title"],
             },
         )
 
@@ -83,14 +112,16 @@ def sync_memory(project_root: Path, args: argparse.Namespace) -> None:
             args.capture_title is not None and capture.get("title") == args.capture_title
         )
         if should_promote:
-            recent_updates.insert(0, promote_capture_to_update(capture))
+            promoted = promote_capture_to_update(capture, lane)
+            recent_updates.insert(0, promoted)
+            global_recent.insert(0, promoted)
         else:
             remaining_captures.append(capture)
 
     inbox["captures"] = remaining_captures
-
-    overview_path.write_text(render_html(memory, profile), encoding="utf-8")
-    index_path.write_text(render_index(memory, profile), encoding="utf-8")
+    save_lane(project_root, lane)
+    memory.setdefault("summary", {})
+    refresh_outputs(project_root, memory, profile)
     write_json(memory_path, memory)
     write_json(inbox_path, inbox)
 

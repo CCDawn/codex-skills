@@ -36,7 +36,7 @@ A paper-readiness skill for checking whether every important claim in a draft ca
 
 ### `agent-html-memory`
 
-A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It keeps a structured memory store, a generated HTML overview, and an index page synchronized as development moves forward.
+A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It now supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.
 
 Ask Codex to initialize project memory in natural language, or explicitly invoke the skill in chat. After initialization, the skill handles ongoing maintenance during later development sessions.
 
