@@ -1,0 +1,38 @@
+{
+  "name": "agent-html-memory-commands",
+  "version": "0.1.0",
+  "description": "Slash commands for initializing project memory in Codex and handing off ongoing maintenance to the agent-html-memory skill.",
+  "author": {
+    "name": "CCDawn"
+  },
+  "homepage": "https://github.com/CCDawn/codex-skills",
+  "repository": "https://github.com/CCDawn/codex-skills",
+  "license": "MIT",
+  "keywords": [
+    "project-memory",
+    "slash-command",
+    "codex",
+    "init"
+  ],
+  "interface": {
+    "displayName": "Project Memory Commands",
+    "shortDescription": "Slash commands for project memory setup",
+    "longDescription": "Provides a manual slash command to initialize project memory in the current project. After initialization, the installed agent-html-memory skill keeps memory synchronized during later development work.",
+    "developerName": "CCDawn",
+    "category": "Engineering",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/CCDawn/codex-skills",
+    "privacyPolicyURL": "https://github.com/CCDawn/codex-skills",
+    "termsOfServiceURL": "https://github.com/CCDawn/codex-skills",
+    "defaultPrompt": [
+      "/memory-init frontend",
+      "/memory-init backend"
+    ],
+    "brandColor": "#2F6FEB",
+    "screenshots": []
+  }
+}

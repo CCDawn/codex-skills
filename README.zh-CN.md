@@ -1,6 +1,6 @@
-# Codex Skills
+# Codex Skills Library
 
-这是一个面向 Codex 的自定义 skills 仓库，重点服务于竞赛型科研工作流。
+这是一个面向 Codex 的多-skill 仓库，重点服务于竞赛型科研工作流、实现前行为治理，以及项目记忆维护。
 
 ## 当前包含的 skill
 
@@ -37,9 +37,25 @@
 
 这是一个论文验收 skill，用来检查论文中的核心结论是否能追溯到实验、表格、图、引用或案例，避免“写出来了，但证据没跟上”。
 
+### `agent-html-memory`
+
+这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它会保留结构化记忆数据、生成 HTML 总览页，并维护一个便于人和 agent 回到上下文的索引页。
+
+这个 skill 还附带一个可选的本地 Codex plugin 命令：
+
+- `/memory-init`
+
+这个命令负责做一次性的项目记忆初始化，后续的持续维护再交还给 skill 本身。
+
 ## 仓库结构
 
 ```text
+agent-html-memory/
+  SKILL.md
+  agents/
+  bin/
+  references/
+  scripts/
 brt/
   SKILL.md
   agents/
@@ -54,11 +70,41 @@ literature-evidence-synthesis/
 paper-claim-traceability/
   SKILL.md
   EXAMPLES.md
+plugins/
+  agent-html-memory-commands/
+    .codex-plugin/
+    commands/
+scripts/
+  install_codex_library.py
 ```
 
 ## 如何安装到 Codex
 
-把对应 skill 文件夹复制到你的 Codex 全局 skills 目录：
+推荐直接一条命令安装整个技能库：
+
+```bash
+python scripts/install_codex_library.py
+```
+
+这条命令会：
+
+- 把仓库里的所有 skill 复制到 `~/.codex/skills/`
+- 把附带的本地 plugin 安装到 `~/.codex/plugins/`
+- 在有 plugin 时自动更新 `~/.agents/plugins/marketplace.json`
+
+如果只想安装部分 skill，可以这样：
+
+```bash
+python scripts/install_codex_library.py --skill brt --skill agent-html-memory
+```
+
+如果这次不想安装 plugin，可以这样：
+
+```bash
+python scripts/install_codex_library.py --skip-plugins
+```
+
+如果你更喜欢手动安装，也可以把对应 skill 文件夹复制到你的 Codex 全局 skills 目录：
 
 ```text
 ~/.codex/skills/
@@ -72,6 +118,8 @@ C:\Users\<你自己的用户名>\.codex\skills\
 
 复制完成后，重启 Codex 桌面端，让它重新加载全局 skills。
 
+如果还安装了本地 plugin，重启后还需要在 Codex 的 `Local Plugins` 里安装或启用它。
+
 ## 使用方式
 
 在 Codex 聊天里可以直接这样触发：
@@ -79,3 +127,5 @@ C:\Users\<你自己的用户名>\.codex\skills\
 - `使用 competition-research-lifecycle 帮我规划这个竞赛项目`
 - `用 literature-evidence-synthesis 把这些论文整理成文献矩阵`
 - `用 paper-claim-traceability 检查这篇论文初稿的证据链`
+- `帮我给这个仓库初始化项目记忆`
+- `/memory-init frontend`

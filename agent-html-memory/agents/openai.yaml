@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: Agent HTML Memory
+  short_description: Create and maintain a project-local HTML memory dashboard.
+  default_prompt: Create or update a project memory dashboard under .docs/project-memory and keep it synchronized with the latest development work.
