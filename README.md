@@ -1,105 +1,193 @@
-# Dawn Codex Skills Library
+# Dawn Codex Skills
 
-Custom skills for Codex, with a focus on competition-driven research workflows, behavior-gated implementation, and persistent project memory.
+A local skill library focused on competition-driven research workflows, behavior-gated implementation, and persistent project memory.
+
+The default operating model for this repo installs to one local live surface:
+
+- `~/.codex/skills/<skill-name>` for the live skill directory Codex can load at runtime
+
+An optional secondary surface is still available when you explicitly need it:
+
+- `~/.agents/skills/<skill-name>` for the local skill catalog surface used by some app setups
+
+Keep the folder name identical to the `name` field in `SKILL.md`, and validate the installed live Codex skill after updates.
 
 [中文说明](README.zh-CN.md)
 
 ## Included skills
 
-### `brt`
+### Engineering
 
-The Behavior / Review / Test workflow skill. It acts as a pre-implementation gate for turning vague behavior changes into explicit examples, review lenses, acceptance criteria, and test intentions before code changes begin.
+- **`brt`**  
+  The Behavior / Review / Test workflow skill. It acts as a pre-implementation gate for turning vague behavior changes into explicit examples, review lenses, acceptance criteria, and test intentions before code changes begin.
 
-### `competition-research-lifecycle`
+- **`dawn-agent-html-memory`**  
+  A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.
 
-An end-to-end workflow skill for research competitions and benchmark-style projects. It covers:
+- **`goal-loop`**  
+  A goal-execution skill for turning an objective into a verified contract with evidence, constraints, allowed scope, next-step rules, and stop-on-blocker reporting.
 
-- task framing
-- data preparation
-- literature and solution research
-- baseline setup
-- training and experimentation
-- analysis and ablation
-- paper writing
-- submission packaging
+### Research
 
-This skill treats `brt` as a governance layer for defining phase goals, review points, and acceptance checks.
-It now ships with a reference guide, a tighter response contract, and copy-ready phase templates.
+- **`competition-research-lifecycle`**  
+  An end-to-end workflow skill for research competitions and benchmark-style projects. It covers task framing, data preparation, literature and solution research, baseline setup, training and experimentation, analysis and ablation, paper writing, and submission packaging.
 
-### `literature-evidence-synthesis`
+  This skill treats `brt` as a governance layer for defining phase goals, review points, and acceptance checks. It ships with a reference guide, a tighter response contract, and copy-ready phase templates.
 
-A supporting research skill for turning papers, web research, experiment notes, and citations into structured evidence artifacts such as literature matrices, method comparisons, claim maps, and experiment hypotheses.
+- **`literature-evidence-synthesis`**  
+  A supporting research skill for turning papers, web research, experiment notes, and citations into structured evidence artifacts such as literature matrices, method comparisons, claim maps, and experiment hypotheses.
 
-### `paper-claim-traceability`
+- **`paper-claim-traceability`**  
+  A paper-readiness skill for checking whether every important claim in a draft can be traced to evidence such as experiments, tables, figures, citations, or qualitative examples.
 
-A paper-readiness skill for checking whether every important claim in a draft can be traced to evidence such as experiments, tables, figures, citations, or qualitative examples.
+### Competition
 
-### `agent-html-memory`
+- **`huawei-nslb-score-loop`**  
+  A project-specific score loop skill for the Huawei Algorithm Challenge 37 NSLB workspace. It coordinates isolated worker lanes, local proxy evidence, baseline promotion, package registration, and online score feedback calibration.
 
-A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It now supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.
+## Management format
 
-Ask Codex to initialize project memory in natural language, or explicitly invoke the skill in chat. After initialization, the skill handles ongoing maintenance during later development sessions.
+Published skills use one consistent shape:
+
+```text
+skills/<bucket>/<skill-name>/
+  SKILL.md
+  agents/openai.yaml        # optional but recommended for Codex slash-command metadata
+  references/               # optional supporting references, templates, ledgers, or schemas
+  scripts/                  # optional helper tools used by the skill
+```
+
+Rules:
+
+- `skill-name` must match the `name` field in `SKILL.md`.
+- Every catalog change should update this README, `README.zh-CN.md`, the bucket README, and `.claude-plugin/plugin.json`.
+- Install into `~/.codex/skills/<skill-name>` as real copied directories by running `python scripts/install_codex_library.py`.
+- Avoid installing the same skill into both `~/.codex/skills` and `~/.agents/skills` unless duplicate slash-command entries are intentional.
 
 ## Structure
 
 ```text
-agent-html-memory/
-  SKILL.md
-  agents/
-  bin/
-  references/
-  scripts/
-brt/
-  SKILL.md
-  agents/
-  references/
-competition-research-lifecycle/
-  SKILL.md
-  REFERENCE.md
-  EXAMPLES.md
-  TEMPLATES.md
-literature-evidence-synthesis/
-  SKILL.md
-  EXAMPLES.md
-paper-claim-traceability/
-  SKILL.md
-  EXAMPLES.md
+.claude-plugin/
+  plugin.json
+AGENTS.md
+CLAUDE.md
+skills/
+  competition/
+    README.md
+    huawei-nslb-score-loop/
+  engineering/
+    README.md
+    dawn-agent-html-memory/
+    brt/
+    goal-loop/
+  research/
+    README.md
+    competition-research-lifecycle/
+    literature-evidence-synthesis/
+    paper-claim-traceability/
 scripts/
   install_codex_library.py
 ```
 
-## Install in Codex
+## Quickstart
 
-Install the whole library with one command:
+Install the skills into the default local Codex surface as real folders:
 
 ```bash
 python scripts/install_codex_library.py
 ```
 
-That command:
+That is the default, recommended workflow for this repo. It copies every published skill into:
 
-- copies every skill in this repository into `~/.codex/skills/`
-- removes any legacy plugins that this repository used to ship
+```text
+~/.codex/skills/<skill-name>
+```
+
+The install script also enforces that:
+
+- the skill folder name matches the `name` field in `SKILL.md`
+- installed Codex skills are copied as real directories, not symlinks or junctions
+- installed live skills are validated when the local Codex `quick_validate.py` helper is available
+
+Installing the same skill into both `.codex/skills` and `.agents/skills` can create duplicate slash-command entries in Codex. Only use the `.agents` target when you explicitly need that extra catalog copy.
 
 Install only selected skills:
 
 ```bash
-python scripts/install_codex_library.py --skill brt --skill agent-html-memory
+python scripts/install_codex_library.py --skill brt --skill dawn-agent-html-memory
 ```
 
-If you prefer manual installation, copy the skill folders into your Codex skills directory:
+Install only to the live Codex directory:
+
+```bash
+python scripts/install_codex_library.py --agent codex
+```
+
+Install only to the local slash-command catalog directory:
+
+```bash
+python scripts/install_codex_library.py --agent agents
+```
+
+Install to Claude's global skill folder only when you explicitly need it:
+
+```bash
+python scripts/install_codex_library.py --agent claude
+```
+
+Install to Codex, `.agents`, and Claude:
+
+```bash
+python scripts/install_codex_library.py --agent all
+```
+
+Install to both Codex and `.agents` only when you explicitly want both copies:
+
+```bash
+python scripts/install_codex_library.py --agent codex-agents
+```
+
+## Slash-command troubleshooting
+
+If a slash-command entry is missing or duplicated, use this checklist before changing prompts or folder names:
+
+1. Inspect the installed live copy in `~/.codex/skills/<skill-name>`, not just the repo copy.
+2. Check whether an extra `~/.agents/skills/<skill-name>` copy exists. Keeping both copies can create duplicate slash-command entries.
+3. Check `agents/openai.yaml` in the live installed copy and keep it aligned with the minimal `interface:` pattern already used by working skills in this repo.
+4. If this repository is the active trusted workspace, also check `.claude-plugin/plugin.json`, because the repo-local manifest can affect visible entries.
+5. Restart Codex and verify from a fresh thread before concluding that a metadata change did not load.
+
+## Optional dev shortcut
+
+For temporary local development only, you can still link the skills into `~/.claude/skills`:
+
+On macOS/Linux:
+
+```bash
+bash scripts/link-skills.sh
+```
+
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\link-skills.ps1
+```
+
+Do not treat the link flow as the formal publish/install path for this repository.
+
+The repo metadata index lives at:
 
 ```text
-~/.codex/skills/
+.claude-plugin/plugin.json
 ```
 
-On Windows, that is typically:
+The skills themselves live under:
 
 ```text
-C:\Users\<you>\.codex\skills\
+skills/
 ```
 
-After copying, restart Codex so it reloads global skills.
+After installing or updating a live skill, restart the client so it reloads local skills.
 
 ## Development
 
@@ -112,8 +200,11 @@ Invoke the skills in chat with prompts such as:
 
 - `Use competition-research-lifecycle to plan this benchmark project`
 - `Help me run this competition through a full research lifecycle`
-- `We need a competition workflow covering data, experiments, and paper writing`
 - `Use literature-evidence-synthesis to turn these papers into a literature matrix`
 - `Use paper-claim-traceability to review this draft before submission`
+- `Use goal-loop to turn this objective into a verified execution contract`
+- `Use huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
 - `Initialize project memory for this repo`
-- `Use agent-html-memory to initialize project memory for this repo as a frontend project`
+- `Use dawn-agent-html-memory to initialize project memory for this repo as a frontend project`
+
+This repository is intentionally shaped like a local skill repo, not a marketplace-installed plugin.

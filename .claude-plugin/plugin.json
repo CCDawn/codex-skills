@@ -1,0 +1,12 @@
+{
+  "name": "dawn-codex-skills",
+  "skills": [
+    "./skills/competition/huawei-nslb-score-loop",
+    "./skills/engineering/dawn-agent-html-memory",
+    "./skills/engineering/brt",
+    "./skills/engineering/goal-loop",
+    "./skills/research/competition-research-lifecycle",
+    "./skills/research/literature-evidence-synthesis",
+    "./skills/research/paper-claim-traceability"
+  ]
+}

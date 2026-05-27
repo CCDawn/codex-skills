@@ -1,0 +1,4 @@
+interface:
+  display_name: "BRT"
+  short_description: "意图发现、行为、评审、测试的实现前闸门。"
+  default_prompt: "使用 BRT：先从用户原话推断并确认真实意图，再锁定行为、确认评审视角，并把场景映射到测试和实现检查点。"

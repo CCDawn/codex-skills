@@ -1,5 +1,0 @@
-version: 1
-interface:
-  display_name: Agent HTML Memory
-  short_description: Create and maintain a shared lane-based HTML memory dashboard for a project.
-  default_prompt: Create or update a project memory dashboard under .docs/project-memory, keep per-responsibility lane files synchronized, and refresh the root PROJECT_MEMORY.html shortcut.

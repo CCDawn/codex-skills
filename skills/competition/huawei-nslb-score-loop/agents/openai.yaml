@@ -1,0 +1,4 @@
+interface:
+  display_name: "Huawei NSLB Score Loop"
+  short_description: "Huawei NSLB scoring loop and autonomous epoch router."
+  default_prompt: "Use $huawei-nslb-score-loop to run doctor/drift checks, initialize online-offline weights, prepare or run an autonomous epoch, gate child-agent results, rank candidates, and record online score calibration for the active Huawei NSLB baseline."

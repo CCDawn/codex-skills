@@ -1,4 +1,0 @@
-interface:
-  display_name: "BRT"
-  short_description: "Behavior, review, then test."
-  default_prompt: "Use BRT: define the behavior, recommend and confirm review perspectives, then map the reviewed scenarios to tests."

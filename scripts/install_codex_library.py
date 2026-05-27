@@ -1,33 +1,85 @@
 import argparse
 import shutil
+import subprocess
+import sys
 from pathlib import Path
-
-LEGACY_PLUGIN_NAMES = {
-    "agent-html-memory-commands",
-    "dawn-commands",
-}
 
 
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.exists():
         shutil.rmtree(dst)
-    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".git"))
+
+
+def read_skill_name(skill_dir: Path) -> str:
+    skill_md = skill_dir / "SKILL.md"
+    lines = skill_md.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].strip() != "---":
+        raise SystemExit(f"{skill_md} is missing YAML frontmatter.")
+
+    for line in lines[1:]:
+        stripped = line.strip()
+        if stripped == "---":
+            break
+        if stripped.startswith("name:"):
+            return stripped.split(":", 1)[1].strip().strip("'\"")
+
+    raise SystemExit(f"{skill_md} is missing a frontmatter name field.")
 
 
 def discover_skills(repo_root: Path) -> list[Path]:
     skills = []
-    for child in repo_root.iterdir():
-        if child.is_dir() and (child / "SKILL.md").exists():
-            skills.append(child)
+    skill_root = repo_root / "skills"
+    for path in skill_root.rglob("SKILL.md"):
+        skill_dir = path.parent
+        skill_name = read_skill_name(skill_dir)
+        if skill_name != skill_dir.name:
+            raise SystemExit(
+                f"Skill folder name '{skill_dir.name}' must match frontmatter name '{skill_name}' in {path}."
+            )
+        skills.append(skill_dir)
     return sorted(skills, key=lambda path: path.name)
 
 
+def destination_roots(home: Path, agent: str) -> list[Path]:
+    roots = []
+    if agent in {"claude", "all"}:
+        roots.append(home / ".claude" / "skills")
+    if agent in {"codex", "codex-agents", "all"}:
+        roots.append(home / ".codex" / "skills")
+    if agent in {"agents", "codex-agents", "all"}:
+        roots.append(home / ".agents" / "skills")
+    return roots
+
+
+def codex_validator_path(home: Path) -> Path:
+    return home / ".codex" / "skills" / ".system" / "skill-creator" / "scripts" / "quick_validate.py"
+
+
+def validate_installed_codex_skills(home: Path, installed_skills: list[Path]) -> list[Path]:
+    validator = codex_validator_path(home)
+    if not validator.exists():
+        return []
+
+    validated = []
+    for skill_path in installed_skills:
+        subprocess.run([sys.executable, str(validator), str(skill_path)], check=True)
+        validated.append(skill_path)
+    return validated
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Install this Codex multi-skill library into the current user's Codex directories.")
+    parser = argparse.ArgumentParser(description="Install this local skill library into local Codex, optional .agents, and Claude skill directories.")
     parser.add_argument(
         "--home",
         default=str(Path.home()),
-        help="Home directory containing .codex and .agents (default: current user home).",
+        help="Home directory containing .claude, .codex, and optional .agents (default: current user home).",
+    )
+    parser.add_argument(
+        "--agent",
+        choices=["claude", "codex", "agents", "codex-agents", "all"],
+        default="codex",
+        help="Which local skill directories to populate (default: codex). Use codex-agents only when you explicitly need both copies.",
     )
     parser.add_argument(
         "--skill",
@@ -50,37 +102,32 @@ def main() -> int:
     if unknown:
         raise SystemExit(f"Unknown skill(s): {', '.join(unknown)}")
 
-    selected_skills = [path for path in available_skills if path.name in selected_skill_names]
-    skill_dest_root = home / ".codex" / "skills"
-    skill_dest_root.mkdir(parents=True, exist_ok=True)
-
+    roots = destination_roots(home, args.agent)
     installed_skills = []
-    for skill_path in selected_skills:
-        destination = skill_dest_root / skill_path.name
-        copy_tree(skill_path, destination)
-        installed_skills.append(destination)
+    installed_codex_skills = []
+    for root in roots:
+        root.mkdir(parents=True, exist_ok=True)
+        for skill_path in available_skills:
+            if skill_path.name not in selected_skill_names:
+                continue
+            destination = root / skill_path.name
+            copy_tree(skill_path, destination)
+            installed_skills.append(destination)
+            if root == home / ".codex" / "skills":
+                installed_codex_skills.append(destination)
 
-    plugin_dest_root = home / ".codex" / "plugins"
-    marketplace_path = home / ".agents" / "plugins" / "marketplace.json"
-    for legacy_name in sorted(LEGACY_PLUGIN_NAMES):
-        legacy_path = plugin_dest_root / legacy_name
-        if legacy_path.exists():
-            shutil.rmtree(legacy_path)
+    validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
 
-    if marketplace_path.exists():
-        import json
-
-        marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
-        plugins = marketplace.get("plugins", [])
-        marketplace["plugins"] = [plugin for plugin in plugins if plugin.get("name") not in LEGACY_PLUGIN_NAMES]
-        marketplace_path.write_text(json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
-    print("Installed Codex skills:")
+    print("Installed skills:")
     for path in installed_skills:
         print(f"  {path}")
-    print("Removed legacy plugin installs from this repository when present.")
-
-    print("Restart Codex so it reloads the updated skill and plugin library.")
+    if validated_codex_skills:
+        print("Validated live Codex skills:")
+        for path in validated_codex_skills:
+            print(f"  {path}")
+    elif installed_codex_skills:
+        print("Codex validator not found; skipped live validation.")
+    print("Restart the client so it reloads the updated local skills.")
     return 0
 
 
