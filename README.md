@@ -34,12 +34,6 @@ Keep the folder name identical to the `name` field in `SKILL.md`, and validate t
 
   This skill treats `brt` as a governance layer for defining phase goals, review points, and acceptance checks. It ships with a reference guide, a tighter response contract, and copy-ready phase templates.
 
-- **`literature-evidence-synthesis`**  
-  A supporting research skill for turning papers, web research, experiment notes, and citations into structured evidence artifacts such as literature matrices, method comparisons, claim maps, and experiment hypotheses.
-
-- **`paper-claim-traceability`**  
-  A paper-readiness skill for checking whether every important claim in a draft can be traced to evidence such as experiments, tables, figures, citations, or qualitative examples.
-
 ### Competition
 
 - **`huawei-nslb-score-loop`**  
@@ -91,8 +85,6 @@ skills/
   research/
     README.md
     competition-research-lifecycle/
-    literature-evidence-synthesis/
-    paper-claim-traceability/
 scripts/
   install_codex_library.py
 ```
@@ -208,8 +200,6 @@ Invoke the skills in chat with prompts such as:
 
 - `Use competition-research-lifecycle to plan this benchmark project`
 - `Help me run this competition through a full research lifecycle`
-- `Use literature-evidence-synthesis to turn these papers into a literature matrix`
-- `Use paper-claim-traceability to review this draft before submission`
 - `Use goal-loop to turn this objective into a verified execution contract`
 - `Use huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
 - `Use creative-toolbox to generate new concept cards from this context`

@@ -32,12 +32,6 @@
 
   它把 `brt` 视为流程治理层，用来定义每个阶段的目标、评审点和验收标准，同时附带参考指南、更紧的响应契约，以及可直接复用的阶段模板。
 
-- **`literature-evidence-synthesis`**  
-  这是一个辅助研究 skill，用来把论文、网页研究、实验笔记和引用整理成结构化证据工件，比如文献矩阵、方法对比、claim map 和实验假设。
-
-- **`paper-claim-traceability`**  
-  这是一个论文就绪性检查 skill，用来审查草稿中的重要论断能否追溯到实验、表格、图、引用或定性例子。
-
 ### Competition
 
 - **`huawei-nslb-score-loop`**  
@@ -89,8 +83,6 @@ skills/
   research/
     README.md
     competition-research-lifecycle/
-    literature-evidence-synthesis/
-    paper-claim-traceability/
 scripts/
   install_codex_library.py
 ```
@@ -200,8 +192,6 @@ skills/
 在 Codex 聊天里可以直接这样触发：
 
 - `使用 competition-research-lifecycle 帮我规划这个竞赛项目`
-- `用 literature-evidence-synthesis 把这些论文整理成文献矩阵`
-- `用 paper-claim-traceability 检查这篇论文初稿的证据链`
 - `用 goal-loop 把这个目标整理成可验证的执行合同`
 - `用 huawei-nslb-score-loop 准备 NSLB epoch 并 gate child results`
 - `用 creative-toolbox 基于当前上下文生成新概念卡`

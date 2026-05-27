@@ -1,4 +1,0 @@
-interface:
-  display_name: "Paper Claim Traceability"
-  short_description: "检查论文 claim 是否有证据支撑"
-  default_prompt: "Use $paper-claim-traceability to audit whether claims in a paper, report, or competition writeup are supported by experiments, tables, figures, citations, or qualitative evidence; report unsupported, overstated, or weakly traced claims."
