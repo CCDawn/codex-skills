@@ -43,6 +43,11 @@
 - **`huawei-nslb-score-loop`**  
   这是一个面向 Huawei Algorithm Challenge 37 NSLB 项目的专用 score loop skill，用来协调隔离 worker lane、本地 proxy evidence、baseline promotion、打包登记，以及 online score feedback 校准。
 
+### Creative
+
+- **`creative-toolbox`**  
+  这是一个上下文创意生成 skill，用来做 concept collision、divergent thinking、Naming Forge、新概念生成、范式探索、产品想法、研究概念和非常规但有用的方向生成。
+
 ## 统一管理格式
 
 已发布 skill 统一使用这个目录形状：
@@ -73,6 +78,9 @@ skills/
   competition/
     README.md
     huawei-nslb-score-loop/
+  creative/
+    README.md
+    creative-toolbox/
   engineering/
     README.md
     dawn-agent-html-memory/
@@ -196,6 +204,7 @@ skills/
 - `用 paper-claim-traceability 检查这篇论文初稿的证据链`
 - `用 goal-loop 把这个目标整理成可验证的执行合同`
 - `用 huawei-nslb-score-loop 准备 NSLB epoch 并 gate child results`
+- `用 creative-toolbox 基于当前上下文生成新概念卡`
 - `帮我给这个仓库初始化项目记忆`
 - `使用 dawn-agent-html-memory 把这个仓库按 frontend 项目初始化项目记忆`
 

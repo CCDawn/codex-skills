@@ -2,6 +2,7 @@
   "name": "dawn-codex-skills",
   "skills": [
     "./skills/competition/huawei-nslb-score-loop",
+    "./skills/creative/creative-toolbox",
     "./skills/engineering/dawn-agent-html-memory",
     "./skills/engineering/brt",
     "./skills/engineering/goal-loop",

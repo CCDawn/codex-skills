@@ -45,6 +45,11 @@ Keep the folder name identical to the `name` field in `SKILL.md`, and validate t
 - **`huawei-nslb-score-loop`**  
   A project-specific score loop skill for the Huawei Algorithm Challenge 37 NSLB workspace. It coordinates isolated worker lanes, local proxy evidence, baseline promotion, package registration, and online score feedback calibration.
 
+### Creative
+
+- **`creative-toolbox`**  
+  A context-aware creative ideation skill for concept collision, divergent thinking, naming, paradigm exploration, unusual alternatives, product ideas, research concepts, and surprising but useful options.
+
 ## Management format
 
 Published skills use one consistent shape:
@@ -75,6 +80,9 @@ skills/
   competition/
     README.md
     huawei-nslb-score-loop/
+  creative/
+    README.md
+    creative-toolbox/
   engineering/
     README.md
     dawn-agent-html-memory/
@@ -204,6 +212,7 @@ Invoke the skills in chat with prompts such as:
 - `Use paper-claim-traceability to review this draft before submission`
 - `Use goal-loop to turn this objective into a verified execution contract`
 - `Use huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
+- `Use creative-toolbox to generate new concept cards from this context`
 - `Initialize project memory for this repo`
 - `Use dawn-agent-html-memory to initialize project memory for this repo as a frontend project`
 
