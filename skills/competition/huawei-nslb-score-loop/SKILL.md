@@ -94,28 +94,25 @@ Do not convert soft constraints into hidden hard gates. Missing dataset lanes, w
 
 ## Attack Thesis Loop
 
-When recent epochs produce no promotion path, do not let the loop end at "missing witness" prose. Turn the missing evidence into the next executable attack thesis.
+When recent epochs produce no promotion path, do not let the loop end at "missing witness" prose. Turn the missing evidence into the next executable attack thesis, or pivot the thesis when the same missing-evidence track has already been spent.
 
-Default stagnation thesis:
+Attack thesis is dynamic. It should be inferred from the selected portfolio, not forced into the baseline-044 residual envelope. Valid thesis families include:
 
-```text
-residual-envelope counterfactual attack
-```
+- counterfactual evidence portfolio: same-case scorer movement or bounded empty-search proof.
+- architecture breakout portfolio: new solver subsystem, search-policy, local repair pipeline, scorer surrogate, or moonshot basin probe.
+- online-confirmed exact-neighbor exploit portfolio: one proven online-positive mechanism, one exact neighboring shape, forensic-before-patch.
+- validation repair portfolio: dataset/proxy/negative-control calibration after online/local disagreement.
+- hidden-objective reframe portfolio: objective model, upload-budget decision, or dataset-candidate decision after second-order stagnation.
+- mechanism divergence portfolio: several independent causal mechanisms under the same execution harness.
 
-Goal:
-
-- Find exact same-case scorer-moving counterfactuals inside the online-positive baseline-044 residual envelope.
-- Keep one bounded high-risk architecture or mutation sidecar alive when source/workspace safety is clean.
-- Use support lanes only if they feed the same proof: case generation, component-delta tracing, neutral-inversion, or synergy tests.
-
-The main witness lane should be `diverge_residual_envelope-counterfactual_census` or an equivalent non-template lane. It must output one of:
+If the current thesis is counterfactual evidence, the witness lane may output one of:
 
 - `counterfactualWitnesses`: records with `caseId`, `flowId`, `baselinePort`, `alternativePort`, component deltas for `phase_inner`, `phase_between`, `job_between`, `max_single`, `max_global`, `scoreDelta`, and legality/runtime notes.
 - `witnessSearchSummary`: bounded empty-search proof with searched case, flow count, alternative count, and the component reason every alternative failed.
 
-The risk sidecar may be an R2/R3 architecture or scorer-moving mutation. It does not have to wait for the witness lane if it is isolated, reversible, compile-checked, and first-kill scored. This sidecar exists to preserve creative pressure; the witness lane exists to make future edits less blind.
+The risk sidecar may be an R2/R3 architecture, scorer-moving mutation, or any bounded free edit lane. It does not have to wait for the witness lane if it is isolated, reversible, compile-checked, first-kill scored, and records a reusable lesson.
 
-Do not run another epoch whose only new result is "we still need exact comparator evidence." Either produce the witness artifact, prove the searched space is empty, or pivot the attack thesis.
+Do not run another epoch whose only new result is "we still need exact comparator evidence." Either produce the witness artifact, prove the searched space is empty, or demote witness to support and pivot toward architecture, objective-reframe, search-policy, or validation-repair lanes.
 
 ## Grandmaster Validation Doctrine
 
@@ -226,7 +223,7 @@ status:
   Run `score_loop_tools.py status`, then summarize baseline id, source hash match, online-best state, and warnings.
 
 idea-board:
-  Run `score_loop_tools.py idea-board`. Generate ideas in two stages: first a freeform non-template divergent pool, then an evidence-based convergence review that selects dispatchable lanes and writes `attackThesis`. The board should include project memory, successful/failed ledger lessons, online/offline weights, dataset-evolution candidates, frozen patterns, recent online feedback, `divergentPool`, per-idea quality scores, evidence anchors, `convergenceReview`, `attackThesis`, `attackDoctrine`, `validationDoctrine`, stagnationMode, and a portfolio qualityGate. Do not treat stock lanes such as generic risk gatekeeper, generic controlled-risk mutation, generic dataset candidate, or generic architecture breakout as the idea step itself; they are harness or fallback lanes. Freeform share, role coverage, dataset coverage, and portfolio shape are soft goals. QualityGate is a harness check: hard failures are only missing lane ownership, workspace/hash safety, stop conditions, or recoverable child-result boundaries. Use `--write` when the board will guide a real epoch. Dataset-evolution lanes are recommended when feedback is neutral/down, but they are not allowed to block a strong exploit, architecture, or controlled-risk lane by themselves. If recent epochs are safe but stagnant, selected lanes should include a counterfactual witness main track plus one bounded risk/architecture/044-style sidecar when safe, but the witness lane cannot veto the sidecar. Use `--force-stagnation` for validation or an explicit strategic reset. Use `--prefer-044-mode` when the coordinator wants the baseline-044 playbook to be prioritized, not made exclusive. Use `--template-only` only for regression testing the old behavior.
+  Run `score_loop_tools.py idea-board`. Generate ideas in two stages: first a freeform non-template divergent pool, then an evidence-based convergence review that selects dispatchable lanes and writes a dynamic `attackThesis`. The board should include project memory, successful/failed ledger lessons, online/offline weights, dataset-evolution candidates, frozen patterns, recent online feedback, `divergentPool`, per-idea quality scores, evidence anchors, `convergenceReview`, `attackThesis`, `attackDoctrine`, `validationDoctrine`, stagnationMode, and a portfolio qualityGate. Do not treat stock lanes such as generic risk gatekeeper, generic controlled-risk mutation, generic dataset candidate, or generic architecture breakout as the idea step itself; they are harness or fallback lanes. Freeform share, role coverage, dataset coverage, and portfolio shape are soft goals. QualityGate is a harness check: hard failures are only missing lane ownership, workspace/hash safety, stop conditions, or recoverable child-result boundaries. Use `--write` when the board will guide a real epoch. Dataset-evolution lanes are recommended when feedback is neutral/down, but they are not allowed to block a strong exploit, architecture, controlled-risk, or bounded free edit lane by themselves. If recent epochs are safe but stagnant, selected lanes should preserve mutation pressure through at least one bounded risk/architecture/044-style/free-edit lane when safe. If counterfactual witness work has already saturated, witness lanes should become support or pivot evidence instead of the default main thesis. Use `--force-stagnation` for validation or an explicit strategic reset. Use `--prefer-044-mode` when the coordinator wants the baseline-044 playbook to be prioritized, not made exclusive. Use `--template-only` only for regression testing the old behavior.
 
 prepare-epoch [run-id]:
   Run `status` first. If clean, run `prepare-epoch` with the optional run id. If an expert idea board exists, use `--idea-board <docs/idea-boards/*.json>`; otherwise the epoch falls back to mutation-space lanes. Report manifest path, lane count, qualityGate state, phase split, workspace paths, worker_context.json paths, harnessWarnings, and which prompts are eligible for dispatch. Expert epochs are invalid only for hard harness failures: missing lane ownership/workspace/hash, missing smallestDecisiveTest/killCondition, missing recoverable child_result contract, or stale baseline mismatch. Advisory warnings should be shown to the coordinator but must not suppress bold lanes by themselves.
@@ -470,8 +467,8 @@ Generated expert worker prompts must contain:
 - `Kill condition`
 - `Idea quality score`
 - `Evidence anchors`
-- durable `mustRead` / `mustUse` context
-- evidence requirements for successful lesson, failed/frozen lesson, and online feedback explained
+- compact worker context plus durable references to read only if compact context is insufficient
+- evidence expectations for successful lesson, failed/frozen lesson, and online feedback when available
 
 If any of these are missing, do not launch workers. Regenerate the epoch from the idea board.
 
@@ -480,8 +477,8 @@ Idea-board quality gate:
 - Every idea gets a deterministic `qualityScore` based on required fields, novelty, duplicate risk, online/offline weights, recent online feedback, artifact clarity, and whether it is cheap diagnostic evidence or a bounded patch candidate.
 - `selectedLanes` is a portfolio, not the first N ideas. It should preserve useful tension across online evidence, proxy/data thinking, score-moving mechanisms, and execution risk. It does not need every category in every epoch if that would suppress a strong exploit or architecture lane.
 - `prepare-epoch --idea-board` should reject only boards that lack harness integrity: missing stop conditions, missing smallest decisive tests, no recoverable worker ownership, or no evidence boundary. Do not reject a board merely because it lacks a dataset lane, has more than one exploit lane, or contains risky architecture.
-- A selected lane with quality below the minimum threshold is proposal-only until the coordinator strengthens its smallest decisive test or evidence anchors.
-- The board must write `evidenceAnchors.successfulLesson`, `evidenceAnchors.failedOrFrozenLesson`, and `evidenceAnchors.onlineFeedbackRecord` so workers cite concrete memory instead of vague history.
+- Idea quality is a ranking hint, not an execution gate. Only missing hypothesis, smallest decisive test, kill condition, owner/workspace/hash, or child-result boundary should block dispatch.
+- The board should write `evidenceAnchors.successfulLesson`, `evidenceAnchors.failedOrFrozenLesson`, and `evidenceAnchors.onlineFeedbackRecord` from compact context when available. Missing anchors reduce confidence but do not block bounded exploration.
 - Treat qualityGate as advisory except for hard harness failures. Low portfolio quality should add `harnessWarnings`, reduce rank confidence, or cause the coordinator to add a balancing lane; it should not freeze search when the user asks for risk or when a 044-style exploit/architecture lane is ready.
 
 ### Stagnation Mode
@@ -500,18 +497,19 @@ When `idea-board` sets `stagnationMode.active=true`:
 - A dataset-evolution worker that claims dataset progress must include `datasetCandidate` with `candidateId`, `sourceOnlineFeedback`, `caseFamily`, `caseShape`, `hypothesis`, `explainsPositive`, `rejectsNeutralOrNegative`, artifact/generated-case evidence, and `promotionGateImpact`. If it cannot, close as diagnostic without blocking other lanes.
 - If two consecutive stagnation-mode epochs still produce no auditable new artifact and no candidate worth parent review, `stagnationMode.escapeLevel` should become `2`; the next board should include an objective-reframe or online-submission revalidation escape lane instead of widening patch size.
 - If two consecutive stagnation-mode epochs produce artifacts but no parent-gate path and `dataset-status` shows validated backlog, this is also second-order stagnation. Prefer a dataset decision lane to promote, freeze, reject, or merge validated clusters, but do not let backlog block an unrelated strong exploit or architecture lane.
+- If two consecutive stagnant epochs have already spent counterfactual/witness lanes without a parent-gate path, set `witnessSaturated=true`: demote witness lanes to support unless they name a changed target, and raise architecture, search-policy, objective-reframe, online-confirmed exploit, or bounded free edit pressure.
 
 ### Controlled Risk Mode
 
 When `stagnationMode.active=true`, the default posture changes from safety-first to controlled-risk-first.
 
-- Each broad stagnation epoch should include one `controlledRiskLane` unless an architecture or 044-style exploit lane already provides mutation pressure: a tiny scorer-moving mutation in `src/Solution.cpp`, one mechanism only, compile once, exactly one first-kill scorer suite unless compilation fails, no package, no ledger write, no promotion without the parent gate.
-- The controlled-risk lane may co-dispatch with Phase A diagnostics. It does not need Phase A to prove a target first; the purpose is to create mutation pressure when diagnosis is stale.
+- Each broad stagnation epoch should preserve mutation pressure through at least one bounded edit lane unless source/workspace/runtime safety is genuinely broken. This may be `controlledRiskLane`, architecture, 044-style exploit, or another freeform edit lane with a workspace, baseline hash, smallest decisive test, kill condition, and child-result contract.
+- Bounded edit lanes may co-dispatch with Phase A diagnostics. They do not need Phase A to prove a target first; the purpose is to create mutation pressure when diagnosis is stale.
 - Risk/Runtime Gatekeeper may narrow the risk lane's blast radius, but it may not block every mutation lane unless active baseline hash/source safety is broken.
-- If Phase A artifacts are flat across known baselines, the gatekeeper may cancel duplicate/stale edit lanes, but it must leave either one output-moving discriminator-search lane or one bounded controlled-risk/architecture lane alive. Cancelling all edit pressure is allowed only with a recorded source-safety, runtime-safety, or explicit online-budget blocker.
+- If Phase A artifacts are flat across known baselines, the gatekeeper may cancel duplicate/stale edit lanes, but it must leave either one output-moving discriminator-search lane or one bounded edit/architecture lane alive. Cancelling all edit pressure is allowed only with a recorded source-safety, runtime-safety, or explicit online-budget blocker.
 - A negative controlled-risk result is acceptable if it contains `mutationAttempted=true`, `attemptedDiffSummary`, `checksRun`, parsed first-kill score/delta, and an `avoidNextTime` lesson.
 - If the first-kill suite is flat/worse, the worker should revert the workspace patch and still record the attempted mutation. Reverted negative attempts are useful evidence; silent non-attempts are invalid.
-- At most one controlled-risk mutation lane should run at a time. The coordinator still applies at most one candidate to the main workspace after collection.
+- The number of concurrent risky lanes is a coordinator budget choice, not a fixed cap. Multiple independent bounded risky lanes may run in isolated workspaces if worker slots, runtime, and duplicate control are clean. The coordinator still applies at most one candidate to the main workspace after collection.
 
 The intent is to trade cheap local failures for search gradient. Do not let process compliance replace scorer movement.
 

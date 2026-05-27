@@ -1,0 +1,4 @@
+interface:
+  display_name: "Literature Evidence Synthesis"
+  short_description: "整理文献、实验笔记和引用证据"
+  default_prompt: "Use $literature-evidence-synthesis to turn papers, web research, experiment notes, and citations into structured evidence artifacts such as literature matrices, method comparisons, evidence maps, related-work outlines, and experiment hypotheses."
