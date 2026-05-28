@@ -1,0 +1,5 @@
+interface:
+  display_name: "CCDawn Competition Research Lifecycle"
+  short_description: "竞赛科研项目的阶段推进、证据账本与提交闭环"
+  default_prompt: "Use $ccdawn-competition-research-lifecycle to diagnose the current research competition phase, identify the active evidence, choose the next gated action, and report whether to advance, iterate, recover, or stop."
+

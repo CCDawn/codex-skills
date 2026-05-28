@@ -1,11 +1,11 @@
 {
-  "name": "dawn-codex-skills",
-  "skills": [
-    "./skills/competition/huawei-nslb-score-loop",
-    "./skills/creative/creative-toolbox",
-    "./skills/engineering/dawn-agent-html-memory",
-    "./skills/engineering/brt",
-    "./skills/engineering/goal-loop",
-    "./skills/research/competition-research-lifecycle"
-  ]
+    "skills":  [
+                   "./skills/competition/ccdawn-huawei-nslb-score-loop",
+                   "./skills/creative/ccdawn-creative-toolbox",
+                   "./skills/engineering/ccdawn-dawn-agent-html-memory",
+                   "./skills/engineering/ccdawn-brt",
+                   "./skills/engineering/ccdawn-goal-loop",
+                   "./skills/research/ccdawn-competition-research-lifecycle"
+               ],
+    "name":  "dawn-codex-skills"
 }

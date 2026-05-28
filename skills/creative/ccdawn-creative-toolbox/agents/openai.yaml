@@ -1,0 +1,5 @@
+interface:
+  display_name: "CCDawn Creative Toolbox"
+  short_description: "上下文概念碰撞与新概念生成"
+  default_prompt: "Use $ccdawn-creative-toolbox to extract context atoms, tensions, evidence gaps, and unnamed needs, then combine creative operators such as Context Collision and Naming Forge to generate 3-7 new concept cards."
+

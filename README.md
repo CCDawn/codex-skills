@@ -4,13 +4,13 @@ A local skill library focused on competition-driven research workflows, behavior
 
 The default operating model for this repo installs to one local live surface:
 
-- `~/.codex/skills/<skill-name>` for the live skill directory Codex can load at runtime
+- `~/.codex/skills/<ccdawn-skill-name>` for the live skill directory Codex can load at runtime
 
 An optional secondary surface is still available when you explicitly need it:
 
-- `~/.agents/skills/<skill-name>` for the local skill catalog surface used by some app setups
+- `~/.agents/skills/<ccdawn-skill-name>` for the local skill catalog surface used by some app setups
 
-Keep the folder name identical to the `name` field in `SKILL.md`, and validate the installed live Codex skill after updates.
+Keep the folder name identical to the `name` field, using the `ccdawn-` namespace in `SKILL.md`, and validate the installed live Codex skill after updates.
 
 [中文说明](README.zh-CN.md)
 
@@ -18,30 +18,30 @@ Keep the folder name identical to the `name` field in `SKILL.md`, and validate t
 
 ### Engineering
 
-- **`brt`**  
+- **`ccdawn-brt`**  
   The Behavior / Review / Test workflow skill. It acts as a pre-implementation gate for turning vague behavior changes into explicit examples, review lenses, acceptance criteria, and test intentions before code changes begin.
 
-- **`dawn-agent-html-memory`**  
+- **`ccdawn-dawn-agent-html-memory`**  
   A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.
 
-- **`goal-loop`**  
+- **`ccdawn-goal-loop`**  
   A goal-execution skill for turning an objective into a verified contract with evidence, constraints, allowed scope, next-step rules, and stop-on-blocker reporting.
 
 ### Research
 
-- **`competition-research-lifecycle`**  
+- **`ccdawn-competition-research-lifecycle`**  
   An end-to-end workflow skill for research competitions and benchmark-style projects. It covers task framing, data preparation, literature and solution research, baseline setup, training and experimentation, analysis and ablation, paper writing, and submission packaging.
 
-  This skill treats `brt` as a governance layer for defining phase goals, review points, and acceptance checks. It ships with a reference guide, a tighter response contract, and copy-ready phase templates.
+  This skill treats `ccdawn-brt` as a governance layer for defining phase goals, review points, and acceptance checks. It ships with a reference guide, a tighter response contract, and copy-ready phase templates.
 
 ### Competition
 
-- **`huawei-nslb-score-loop`**  
+- **`ccdawn-huawei-nslb-score-loop`**  
   A project-specific score loop skill for the Huawei Algorithm Challenge 37 NSLB workspace. It coordinates isolated worker lanes, local proxy evidence, baseline promotion, package registration, and online score feedback calibration.
 
 ### Creative
 
-- **`creative-toolbox`**  
+- **`ccdawn-creative-toolbox`**  
   A context-aware creative ideation skill for concept collision, divergent thinking, naming, paradigm exploration, unusual alternatives, product ideas, research concepts, and surprising but useful options.
 
 ## Management format
@@ -49,7 +49,7 @@ Keep the folder name identical to the `name` field in `SKILL.md`, and validate t
 Published skills use one consistent shape:
 
 ```text
-skills/<bucket>/<skill-name>/
+skills/<bucket>/<ccdawn-skill-name>/
   SKILL.md
   agents/openai.yaml        # optional but recommended for Codex slash-command metadata
   references/               # optional supporting references, templates, ledgers, or schemas
@@ -60,7 +60,7 @@ Rules:
 
 - `skill-name` must match the `name` field in `SKILL.md`.
 - Every catalog change should update this README, `README.zh-CN.md`, the bucket README, and `.claude-plugin/plugin.json`.
-- Install into `~/.codex/skills/<skill-name>` as real copied directories by running `python scripts/install_codex_library.py`.
+- Install into `~/.codex/skills/<ccdawn-skill-name>` as real copied directories by running `python scripts/install_codex_library.py`.
 - Avoid installing the same skill into both `~/.codex/skills` and `~/.agents/skills` unless duplicate slash-command entries are intentional.
 
 ## Structure
@@ -73,18 +73,18 @@ CLAUDE.md
 skills/
   competition/
     README.md
-    huawei-nslb-score-loop/
+    ccdawn-huawei-nslb-score-loop/
   creative/
     README.md
-    creative-toolbox/
+    ccdawn-creative-toolbox/
   engineering/
     README.md
-    dawn-agent-html-memory/
-    brt/
-    goal-loop/
+    ccdawn-dawn-agent-html-memory/
+    ccdawn-brt/
+    ccdawn-goal-loop/
   research/
     README.md
-    competition-research-lifecycle/
+    ccdawn-competition-research-lifecycle/
 scripts/
   install_codex_library.py
 ```
@@ -100,7 +100,7 @@ python scripts/install_codex_library.py
 That is the default, recommended workflow for this repo. It copies every published skill into:
 
 ```text
-~/.codex/skills/<skill-name>
+~/.codex/skills/<ccdawn-skill-name>
 ```
 
 The install script also enforces that:
@@ -114,7 +114,7 @@ Installing the same skill into both `.codex/skills` and `.agents/skills` can cre
 Install only selected skills:
 
 ```bash
-python scripts/install_codex_library.py --skill brt --skill dawn-agent-html-memory
+python scripts/install_codex_library.py --skill ccdawn-brt --skill ccdawn-dawn-agent-html-memory
 ```
 
 Install only to the live Codex directory:
@@ -151,8 +151,8 @@ python scripts/install_codex_library.py --agent codex-agents
 
 If a slash-command entry is missing or duplicated, use this checklist before changing prompts or folder names:
 
-1. Inspect the installed live copy in `~/.codex/skills/<skill-name>`, not just the repo copy.
-2. Check whether an extra `~/.agents/skills/<skill-name>` copy exists. Keeping both copies can create duplicate slash-command entries.
+1. Inspect the installed live copy in `~/.codex/skills/<ccdawn-skill-name>`, not just the repo copy.
+2. Check whether an extra `~/.agents/skills/<ccdawn-skill-name>` copy exists. Keeping both copies can create duplicate slash-command entries.
 3. Check `agents/openai.yaml` in the live installed copy and keep it aligned with the minimal `interface:` pattern already used by working skills in this repo.
 4. If this repository is the active trusted workspace, also check `.claude-plugin/plugin.json`, because the repo-local manifest can affect visible entries.
 5. Restart Codex and verify from a fresh thread before concluding that a metadata change did not load.
@@ -198,12 +198,12 @@ After installing or updating a live skill, restart the client so it reloads loca
 
 Invoke the skills in chat with prompts such as:
 
-- `Use competition-research-lifecycle to plan this benchmark project`
+- `Use ccdawn-competition-research-lifecycle to plan this benchmark project`
 - `Help me run this competition through a full research lifecycle`
-- `Use goal-loop to turn this objective into a verified execution contract`
-- `Use huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
-- `Use creative-toolbox to generate new concept cards from this context`
+- `Use ccdawn-goal-loop to turn this objective into a verified execution contract`
+- `Use ccdawn-huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
+- `Use ccdawn-creative-toolbox to generate new concept cards from this context`
 - `Initialize project memory for this repo`
-- `Use dawn-agent-html-memory to initialize project memory for this repo as a frontend project`
+- `Use ccdawn-dawn-agent-html-memory to initialize project memory for this repo as a frontend project`
 
 This repository is intentionally shaped like a local skill repo, not a marketplace-installed plugin.

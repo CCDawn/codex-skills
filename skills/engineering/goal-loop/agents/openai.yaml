@@ -1,4 +1,0 @@
-interface:
-  display_name: "Goal Loop"
-  short_description: "Turn an objective into a verified execution contract."
-  default_prompt: "Use goal-loop to turn the user's objective into a goal contract with evidence, constraints, allowed scope, next-step rules, and blocker reporting; then iterate until the goal is achieved or no valid path remains."

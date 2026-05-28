@@ -1,0 +1,5 @@
+interface:
+  display_name: "CCDawn Dawn HTML Memory"
+  short_description: "Maintain a shared HTML project memory dashboard."
+  default_prompt: "Use $ccdawn-dawn-agent-html-memory to create or update the shared project memory dashboard under .docs/project-memory."
+
