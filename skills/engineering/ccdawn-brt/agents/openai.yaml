@@ -1,6 +1,6 @@
 interface:
   display_name: "CCDawn BRT"
-  short_description: "低噪声对齐用户真实意图，再形成行为、测试和执行闸门。"
-  default_prompt: "使用 $ccdawn-brt：先揣测并校准用户心里真正想要的结果，只追问会改变行为、范围、风险、测试或许可的最高信号问题，再形成行为契约、测试锚点和必要的执行闸门。"
+  short_description: "主动揣测用户真实意图，用高信号问题和建议完成需求对齐。"
+  default_prompt: "使用 $ccdawn-brt：主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和多个高信号选择题，让用户选择或确认后，再形成行为契约、测试锚点和必要的执行闸门。"
 
 

@@ -7,20 +7,26 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 ```text
 意图发现:
 - 用户原话:
+- 候选意图:
+  - A:
+  - B:
+  - C:
 - 推荐理解:
 - 备选误解风险:
 - 关键信号:
 - 状态判定: CONVERGED / NEED_ASSUMPTION / NEED_PROBE
-- 下一步动作: ENTER_PLANNING / ASK_SINGLE_CLARIFYING_QUESTION / RUN_PROBE
+- 下一步动作: ENTER_PLANNING / ASK_CLARIFYING_QUESTIONS / RUN_PROBE
 
 需求对齐:
-- 我理解你真正想要的是:
-- 最可能误解的是:
+- 我猜你真正想要的是:
+- 你也可能是在要:
+- 我的建议:
 
 追问:
-- 是否按 [推荐答案] 推进？
-- 推荐答案:
-- 原因: [为什么这是最高信号问题]
+- 请选这几个关键项，或直接说“按推荐来”:
+  1. [问题一]: A / B(推荐) / C
+  2. [问题二]: A(推荐) / B / C
+  3. [问题三]: A / B / C(推荐)
 ```
 
 ## Intent Discovery
@@ -28,18 +34,27 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 ```text
 意图发现:
 - 用户原话: [用户实际说法]
+- 候选意图:
+  - A: [保守理解]
+  - B: [标准理解]
+  - C: [扩展理解，可选]
 - 推荐理解: [用户可能真正想解决的问题]
 - 心智画像: [用户可能在担心什么、想避免什么、希望最终看到什么]
 - 备选误解风险: [最容易走偏的相邻意图]
 - 关键信号: [来自措辞、上下文、代码或任务形态的证据]
 - 关键词风险: [过宽/过窄/可能用错的词]
 - 状态判定: [CONVERGED / NEED_ASSUMPTION / NEED_PROBE]
-- 下一步动作: [ENTER_PLANNING / ASK_SINGLE_CLARIFYING_QUESTION / RUN_PROBE]
+- 下一步动作: [ENTER_PLANNING / ASK_CLARIFYING_QUESTIONS / RUN_PROBE]
 
 追问:
-- 问题: [只问当前最高信号的一个问题]
-- 推荐答案: [agent 建议]
-- 原因: [为什么答案会改变行为/范围/风险/测试/许可]
+- Q1: [高信号问题]
+  - 选项: A / B / C
+  - 推荐答案:
+  - 原因:
+- Q2: [高信号问题]
+  - 选项: A / B / C
+  - 推荐答案:
+  - 原因:
 ```
 
 ## Multi-Hypothesis Discovery
@@ -94,9 +109,11 @@ Use only when the recommendation is unstable or the user benefits from choosing 
 ```text
 需求对齐:
 - 推荐理解:
+- 候选意图:
 - 备选误解风险:
 - 关键信号:
-- 推荐答案:
+- 关键选择:
+  1. [问题]: A / B(推荐) / C
 
 行为摘要:
 - 参与者:
@@ -287,7 +304,7 @@ BRT 结果:
 - 已交付行为: BRT 会在任一阶段发现关键不确定性时暂停追问。
 - 测试锚点: quick_validate.py passed。
 - 开放问题: 尚未做真实对话压测。
-- 下一步: 用一个模糊功能请求压测 BRT 是否只问一个高价值问题并更新需求账本。
+- 下一步: 用一个模糊功能请求压测 BRT 是否主动给出候选意图、高信号选择题并更新需求账本。
 ```
 
 Bad:
