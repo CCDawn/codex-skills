@@ -1,6 +1,6 @@
 interface:
   display_name: "CCDawn BRT"
-  short_description: "意图发现、行为、评审、测试的实现前闸门。"
-  default_prompt: "使用 $ccdawn-brt：先从用户原话推断并确认真实意图，再锁定行为、确认评审视角，并把场景映射到测试和实现检查点。"
+  short_description: "低噪声对齐用户真实意图，再形成行为、测试和执行闸门。"
+  default_prompt: "使用 $ccdawn-brt：先揣测并校准用户心里真正想要的结果，只追问会改变行为、范围、风险、测试或许可的最高信号问题，再形成行为契约、测试锚点和必要的执行闸门。"
 
 

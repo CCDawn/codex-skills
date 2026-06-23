@@ -17,7 +17,7 @@
 ### Engineering
 
 - **`ccdawn-brt`**  
-  Behavior / Review / Test 工作流 skill。它的作用是在真正开始实现之前，把模糊的功能想法收束成清晰的行为定义、评审视角、验收标准和测试意图。
+  Behavior / Review / Test 工作流 skill。它优先低噪声地对齐用户心里真正想要的结果，只追问高信号问题，然后把模糊功能想法收束成清晰的行为定义、评审视角、Task Graph、执行闸门、验收标准和测试意图。
 
 - **`ccdawn-dawn-agent-html-memory`**  
   这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它支持按职责拆分的多会话共享 lane，生成会聚合这些 lane 的 HTML 总览页，并在项目根目录生成一个 `PROJECT_MEMORY.html` 快捷入口。

@@ -19,7 +19,7 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 ### Engineering
 
 - **`ccdawn-brt`**  
-  The Behavior / Review / Test workflow skill. It acts as a pre-implementation gate for turning vague behavior changes into explicit examples, review lenses, acceptance criteria, and test intentions before code changes begin.
+  The Behavior / Review / Test workflow skill. It prioritizes low-noise alignment with what the user actually means, asks only high-signal questions, and then turns vague behavior changes into explicit examples, review lenses, task graphs, execution gates, acceptance criteria, and test intentions.
 
 - **`ccdawn-dawn-agent-html-memory`**  
   A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.

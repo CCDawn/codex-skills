@@ -7,21 +7,20 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 ```text
 意图发现:
 - 用户原话:
-- agent 推断意图:
-- 关键词风险:
-- 推荐解释:
-- 待确认点:
+- 推荐理解:
+- 备选误解风险:
+- 关键信号:
+- 状态判定: CONVERGED / NEED_ASSUMPTION / NEED_PROBE
+- 下一步动作: ENTER_PLANNING / ASK_SINGLE_CLARIFYING_QUESTION / RUN_PROBE
 
 需求对齐:
-- 当前理解:
-- 未决分歧:
-- 为什么重要:
-- 我建议先确认:
+- 我理解你真正想要的是:
+- 最可能误解的是:
 
 追问:
-- 问题:
+- 是否按 [推荐答案] 推进？
 - 推荐答案:
-- 原因:
+- 原因: [为什么这是最高信号问题]
 ```
 
 ## Intent Discovery
@@ -29,15 +28,43 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 ```text
 意图发现:
 - 用户原话: [用户实际说法]
-- agent 推断意图: [用户可能真正想解决的问题]
+- 推荐理解: [用户可能真正想解决的问题]
+- 心智画像: [用户可能在担心什么、想避免什么、希望最终看到什么]
+- 备选误解风险: [最容易走偏的相邻意图]
+- 关键信号: [来自措辞、上下文、代码或任务形态的证据]
 - 关键词风险: [过宽/过窄/可能用错的词]
-- 推荐解释: [建议按哪个意图推进]
-- 待确认点: [当前最影响行为边界的一点]
+- 状态判定: [CONVERGED / NEED_ASSUMPTION / NEED_PROBE]
+- 下一步动作: [ENTER_PLANNING / ASK_SINGLE_CLARIFYING_QUESTION / RUN_PROBE]
 
 追问:
-- 问题: [让用户确认或纠正推荐解释]
+- 问题: [只问当前最高信号的一个问题]
 - 推荐答案: [agent 建议]
-- 原因: [为什么这个解释更适合先推进]
+- 原因: [为什么答案会改变行为/范围/风险/测试/许可]
+```
+
+## Multi-Hypothesis Discovery
+
+Use only when the recommendation is unstable or the user benefits from choosing between paths.
+
+```text
+候选意图:
+- 保守路径:
+  - Goal:
+  - Expected Output:
+  - Required Capability:
+- 标准路径:
+  - Goal:
+  - Expected Output:
+  - Required Capability:
+- 扩展路径（可选）:
+  - Goal:
+  - Expected Output:
+  - Required Capability:
+
+推荐理解:
+- 选择:
+- 原因:
+- 最大误解风险:
 ```
 
 ## Failed Intent Calibration
@@ -66,8 +93,9 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 
 ```text
 需求对齐:
-- 当前理解:
-- 最关键歧义:
+- 推荐理解:
+- 备选误解风险:
+- 关键信号:
 - 推荐答案:
 
 行为摘要:
