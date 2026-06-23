@@ -19,7 +19,7 @@ State transition rules:
 - Stay in INTENT_DISCOVERY until the user's real goal is at least roughly understood.
 - Move to INTENT_CONVERGENCE when multiple plausible meanings would change behavior.
 - Move to PLANNING only when at least one hypothesis is stable and remaining risk can be recorded.
-- If all hypotheses are unstable, run a reversible probe or ask one high-signal question.
+- If all hypotheses are unstable, run a reversible probe or ask a small set of high-signal choice questions.
 - Do not enter EXECUTING until the implementation gate is shown and the user allows it.
 - Do not enter COMPLETED before verification.
 
@@ -71,7 +71,7 @@ If verification fails:
 - Explain blockage reason.
 - Mark impacted step.
 - Provide possible fixes.
-- Ask only one required user input unless a reversible probe can resolve it.
+- Ask only the required high-signal choice questions unless a reversible probe can resolve it.
 
 ## Probe
 
