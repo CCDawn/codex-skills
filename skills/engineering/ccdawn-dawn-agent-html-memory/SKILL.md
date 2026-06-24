@@ -18,6 +18,7 @@ Create a project-local memory system under `.docs/project-memory/` and keep it c
 Treat project memory maintenance as part of the definition of done.
 
 - Before meaningful development, read `INDEX.md`, `memory.json`, `profile.json`, and any lane files relevant to the current responsibility.
+- When another agent may be working in the same project, run the work guard status/check before editing and claim the active lane when overlap risk exists.
 - During development, place raw findings in `inbox.json` when needed.
 - After meaningful development, update only the current lane file plus the global recent-updates feed, then run the sync command.
 - Do not end a task with stale project memory unless the user explicitly says to skip it.
@@ -110,8 +111,21 @@ Maintain these files inside the target project:
 - `lanes/*.json` are the per-responsibility memory files that individual sessions should maintain.
 - `archive/` stores historical items moved out of the active dashboard.
 - `PROJECT_MEMORY.html` lives at the project root as the stable human-facing shortcut into the dashboard.
+- `agent-claims.json` is an optional coordination registry for active/ready agent work claims.
 
 Do not treat `overview.html` as the primary editable artifact unless the user explicitly asks for a one-off manual page.
+
+## Work guard
+
+Use `scripts/agent_work_guard.py` when work may overlap across sessions or agents.
+
+- `status` is read-only and shows active/ready claims.
+- `check` is read-only and returns nonzero when the requested lane or scope overlaps an active/ready claim.
+- `claim` writes an expiring claim to `agent-claims.json` only when no overlap exists, unless `--force` is used after manual review.
+- `release` closes the claim as `released`, `completed`, or `blocked`.
+- Claims expire automatically by TTL and are stored outside the main memory model, so they do not pollute the dashboard.
+
+Claim the smallest stable lane/scope that protects the work. Release the claim after the memory sync step finishes.
 
 ## Setup
 
@@ -245,8 +259,13 @@ python <skill-root>/scripts/init_project_memory.py <project-root> --project-type
 python <skill-root>/scripts/render_overview.py <project-root>
 python <skill-root>/scripts/sync_project_memory.py <project-root> --lane backend-auth --focus "What changed" --update "Short summary of this task"
 python <skill-root>/scripts/capture_note.py <project-root> --lane backend-auth --title "Observation" --details "What you noticed"
+python <skill-root>/scripts/agent_work_guard.py <project-root> status
+python <skill-root>/scripts/agent_work_guard.py <project-root> check --lane backend-auth --scope src/auth
+python <skill-root>/scripts/agent_work_guard.py <project-root> claim --lane backend-auth --scope src/auth --agent codex-session --task "Auth changes"
+python <skill-root>/scripts/agent_work_guard.py <project-root> release --claim-id claim-id --status completed
 agent-html-memory-init <project-root> --project-type frontend --dashboard-preset review-heavy --visual-mode studio --density comfortable
 agent-html-memory-sync <project-root> --lane backend-auth --focus "What changed" --update "Short summary of this task"
 agent-html-memory-capture <project-root> --lane backend-auth --title "Observation" --details "What you noticed"
+agent-html-memory-guard <project-root> status
 ```
 

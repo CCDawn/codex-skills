@@ -9,6 +9,7 @@
   "bin": {
     "agent-html-memory-init": "./bin/agent-html-memory-init.js",
     "agent-html-memory-sync": "./bin/agent-html-memory-sync.js",
-    "agent-html-memory-capture": "./bin/agent-html-memory-capture.js"
+    "agent-html-memory-capture": "./bin/agent-html-memory-capture.js",
+    "agent-html-memory-guard": "./bin/agent-html-memory-guard.js"
   }
 }

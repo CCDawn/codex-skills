@@ -13,6 +13,11 @@ Add this block to the target repository `AGENTS.md` so every agent session treat
   - `.docs/project-memory/profile.json`
   - any lane files in `.docs/project-memory/lanes/` that are relevant to the current responsibility
 
+- When another agent may be active or the task touches a shared lane/scope, check and claim work with:
+  - `python <skill-root>/scripts/agent_work_guard.py <project-root> status`
+  - `python <skill-root>/scripts/agent_work_guard.py <project-root> claim --lane "<stable-responsibility-id>" --scope "<file-or-module-scope>" --agent "<session-label>" --task "<short task>"`
+  - release the claim after syncing memory
+
 - During development, store raw findings, partial observations, and unresolved breadcrumbs in:
   - `.docs/project-memory/inbox.json`
 

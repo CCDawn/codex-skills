@@ -21,3 +21,4 @@ Use this file to record concrete friction discovered while using the skill and t
 - 2026-05-18: Added `profile.json.density` with named levels (`comfortable`, `balanced`, `compact`) so information spacing can be tuned independently from visual style.
 - 2026-05-18: Added `profile.json.sectionLayouts` so section width and dashboard rhythm can be tuned per repository without patching the renderer.
 - 2026-05-18: Added preset-driven profile resolution with `dashboardPreset` so section order, emphasis, visual mode, and density can move together while lower-level fields remain optional overrides.
+- 2026-06-24: Added `agent_work_guard.py` and `agent-html-memory-guard` so multi-agent sessions can check, claim, and release project-memory lanes without manually editing registry files.
