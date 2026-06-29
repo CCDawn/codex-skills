@@ -36,12 +36,13 @@ Transition rules:
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
 - Prefer existing specialized skills before CCDawn wrapper skills. Route bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
-- Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
+- Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
 - If a selected task is unclear, return to `ccdawn-task-splitting`.
 - A user may authorize continuous Critical Path execution after task splitting. This authorizes repeated task handoff only; each task still runs through its selected development mode, verification, ledger update, and stop-on-blocker checks.
-- Continuous Critical Path execution must stop on blocker, failed verification, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
+- Continuous Critical Path execution must stop on blocker, failed verification that cannot be safely recovered inside the current Execution Contract, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
+- A failed verification is first a recovery signal, not automatically a handoff stop. If the cause is inside the current Execution Contract and safe to fix, route back to the owning development/debug stage, fix, and re-verify. Stop only when it becomes a natural gate.
 - Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
 - Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means implementation evidence passed; `MERGE_READY` means integration review passed.
 
@@ -63,6 +64,35 @@ Self-assess process weight before routing:
 - If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
 - If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.
 - Reuse the current worktree for one theme. Create a new worktree only for parallel work, conflict isolation, high-risk isolation, or explicit user request.
+
+## Execution Contract and Edit Guard
+
+Any stage that may write files must carry a compact Execution Contract. Keep it internal for small safe tasks; output it when handing off, resuming, or touching risky areas.
+
+```text
+Execution Contract:
+- Target:
+- Desired Outcome:
+- Allowed Actions:
+- Out of Scope:
+- Success Evidence:
+- Recovery Signal:
+```
+
+Before writing, run the edit guard:
+
+- identify the owning surface and expected files;
+- inspect worktree state and protect unrelated user or agent changes;
+- list the protected boundary: adjacent files, behavior, tests, config, docs, dependencies, or cleanup not required by the contract;
+- if the needed edit crosses the protected boundary, return to `ccdawn-brt` or `ccdawn-planning` before writing;
+- if ownership is uncertain after reading local context, probe or ask instead of editing.
+
+Verification recovery:
+
+- classify failures as implementation, test intent, environment, or requirement mismatch;
+- fix implementation/test alignment only when the fix stays inside the contract;
+- do not weaken behavior requirements just to pass tests;
+- route environment or requirement mismatches to the owning stage with one concrete next action.
 
 Owner boundaries:
 
@@ -115,6 +145,7 @@ Ledger rules:
 - Do not invent missing entries. If a field is unknown, mark it as unknown and route to the stage that can resolve it.
 - If code reality conflicts with the ledger, update the ledger and explain the mismatch before continuing.
 - Compress the ledger for small tasks: output one `Ledger Update` line when no stage handoff, blocker, or resumed work depends on the full ledger.
+- Add `Execution Contract` and `Protected Boundary` only when they affect handoff, resumption, high-risk editing, or failed-verification recovery.
 
 ## Stage Delta Ledger
 
@@ -165,3 +196,4 @@ Runtime owns the state transition; the stage skills own the detailed criteria.
 - Do not mark `COMPLETED` without `ccdawn-completion-summary` evidence.
 - Do not mark `MERGE_READY` without `ccdawn-pr-review` evidence.
 - If evidence is missing, stale, or contradicted by the diff, route to the owning stage instead of claiming readiness.
+- If the gap is fixable inside the current Execution Contract, recommend the recovery route; if it requires new scope, permission, or intent change, stop at the natural gate.

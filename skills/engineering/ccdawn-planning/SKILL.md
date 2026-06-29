@@ -15,6 +15,7 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 - 本轮做什么、不做什么；
 - 采用哪条实现路径，为什么；
 - 会影响哪些文件、模块、状态或接口；
+- 哪些相邻文件、行为、测试、配置或清理不属于本轮；
 - 如何验证成功；
 - 哪些风险需要在执行前知道。
 
@@ -51,6 +52,7 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 - 影响面:
   - 文件/模块: ...
   - 接口/状态/数据: ...
+- 保护边界: 不碰哪些相邻区域、用户改动或清理项
 - 风险决策: ...
 - 验证策略: ...
 - 需要保留的假设: ...
@@ -85,6 +87,7 @@ D. 暂停在方案阶段...
 - 不过早拆任务：是否拆分和子任务模式留给 `ccdawn-task-splitting`；本阶段只提供可执行方案。
 - 不实现：本阶段不编辑业务代码，除非用户明确改变阶段目标。
 - 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
+- 不写“相关文件都可能调整”这类无限边界；无法枚举影响面时，必须说明需要先 probe 或进入任务拆分降低误改风险。
 
 ## Workflow Ledger
 
@@ -94,6 +97,7 @@ D. 暂停在方案阶段...
 - `Accepted Plan` 写成一句可执行方案摘要。
 - `Task Graph` 在本阶段标为未判定，留给 `ccdawn-task-splitting` 决定拆分或不拆分。
 - `Decisions` 只记录会影响实现、测试、风险或范围的决定。
+- `Unresolved Risks` 必须包含仍不清楚的影响面或保护边界。
 - `Recommended Next Stage` 默认是 `ccdawn-task-splitting` 做拆分判定；只有明确低风险直接执行时才写直接执行。
 - 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 

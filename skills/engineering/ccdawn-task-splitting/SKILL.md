@@ -14,6 +14,7 @@ description: Use after a CCDawn implementation plan is accepted and the user con
 - 这个方案是否真的需要拆分；
 - 先做哪一项，为什么；
 - 每个任务的输入、输出和依赖；
+- 每个任务拥有哪个修改面，以及哪些相邻区域不能误碰；
 - 每个任务适合轻量实现还是需要 BDD/TDD；
 - 哪些任务是关键路径，哪些是可选优化；
 - 完成一个任务后怎样判断可以进入下一个任务。
@@ -90,6 +91,7 @@ Task Graph 规则归入本阶段。每个任务必须说明：
 - output：本任务完成后可观察或可复用的产物；
 - dependency：依赖的任务、确认、工具或环境状态；
 - verification condition：证明任务完成且对齐的证据。
+- owned surface / protected boundary：本任务负责的文件、模块、行为，以及不应顺手修改的相邻区域。
 
 任务图还要标出：
 
@@ -110,6 +112,7 @@ Task N: 名称
 - Inputs: 来自需求、方案或前置任务的输入
 - Outputs: 后续任务依赖的产物
 - Files: 预计创建/修改/测试的路径
+- Boundary: 本任务拥有的修改面；明确不碰的相邻文件、行为或清理项
 - Dependencies: 无 / Task X
 - Criticality: critical / optional
 - Development Mode: SIMPLE / BDD_TDD
@@ -124,7 +127,7 @@ Task N: 名称
 ```text
 Task N: 名称
 - Output:
-- Files:
+- Files/Boundary:
 - Development Mode: SIMPLE
 - Verification:
 - Risk:
@@ -201,6 +204,7 @@ F. 暂停...
 - `BDD_TDD` 任务没有 BDD/TDD Anchor 不合格。
 - `SIMPLE` 任务不要补形式化 BDD/TDD；只要说明为什么轻量验证足够。
 - 任务不能只写“实现功能”“添加测试”“更新文档”。
+- 有误改风险的任务缺少 Boundary 不合格。
 - 不能在拆分阶段改代码。
 - 如果拆分发现方案不可执行，回到 `ccdawn-planning`，不要硬拆。
 

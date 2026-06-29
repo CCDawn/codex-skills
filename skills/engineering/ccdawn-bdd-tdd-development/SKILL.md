@@ -21,6 +21,7 @@ description: Use when a selected CCDawn task is not safe to finish in one pass, 
 - 用户确认进入开发；
 - 一个明确的 `ccdawn-task-splitting` 任务；
 - 任务的 Goal/Output、Files、Development Mode、Verification；
+- 当前任务的 Execution Contract 或等价边界：Target、Desired Outcome、Allowed Actions、Out of Scope、Success Evidence；
 - 当前工作区状态已检查，不覆盖无关用户改动。
 
 如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。如果用户授权连续执行全部 Critical Path，必须同时有有序 Task Graph、每个 critical task 的 Development Mode/Verification，以及当前下一个任务。
@@ -99,6 +100,7 @@ Behavior Contract:
 
 ## 执行边界
 
+- 动手前确认 owning surface、预计文件、保护边界、已有用户改动和 Success Evidence。
 - 只执行当前任务；除非用户明确授权连续 Critical Path，否则不顺手做下一个任务。
 - 连续 Critical Path 授权只允许自动选择下一个 critical task；不得合并任务、跳过验证或扩大范围。SIMPLE 任务按轻量验证执行，BDD_TDD 任务按 RED/GREEN 执行。停止条件以 `ccdawn-brt/references/runtime.md` 为准。
 - 不扩大范围，不重构无关区域。
@@ -110,7 +112,7 @@ Behavior Contract:
 
 执行循环归入本阶段。每个任务按这个顺序执行：
 
-1. BEFORE：确认当前任务、Development Mode、验证方式、文件范围、工作区状态和无阻塞歧义。
+1. BEFORE：确认当前任务、Development Mode、验证方式、文件范围、owning surface、保护边界、工作区状态和无阻塞歧义。
 2. DURING：按 SIMPLE 或 BDD_TDD 执行当前任务，不扩大范围，不顺手执行下一个任务。
 3. AFTER：验证输出契约，对比 expected vs actual，检查副作用，更新 Workflow Ledger。
 
@@ -118,9 +120,10 @@ Behavior Contract:
 
 如果验证失败：
 
-- 标记当前任务为 `PARTIAL` 或 `BLOCKED`；
-- 写清失败命令、失败原因和影响范围；
-- 给出可选修复；
+- 先判断失败属于 implementation、test intent、environment 还是 requirement mismatch；
+- 若原因在当前 Execution Contract 内且可安全修复，修复后重新验证，不要过早停在汇报；
+- 若修复会扩大范围、触碰保护边界、改变需求或需要高风险动作，标记当前任务为 `PARTIAL` 或 `BLOCKED`；
+- 写清失败命令、失败原因、影响范围和推荐恢复动作；
 - 只问一个真正阻塞的问题，其他问题放入风险或可选修复。
 
 连续 Critical Path 模式遇到 runtime 定义的停止条件时，必须停止连续推进并报告当前任务状态。
@@ -163,6 +166,7 @@ E. 暂停...
 - Development Mode 判定；
 - 与任务 Goal 对齐的变更摘要；
 - 新鲜验证证据；
+- 未越过保护边界的自审结论；
 - 对副作用和范围偏离的自审结论。
 
 `BDD_TDD` 任务还必须有 BDD 契约、RED 证据和 GREEN 后验证证据。

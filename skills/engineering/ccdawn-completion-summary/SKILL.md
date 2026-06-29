@@ -15,6 +15,8 @@ description: Use after CCDawn development, verification, or a workflow stage end
 没有新鲜验证证据，就不要声称完成。
 ```
 
+总结阶段不直接补写功能；但发现可恢复缺口时，必须把用户带回最具体的开发、debug 或验证阶段，而不是把半成品包装成最终汇报。
+
 ## 进入条件
 
 使用前确认已有：
@@ -22,6 +24,7 @@ description: Use after CCDawn development, verification, or a workflow stage end
 - 已对齐需求或任务图；
 - 已完成的实现、验证或阶段产物；
 - 可以运行或检查的验证证据；
+- 涉及写入时，有当前 Execution Contract、保护边界和 Success Evidence；缺失时先从需求、任务图和 diff 快速补齐；
 - 需要汇报给用户的下一步决策。
 
 如果发现关键任务没做完，按任务的 Development Mode 回到轻量开发或 `ccdawn-bdd-tdd-development`；如果任务本身不清楚，回到 `ccdawn-task-splitting`，不要把未完成包装成总结。
@@ -34,7 +37,8 @@ description: Use after CCDawn development, verification, or a workflow stage end
 2. 运行或读取能证明 claim 的新鲜证据。
 3. 检查输出、退出码、失败数、覆盖项。
 4. 对照需求和任务图逐项判断。
-5. 只陈述证据能支持的结论。
+5. 检查变更是否越过保护边界。
+6. 只陈述证据能支持的结论。
 
 不能用这些话代替证据：
 
@@ -54,7 +58,14 @@ description: Use after CCDawn development, verification, or a workflow stage end
 - 没有 unresolved blocker。
 - 阶段自审或 Review Matrix 没有未解决的 `NEEDS_CLARIFICATION` 或 `NEEDS_CHANGE`。
 - 副作用检查没有未披露风险。
+- 变更没有越过保护边界，或越界点已被用户明确接受。
 - residual risks 已列出并说明是否接受。
+
+如果验证失败或证据不足：
+
+- 若缺口可在当前 Execution Contract 内修复，结论写 `PARTIAL`，`Recommended Next Stage` 指向具体恢复动作：轻量开发、`ccdawn-bdd-tdd-development`、`systematic-debugging` 或补验证。
+- 若缺口需要新范围、权限、迁移、删除、发布或需求变更，结论写 `BLOCKED`，只问一个阻塞问题。
+- 不把“已发现问题”当作完成；不让用户自己猜下一步该回哪里修。
 
 ## 输出契约
 
@@ -72,6 +83,8 @@ description: Use after CCDawn development, verification, or a workflow stage end
   - 结果: ...
 - 主要变更: ...
 - 副作用和风险: ...
+- 保护边界: PASS/ACCEPT_RISK/NEEDS_CHANGE ...
+- 恢复动作: 无 / 回到具体阶段...
 - 交付状态: 可提交/需补测/需返工/等待用户决策
 
 Ledger Update:
