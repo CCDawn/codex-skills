@@ -89,6 +89,25 @@ BRT 检查点:
 Bad:
 
 ```text
+多角度自审:
+- 核心用户: Challenge=用户可能不满意；Evidence=我会尽量对齐；Verdict=PASS
+- 维护者: Challenge=以后可能难维护；Evidence=风险较低；Verdict=PASS
+```
+
+Why bad: Evidence 是态度或判断，不是证据；无法证明可以进入实现。
+
+Better:
+
+```text
+多角度自审:
+- 核心用户: Challenge=是否真的解决“备选没参考价值”；Evidence=候选规则要求 Choose When 和 Tradeoff，且模板反例覆盖空泛备选；Verdict=PASS
+- 维护者: Challenge=规则是否变臃肿；Evidence=主文件只新增质量门槛，详细例子留在 templates.md；Verdict=PASS
+- 测试/QA: Challenge=如何检查 agent 是否执行；Evidence=输出必须包含 Review Matrix，且 Evidence 只能来自用户确认、本地事实、验证命令、probe 或显式假设；Verdict=PASS
+```
+
+Bad:
+
+```text
 评审:
 - 核心用户
 - 维护者

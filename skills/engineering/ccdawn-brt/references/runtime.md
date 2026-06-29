@@ -97,5 +97,6 @@ Enter COMPLETED only when:
 - intent is satisfied or explicitly updated.
 - expected vs actual is aligned.
 - Review Matrix has no unresolved NEEDS_CLARIFICATION or NEEDS_CHANGE verdict.
+- Review Matrix evidence is concrete: user confirmation, local context, verification output, probe result, or explicit assumption with risk.
 - side-effect check found no undisclosed risk.
 - closure lists open questions and residual risks.
