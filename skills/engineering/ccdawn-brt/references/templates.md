@@ -69,7 +69,7 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 - 关键边界:
 ```
 
-## Implementation Gate
+## Planning Gate
 
 ```text
 BRT 检查点:
@@ -79,9 +79,18 @@ BRT 检查点:
 - 关键风险:
 - 自审结论:
 - 测试锚点:
-- 完成汇报:
+- Workflow Ledger:
+  - Confirmed Intent:
+  - Current Stage: PLANNING_READY
+  - Assumptions:
+  - Unresolved Risks:
+  - Recommended Next Stage: ccdawn-planning
 
-是否进入实现？
+是否进入 ccdawn-planning 制定实施方案？
+A. 进入方案制定（推荐）...
+B. 继续需求对齐...
+C. 低风险直接实现（仅当用户明确选择）...
+D. 暂停...
 ```
 
 ## Anti-Patterns
@@ -94,7 +103,7 @@ Bad:
 - 维护者: Challenge=以后可能难维护；Evidence=风险较低；Verdict=PASS
 ```
 
-Why bad: Evidence 是态度或判断，不是证据；无法证明可以进入实现。
+Why bad: Evidence 是态度或判断，不是证据；无法证明可以进入下一阶段。
 
 Better:
 

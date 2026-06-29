@@ -37,6 +37,24 @@ description: Use after a CCDawn implementation plan is accepted and the user con
 - 不把多个无关模块塞进同一个任务。
 - 不把一次微小改动拆成无意义的小碎片。
 
+## Task Graph
+
+Task Graph 规则归入本阶段。每个任务必须说明：
+
+- input：本任务需要的需求、文件、数据、前置产物；
+- output：本任务完成后可观察或可复用的产物；
+- dependency：依赖的任务、确认、工具或环境状态；
+- verification condition：证明任务完成且对齐的证据。
+
+任务图还要标出：
+
+- critical path：完成目标必须执行的任务；
+- optional path：有价值但非必需的优化；
+- high risk task：数据丢失、安全、回归、API 破坏或难回滚风险；
+- ambiguous task：仍依赖假设或实现分叉的任务。
+
+没有 verification condition 的 critical task 不允许进入开发。
+
 ## 任务卡格式
 
 每个任务必须包含：
@@ -48,6 +66,7 @@ Task N: 名称
 - Outputs: 后续任务依赖的产物
 - Files: 预计创建/修改/测试的路径
 - Dependencies: 无 / Task X
+- Criticality: critical / optional
 - BDD Anchor: Given / When / Then
 - TDD Anchor: 先写哪个失败测试，失败原因应是什么
 - Verification: 要运行的命令或结构性检查
@@ -68,6 +87,19 @@ Task N: 名称
 Task 1: ...
 Task 2: ...
 Task 3: ...
+
+Workflow Ledger:
+- Confirmed Intent: ...
+- Current Stage: TASK_SPLITTING
+- Accepted Plan: ...
+- Task Graph: Critical Path..., Optional Path...
+- Current Task: 推荐 Task 1
+- Completed Tasks: 无
+- Verification Evidence: 拆分自审...
+- Decisions: ...
+- Assumptions: ...
+- Unresolved Risks: ...
+- Recommended Next Stage: ccdawn-bdd-tdd-development
 
 拆分自审:
 - 覆盖方案: PASS/NEEDS_CHANGE，证据...
@@ -90,6 +122,16 @@ D. 暂停...
 - 任务不能只写“实现功能”“添加测试”“更新文档”。
 - 不能在拆分阶段改代码。
 - 如果拆分发现方案不可执行，回到 `ccdawn-planning`，不要硬拆。
+
+## Workflow Ledger
+
+任务拆分完成时必须更新账本：
+
+- `Accepted Plan` 必须来自 `ccdawn-planning`。
+- `Task Graph` 必须包含 critical path、optional path 和任务依赖。
+- `Current Task` 默认推荐第一个未完成 critical task，除非用户指定其他任务。
+- `Completed Tasks` 在本阶段通常为空；如果是续接拆分，保留已有完成记录。
+- `Recommended Next Stage` 默认是 `ccdawn-bdd-tdd-development`。
 
 ## 阶段交接
 

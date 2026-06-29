@@ -44,6 +44,18 @@ description: Use after CCDawn development, verification, or a workflow stage end
 - “我已经改了所以完成”
 - “测试之前通过过”
 
+## Completion Gate
+
+完成闸门归入本阶段。只有同时满足这些条件，才能输出 `COMPLETE`：
+
+- 所有 critical tasks 已完成，或已被用户明确移出范围。
+- 新鲜验证证据通过。
+- expected vs actual 对齐。
+- 没有 unresolved blocker。
+- 阶段自审或 Review Matrix 没有未解决的 `NEEDS_CLARIFICATION` 或 `NEEDS_CHANGE`。
+- 副作用检查没有未披露风险。
+- residual risks 已列出并说明是否接受。
+
 ## 输出契约
 
 默认输出：
@@ -62,6 +74,19 @@ description: Use after CCDawn development, verification, or a workflow stage end
 - 副作用和风险: ...
 - 交付状态: 可提交/需补测/需返工/等待用户决策
 
+Workflow Ledger:
+- Confirmed Intent: ...
+- Current Stage: SUMMARIZING / COMPLETED / BLOCKED
+- Accepted Plan: ...
+- Task Graph: ...
+- Current Task: 无 / 阻塞任务
+- Completed Tasks: ...
+- Verification Evidence: ...
+- Decisions: ...
+- Assumptions: ...
+- Unresolved Risks: ...
+- Recommended Next Stage: 提交/PR / 补任务 / 回到规划 / 暂停
+
 下一步:
 A. 提交/推送/准备 PR（证据充分时推荐）...
 B. 回到 ccdawn-bdd-tdd-development 补任务...
@@ -74,6 +99,15 @@ D. 暂停...
 - `COMPLETE`：所有关键任务完成，验证通过，没有未解决阻塞，满足已确认意图。
 - `PARTIAL`：有可用进展，但仍缺关键任务、验证或用户决策。
 - `BLOCKED`：当前无法继续，必须说明阻塞原因、影响步骤、可选修复和一个最关键问题。
+
+## Workflow Ledger
+
+总结时必须读取并更新账本：
+
+- 用 `Task Graph` 判断是否所有 critical tasks 完成。
+- 用 `Verification Evidence` 支撑结论，不够就输出 `PARTIAL` 或 `BLOCKED`。
+- `Unresolved Risks` 不能为空泛，必须说明影响和建议下一步。
+- `Recommended Next Stage` 必须是用户可选择的动作。
 
 ## 汇报风格
 

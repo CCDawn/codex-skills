@@ -1,77 +1,64 @@
-# BRT Runtime Details
+# CCDawn Workflow Runtime
 
-Read this file only when the task is long-running, multi-step, blocked, resumed, or about agent execution behavior.
+Read this file only when the work is long-running, multi-step, blocked, resumed, or needs cross-stage handoff.
 
-## Task State
+This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
-State is an execution control signal, not a decoration.
+```text
+ccdawn-brt -> ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary
+```
 
-- INTENT_DISCOVERY: identifying the user text, possible intent, and keyword risk.
-- INTENT_CONVERGENCE: comparing hypotheses and converging a recommendation.
-- PLANNING: intent is stable enough to build a Task Graph and verification strategy.
-- EXECUTING: the user has allowed implementation and steps are being executed.
-- VERIFYING: checking output against expectations.
+## Workflow State
+
+State is a routing signal, not decoration.
+
+- INTENT_DISCOVERY: `ccdawn-brt` is identifying the user text, likely intent, and risks.
+- INTENT_CONVERGENCE: `ccdawn-brt` is comparing candidate intents and asking high-signal questions.
+- PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
+- PLANNING: `ccdawn-planning` is producing an implementation plan.
+- TASK_SPLITTING: `ccdawn-task-splitting` is producing a task graph.
+- DEVELOPING: `ccdawn-bdd-tdd-development` is executing one selected task.
+- SUMMARIZING: `ccdawn-completion-summary` is checking evidence and reporting status.
 - BLOCKED: required information, prerequisites, or evidence are missing.
-- COMPLETED: critical steps are done, verification passed, and no blocker remains.
+- COMPLETED: critical tasks are done, evidence passed, and no blocker remains.
 
-State transition rules:
+Transition rules:
 
-- Stay in INTENT_DISCOVERY until the user's real goal is at least roughly understood.
-- Move to INTENT_CONVERGENCE when multiple plausible meanings would change behavior.
-- Move to PLANNING only when at least one hypothesis is stable and remaining risk can be recorded.
-- If all hypotheses are unstable, run a reversible probe or ask a small set of high-signal choice questions.
-- Do not enter EXECUTING until the implementation gate is shown and the user allows it.
-- Do not enter COMPLETED before verification.
+- Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
+- `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user explicitly chooses a low-risk direct implementation path.
+- Each stage stops after its output contract and asks whether to enter the next stage.
+- If the user changes the goal, return to `ccdawn-brt`.
+- If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
+- If a selected task is unclear, return to `ccdawn-task-splitting`.
+- Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
 
-## Task Graph
+## Workflow Ledger
 
-Use a Task Graph for long tasks, cross-file changes, multi-step workflows, or anything requiring more than one execution step.
+Maintain a compact ledger whenever work spans more than one reply, one file, or one stage. The ledger can live in the reply unless the project has persistent memory.
 
-Each step must include:
+Minimum fields:
 
-- input: context, files, data, or previous outputs needed by the step.
-- output: observable result required after the step.
-- dependency: prior steps, confirmations, tools, or environment state.
-- verification condition: evidence that the step is complete and aligned.
+```text
+Workflow Ledger:
+- Confirmed Intent:
+- Current Stage:
+- Accepted Plan:
+- Task Graph:
+- Current Task:
+- Completed Tasks:
+- Verification Evidence:
+- Decisions:
+- Assumptions:
+- Unresolved Risks:
+- Recommended Next Stage:
+```
 
-Also mark:
+Ledger rules:
 
-- critical path: required for completion.
-- optional path: useful but not required.
-- high risk step: data loss, security, regression, API breakage, or hard rollback risk.
-- ambiguous step: still depends on assumptions or implementation branches.
-
-Do not execute a critical path step without a verification condition.
-
-## Task Memory
-
-Maintain Task Memory for continuous development, debugging, optimization, long tasks, and skill design. It can live in the current reply unless the project already has persistent memory.
-
-Include:
-
-- intent: converged intent.
-- assumptions: explicit assumptions and risks.
-- decisions: choices affecting behavior, scope, tests, or implementation permission.
-- step progress: Task Graph step state.
-- unresolved risks: remaining risks and next action.
-
-Update Task Memory after every execution step. If code reality conflicts with the plan, update Task Memory and the requirement ledger before continuing.
-
-## Execution Loop
-
-After entering EXECUTING:
-
-1. BEFORE execution: verify prerequisites, confirm no ambiguity, and declare step scope.
-2. DURING execution: execute only the current step; do not expand scope.
-3. AFTER execution: verify the output contract, compare expected vs actual, rerun the relevant Review Matrix when risk or behavior changed, check side effects, and update Task Memory and task state.
-
-If verification fails:
-
-- Set state to VERIFYING or BLOCKED.
-- Explain blockage reason.
-- Mark impacted step.
-- Provide possible fixes.
-- Ask only the required high-signal choice questions unless a reversible probe can resolve it.
+- Update the ledger at every stage boundary.
+- Treat the ledger as the handoff contract for "continue".
+- Do not invent missing entries. If a field is unknown, mark it as unknown and route to the stage that can resolve it.
+- If code reality conflicts with the ledger, update the ledger and explain the mismatch before continuing.
 
 ## Probe
 
@@ -79,24 +66,38 @@ Use a low-risk probe when intent, environment, or implementation path is unstabl
 
 Probe requirements:
 
-- no write action unless explicitly allowed and reversible.
 - no destructive action.
-- reversible.
+- no write action unless explicitly allowed and reversible.
 - clear observation signals.
-- clear interpretation mapping from signal to likely intent/path.
+- clear interpretation mapping from signal to likely intent, plan, or task.
 
-A probe is not implementation. After it, update the requirement ledger, Task Memory, convergence judgment, and next action.
+A probe is not implementation. After a probe, update the requirement ledger, Workflow Ledger, convergence judgment, and next-stage recommendation.
+
+## Blocked Handling
+
+When blocked, output:
+
+```text
+BLOCKED:
+- Reason:
+- Impacted Stage:
+- Impacted Ledger Field:
+- Possible Fixes:
+- Required User Input: [one high-signal question, with options]
+```
+
+Ask one blocking question only. If several questions are useful but not required, put them in possible fixes instead.
 
 ## Completion Gate
 
-Enter COMPLETED only when:
+Only `ccdawn-completion-summary` can mark the workflow `COMPLETED`.
 
-- all critical steps executed.
-- verification passed.
-- no unresolved blockers remain.
-- intent is satisfied or explicitly updated.
-- expected vs actual is aligned.
-- Review Matrix has no unresolved NEEDS_CLARIFICATION or NEEDS_CHANGE verdict.
-- Review Matrix evidence is concrete: user confirmation, local context, verification output, probe result, or explicit assumption with risk.
-- side-effect check found no undisclosed risk.
-- closure lists open questions and residual risks.
+Completion requires:
+
+- all critical tasks completed or explicitly removed from scope.
+- verification evidence is fresh and passed.
+- expected vs actual behavior is aligned.
+- no unresolved blocker remains.
+- Review Matrix or stage self-review has no unresolved `NEEDS_CLARIFICATION` or `NEEDS_CHANGE`.
+- accepted residual risks are listed.
+- next action is explicit: commit/PR, stop, or return to a prior stage.

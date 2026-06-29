@@ -62,7 +62,7 @@ Behavior Contract:
 - 用什么结构性检查、人工验收或可逆 probe 代替；
 - 这个替代证据的风险。
 
-写测试、mock 或测试工具时，如出现 mock 断言、test-only production API、过度 mock，读取 `testing-anti-patterns.md`。
+写正式 BDD 场景或 `.feature` 文件时，读取 `references/gherkin.md`。写测试、mock 或测试工具时，如出现 mock 断言、test-only production API、过度 mock，读取 `testing-anti-patterns.md`。
 
 ## 执行边界
 
@@ -71,6 +71,21 @@ Behavior Contract:
 - 不覆盖用户或其他 agent 的无关改动。
 - 不把失败测试改成适配实现；修实现或修测试意图，不能抹掉行为要求。
 - 不用“手动看起来可以”替代要求中的测试命令。
+
+## Execution Loop
+
+执行循环归入本阶段。每个任务按这个顺序执行：
+
+1. BEFORE：确认当前任务、BDD/TDD Anchor、文件范围、工作区状态和无阻塞歧义。
+2. DURING：只执行当前任务，不扩大范围，不顺手执行下一个任务。
+3. AFTER：验证输出契约，对比 expected vs actual，检查副作用，更新 Workflow Ledger。
+
+如果验证失败：
+
+- 标记当前任务为 `PARTIAL` 或 `BLOCKED`；
+- 写清失败命令、失败原因和影响范围；
+- 给出可选修复；
+- 只问一个真正阻塞的问题，其他问题放入风险或可选修复。
 
 ## 输出契约
 
@@ -84,6 +99,19 @@ Task N 开发结果:
 - 变更: 文件/模块...
 - 自审: 行为契约 PASS/NEEDS_CHANGE；副作用 PASS/ACCEPT_RISK；测试 PASS/NEEDS_CHANGE
 - 剩余风险: ...
+
+Workflow Ledger:
+- Confirmed Intent: ...
+- Current Stage: DEVELOPING
+- Accepted Plan: ...
+- Task Graph: ...
+- Current Task: Task N
+- Completed Tasks: Task X..., Task N DONE/PARTIAL/BLOCKED
+- Verification Evidence: RED..., GREEN...
+- Decisions: ...
+- Assumptions: ...
+- Unresolved Risks: ...
+- Recommended Next Stage: 下一个任务 / ccdawn-completion-summary
 
 下一步:
 Task N 已完成。是否继续？
@@ -104,6 +132,16 @@ D. 暂停...
 - 对副作用和范围偏离的自审结论。
 
 缺任一项，都不能声称任务完成。
+
+## Workflow Ledger
+
+每完成或阻塞一个任务，都必须更新账本：
+
+- `Current Task` 是刚执行的任务。
+- `Completed Tasks` 记录 `DONE / PARTIAL / BLOCKED`，不能只写“已处理”。
+- `Verification Evidence` 写入 RED 和 GREEN 的命令与结果，或替代证据及风险。
+- `Unresolved Risks` 写剩余风险和后续验证方式。
+- 如果还有未完成 critical task，`Recommended Next Stage` 是下一个任务；否则是 `ccdawn-completion-summary`。
 
 ## 阶段交接
 

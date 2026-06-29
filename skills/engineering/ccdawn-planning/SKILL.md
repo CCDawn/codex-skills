@@ -36,7 +36,7 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 3. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
 4. 写方案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
 5. 自审：从范围、可实施性、风险、验证四个角度检查方案。
-6. 收口：询问用户是否进入 `ccdawn-task-splitting`。
+6. 更新 Workflow Ledger，询问用户是否进入 `ccdawn-task-splitting`。
 
 ## 输出契约
 
@@ -54,6 +54,19 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 - 风险决策: ...
 - 验证策略: ...
 - 需要保留的假设: ...
+
+Workflow Ledger:
+- Confirmed Intent: ...
+- Current Stage: PLANNING
+- Accepted Plan: ...
+- Task Graph: 未生成
+- Current Task: 无
+- Completed Tasks: 无
+- Verification Evidence: ...
+- Decisions: ...
+- Assumptions: ...
+- Unresolved Risks: ...
+- Recommended Next Stage: ccdawn-task-splitting
 
 方案自审:
 - 范围: PASS/NEEDS_CHANGE，证据...
@@ -75,6 +88,16 @@ C. 暂停在方案阶段...
 - 不过早拆任务：任务粒度留给 `ccdawn-task-splitting`。
 - 不实现：本阶段不编辑业务代码，除非用户明确改变阶段目标。
 - 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
+
+## Workflow Ledger
+
+方案完成时必须给后续阶段留下可续接账本：
+
+- `Confirmed Intent` 来自 `ccdawn-brt`，不能重新发明。
+- `Accepted Plan` 写成一句可执行方案摘要。
+- `Task Graph` 在本阶段标为未生成，留给 `ccdawn-task-splitting`。
+- `Decisions` 只记录会影响实现、测试、风险或范围的决定。
+- `Recommended Next Stage` 默认是 `ccdawn-task-splitting`。
 
 ## 高风险方案审查
 
