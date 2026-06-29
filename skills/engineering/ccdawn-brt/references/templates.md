@@ -60,6 +60,10 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 - 结果:
 - 不做:
 
+多角度自审:
+- [视角]: Challenge / Evidence / Verdict
+- [视角]: Challenge / Evidence / Verdict
+
 测试锚点:
 - 主路径:
 - 关键边界:
@@ -73,6 +77,7 @@ BRT 检查点:
 - 范围边界:
 - 允许动作:
 - 关键风险:
+- 自审结论:
 - 测试锚点:
 - 完成汇报:
 
@@ -80,6 +85,26 @@ BRT 检查点:
 ```
 
 ## Anti-Patterns
+
+Bad:
+
+```text
+评审:
+- 核心用户
+- 维护者
+- QA
+```
+
+Why bad: 只列视角，没有质疑、证据和结论，不能阻止错误实现。
+
+Better:
+
+```text
+多角度自审:
+- 核心用户: Challenge=是否真的减少重复解释；Evidence=下轮可复用项目上下文；Verdict=PASS
+- 维护者: Challenge=记忆噪声会不会膨胀；Evidence=只写项目级摘要并保留确认门槛；Verdict=ACCEPT_RISK，剩余风险是需要定期清理
+- 测试/QA: Challenge=如何证明不是只改了话术；Evidence=用一次模糊需求对齐样例检查候选项是否都有适用信号和代价；Verdict=PASS
+```
 
 Bad:
 

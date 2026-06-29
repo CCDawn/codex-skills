@@ -63,7 +63,7 @@ After entering EXECUTING:
 
 1. BEFORE execution: verify prerequisites, confirm no ambiguity, and declare step scope.
 2. DURING execution: execute only the current step; do not expand scope.
-3. AFTER execution: verify the output contract, compare expected vs actual, check side effects, and update Task Memory and task state.
+3. AFTER execution: verify the output contract, compare expected vs actual, rerun the relevant Review Matrix when risk or behavior changed, check side effects, and update Task Memory and task state.
 
 If verification fails:
 
@@ -96,5 +96,6 @@ Enter COMPLETED only when:
 - no unresolved blockers remain.
 - intent is satisfied or explicitly updated.
 - expected vs actual is aligned.
+- Review Matrix has no unresolved NEEDS_CLARIFICATION or NEEDS_CHANGE verdict.
 - side-effect check found no undisclosed risk.
 - closure lists open questions and residual risks.
