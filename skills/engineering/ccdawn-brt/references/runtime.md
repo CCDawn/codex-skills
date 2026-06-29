@@ -5,12 +5,13 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> [ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
+ccdawn-brt -> [existing skill reuse | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
 ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
 ```
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
-`ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment. `ccdawn-bug-review` applies when the current need is evidence-led bug or regression diagnosis.
+`systematic-debugging` is the primary bug/failure route; `root-cause-tracing` is added when the source is hidden deep in a call chain. `ccdawn-bug-review` is only a CCDawn adapter around those existing skills.
+`ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment and no more specific existing skill owns the task.
 
 ## Workflow State
 
@@ -33,7 +34,7 @@ State is a routing signal, not decoration.
 Transition rules:
 
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
-- Route to `ccdawn-evaluation`, `ccdawn-bug-review`, or `ccdawn-pr-review` when the task is primarily evaluation, bug diagnosis, or PR/diff review; do not force those tasks through planning.
+- Prefer existing specialized skills before CCDawn wrapper skills. Route bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user explicitly chooses a direct path that is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
@@ -56,8 +57,8 @@ Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
 
 Self-assess process weight before routing:
 
-- If the main value is judgment, comparison, or audit, route to `ccdawn-evaluation`.
-- If the main value is diagnosing a failing behavior, route to `ccdawn-bug-review`.
+- If the main value is judgment, comparison, or audit, route to the most specific existing review skill; use `ccdawn-evaluation` only when none fits.
+- If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
 - If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
 - If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.
 - Reuse the current worktree for one theme. Create a new worktree only for parallel work, conflict isolation, high-risk isolation, or explicit user request.

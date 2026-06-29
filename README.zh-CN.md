@@ -35,10 +35,10 @@
   PR 审阅阶段 skill，用来把 PR、分支、提交范围或本地 diff 对照已确认需求、任务证据、回归风险和合并准备度进行审查。
 
 - **`ccdawn-bug-review`**
-  Bug 审查 skill，用来对 bug、回归、失败测试、异常行为和疑似根因做证据化检查，再决定是否进入修复流程。
+  CCDawn bug 审查适配器，优先复用 `systematic-debugging` 和 `root-cause-tracing`，再总结证据、根因状态、影响范围和修复路由。
 
 - **`ccdawn-evaluation`**
-  评估 skill，用来评价方案、流程、skill、实现结果或当前状态是否符合用户目标、证据、风险、噪声和下一步价值。
+  CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。
 
 - **`ccdawn-dawn-agent-html-memory`**  
   这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它支持按职责拆分的多会话共享 lane，生成会聚合这些 lane 的 HTML 总览页，并在项目根目录生成一个 `PROJECT_MEMORY.html` 快捷入口。
@@ -222,8 +222,8 @@ skills/
 - `使用 ccdawn-competition-research-lifecycle 帮我规划这个竞赛项目`
 - `用 ccdawn-goal-loop 把这个目标整理成可验证的执行合同`
 - `用 ccdawn-pr-review 在合并前审阅这个 PR`
-- `用 ccdawn-bug-review 先审查这个回归的根因`
-- `用 ccdawn-evaluation 评估这个流程是否太重`
+- `用 ccdawn-bug-review 包装 systematic-debugging 来审查这个回归`
+- `用 ccdawn-evaluation 在检查更具体 skill 后评估这个流程`
 - `用 ccdawn-huawei-nslb-score-loop 准备 NSLB epoch 并 gate child results`
 - `用 ccdawn-creative-toolbox 基于当前上下文生成新概念卡`
 - `帮我给这个仓库初始化项目记忆`

@@ -1,5 +1,5 @@
 interface:
   display_name: "CCDawn Bug Review"
-  short_description: "Evidence-led bug, regression, and failing-test review before choosing a fix path."
-  default_prompt: "Use ccdawn-bug-review to inspect the reported bug or failed behavior, identify evidence and likely root cause, then route to the right CCDawn fix stage."
+  short_description: "CCDawn handoff wrapper that reuses systematic-debugging and root-cause-tracing."
+  default_prompt: "Use ccdawn-bug-review only as a CCDawn wrapper: first reuse systematic-debugging or root-cause-tracing, then summarize evidence, root-cause state, impact, and the next CCDawn route."
 
