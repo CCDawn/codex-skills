@@ -82,6 +82,7 @@ BRT 检查点:
 - Workflow Ledger:
   - Confirmed Intent:
   - Current Stage: PLANNING_READY
+  - Seed From Requirement Ledger: 已确认意图 / 显式假设 / 剩余风险 / 验证锚点
   - Assumptions:
   - Unresolved Risks:
   - Recommended Next Stage: ccdawn-planning
@@ -89,7 +90,7 @@ BRT 检查点:
 是否进入 ccdawn-planning 制定实施方案？
 A. 进入方案制定（推荐）...
 B. 继续需求对齐...
-C. 低风险直接实现（仅当用户明确选择）...
+C. 低风险直接实现（仅当用户明确选择，且单点、可逆、可验证、无迁移/删除/权限/发布风险）...
 D. 暂停...
 ```
 

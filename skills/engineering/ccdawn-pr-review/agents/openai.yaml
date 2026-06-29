@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn PR Review"
+  short_description: "Evidence-led PR review after CCDawn completion"
+  default_prompt: "Use ccdawn-pr-review to review the current PR against aligned requirements, task evidence, risks, and merge readiness."

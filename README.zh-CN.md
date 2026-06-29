@@ -17,7 +17,7 @@
 ### Engineering
 
 - **`ccdawn-brt`**  
-  Behavior / Review / Test 工作流 skill。它会主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和高信号选择题，让用户选择或确认后，再把模糊功能想法收束成清晰的行为定义、评审视角、Task Graph、执行闸门、验收标准和测试意图。
+  Behavior / Review / Test 流程入口 skill。它会主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和高信号选择题，让用户选择或确认后，再把模糊功能想法收束成行为契约、评审视角、测试锚点和下一阶段路由。
 
 - **`ccdawn-planning`**
   方案制定阶段 skill，用来在需求对齐后、动代码前形成实施方案。
@@ -30,6 +30,9 @@
 
 - **`ccdawn-completion-summary`**
   完成总结阶段 skill，用来做新鲜验证、需求对照和简洁交接总结。
+
+- **`ccdawn-pr-review`**
+  PR 审阅阶段 skill，用来把 PR、分支、提交范围或本地 diff 对照已确认需求、任务证据、回归风险和合并准备度进行审查。
 
 - **`ccdawn-dawn-agent-html-memory`**  
   这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它支持按职责拆分的多会话共享 lane，生成会聚合这些 lane 的 HTML 总览页，并在项目根目录生成一个 `PROJECT_MEMORY.html` 快捷入口。
@@ -95,6 +98,7 @@ skills/
     ccdawn-task-splitting/
     ccdawn-bdd-tdd-development/
     ccdawn-completion-summary/
+    ccdawn-pr-review/
     ccdawn-goal-loop/
   research/
     README.md
@@ -209,6 +213,7 @@ skills/
 
 - `使用 ccdawn-competition-research-lifecycle 帮我规划这个竞赛项目`
 - `用 ccdawn-goal-loop 把这个目标整理成可验证的执行合同`
+- `用 ccdawn-pr-review 在合并前审阅这个 PR`
 - `用 ccdawn-huawei-nslb-score-loop 准备 NSLB epoch 并 gate child results`
 - `用 ccdawn-creative-toolbox 基于当前上下文生成新概念卡`
 - `帮我给这个仓库初始化项目记忆`

@@ -5,8 +5,10 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary
+ccdawn-brt -> ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
 ```
+
+`ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
 
 ## Workflow State
 
@@ -19,18 +21,21 @@ State is a routing signal, not decoration.
 - TASK_SPLITTING: `ccdawn-task-splitting` is producing a task graph.
 - DEVELOPING: `ccdawn-bdd-tdd-development` is executing one selected task.
 - SUMMARIZING: `ccdawn-completion-summary` is checking evidence and reporting status.
+- PR_REVIEWING: `ccdawn-pr-review` is checking a PR, branch, commit range, or local diff against requirements and evidence.
+- MERGE_READY: `ccdawn-pr-review` found no blocking issues and the next action is submit, push, merge, release, or stop.
 - BLOCKED: required information, prerequisites, or evidence are missing.
 - COMPLETED: critical tasks are done, evidence passed, and no blocker remains.
 
 Transition rules:
 
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
-- `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user explicitly chooses a low-risk direct implementation path.
+- `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user explicitly chooses a direct path that is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk.
 - Each stage stops after its output contract and asks whether to enter the next stage.
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
 - If a selected task is unclear, return to `ccdawn-task-splitting`.
 - Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
+- Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means implementation evidence passed; `MERGE_READY` means integration review passed.
 
 ## Workflow Ledger
 
@@ -55,10 +60,12 @@ Workflow Ledger:
 
 Ledger rules:
 
+- When `ccdawn-brt` enters planning, seed `Workflow Ledger` from the requirement ledger: confirmed intent, assumptions, unresolved risks, and verification anchors.
 - Update the ledger at every stage boundary.
 - Treat the ledger as the handoff contract for "continue".
 - Do not invent missing entries. If a field is unknown, mark it as unknown and route to the stage that can resolve it.
 - If code reality conflicts with the ledger, update the ledger and explain the mismatch before continuing.
+- Compress the ledger for small tasks: output one `Ledger Update` line when no stage handoff, blocker, or resumed work depends on the full ledger.
 
 ## Probe
 
@@ -90,7 +97,7 @@ Ask one blocking question only. If several questions are useful but not required
 
 ## Completion Gate
 
-Only `ccdawn-completion-summary` can mark the workflow `COMPLETED`.
+Only `ccdawn-completion-summary` can mark implementation `COMPLETED`. Only `ccdawn-pr-review` can mark a PR or diff `MERGE_READY`.
 
 Completion requires:
 

@@ -19,7 +19,7 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 ### Engineering
 
 - **`ccdawn-brt`**  
-  The Behavior / Review / Test workflow skill. It proactively infers what the user likely means, offers candidate intents and high-signal questions with recommendations, and then turns the aligned behavior into examples, review lenses, task graphs, execution gates, acceptance criteria, and test intentions.
+  The Behavior / Review / Test workflow entry skill. It proactively infers what the user likely means, offers candidate intents and high-signal questions with recommendations, and turns aligned intent into behavior contracts, review lenses, test anchors, and next-stage routing.
 
 - **`ccdawn-planning`**
   The planning-stage skill for turning aligned requirements into an implementation plan before code changes.
@@ -32,6 +32,9 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 
 - **`ccdawn-completion-summary`**
   The completion-stage skill for fresh verification evidence, requirement comparison, and concise handoff summaries.
+
+- **`ccdawn-pr-review`**
+  The PR-review-stage skill for checking a PR, branch, commit range, or local diff against aligned requirements, task evidence, regression risk, and merge readiness.
 
 - **`ccdawn-dawn-agent-html-memory`**  
   A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.
@@ -97,6 +100,7 @@ skills/
     ccdawn-task-splitting/
     ccdawn-bdd-tdd-development/
     ccdawn-completion-summary/
+    ccdawn-pr-review/
     ccdawn-goal-loop/
   research/
     README.md
@@ -217,6 +221,7 @@ Invoke the skills in chat with prompts such as:
 - `Use ccdawn-competition-research-lifecycle to plan this benchmark project`
 - `Help me run this competition through a full research lifecycle`
 - `Use ccdawn-goal-loop to turn this objective into a verified execution contract`
+- `Use ccdawn-pr-review to review this PR before merge`
 - `Use ccdawn-huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
 - `Use ccdawn-creative-toolbox to generate new concept cards from this context`
 - `Initialize project memory for this repo`
