@@ -34,10 +34,29 @@ Transition rules:
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
 - If a selected task is unclear, return to `ccdawn-task-splitting`.
-- A user may authorize continuous Critical Path execution after task splitting. This authorizes repeated task handoff only; each task still runs through BDD, RED, GREEN, VERIFY, ledger update, and stop-on-blocker checks.
+- A user may authorize continuous Critical Path execution after task splitting. This authorizes repeated task handoff only; each task still runs through its selected development mode, verification, ledger update, and stop-on-blocker checks.
 - Continuous Critical Path execution must stop on blocker, failed verification, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
 - Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
 - Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means implementation evidence passed; `MERGE_READY` means integration review passed.
+
+## Execution Mode Gate
+
+Before planning, splitting, or development, classify the work:
+
+- `FAST_PATH`: clear, low-risk, reversible, locally verifiable, and the model expects it can finish in one implementation pass. Use light implementation and necessary verification. Do not require BDD/TDD.
+- `COMPACT_FLOW`: multiple related low-risk tasks under one theme. Use one continuous workspace/context and compact task list. Upgrade only the complex tasks to BDD/TDD.
+- `FULL_FLOW`: the model expects the work cannot be completed safely in one pass, has unclear behavior, crosses modules, touches state/API/security/data/migration/release, or has high regression risk. Use planning, task splitting, and BDD/TDD for complex tasks.
+
+Upgrade a task to `BDD_TDD` only when at least one signal is present:
+
+- behavior is new or ambiguous enough that a one-pass implementation is likely to drift;
+- failure path, state transition, persistence, permission, migration, API, or integration contract matters;
+- change spans multiple modules or depends on staged refactoring;
+- existing bug is not localized or has already regressed;
+- verification requires a new behavior test to be trustworthy;
+- user explicitly asks for strict BDD/TDD.
+
+Keep `SIMPLE` mode when the task is a small localized edit with clear expected output, no risky state/API/data change, and a direct verification command or structural check is enough.
 
 ## Workflow Ledger
 
@@ -75,7 +94,7 @@ Stage skills should not repeat the full ledger when a compact update is enough. 
 
 - `ccdawn-planning`: `Current Stage`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-task-splitting`: `Current Stage`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
-- `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Development Mode`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-completion-summary`: `Current Stage`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-pr-review`: `Current Stage`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 

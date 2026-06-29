@@ -1,21 +1,18 @@
 ---
 name: ccdawn-bdd-tdd-development
-description: Use when a CCDawn task has been selected and the user confirms entering development; applies before implementing behavior changes, features, bug fixes, refactors, or tests that need BDD behavior anchors, TDD red-green-refactor discipline, task-scoped execution, and evidence before moving on.
+description: Use when a selected CCDawn task is not safe to finish in one pass, is complex, ambiguous, cross-module, regression-prone, or user explicitly asks for BDD/TDD; simple low-risk tasks should use lightweight implementation and verification instead.
 ---
 
-# CCDawn BDD/TDD Development
+# CCDawn Development Mode
 
 ## 目标
 
-按已选择的任务进行开发。此阶段一次只执行一个任务，先锁定行为，再用 TDD 实现。即使用户授权连续执行全部 Critical Path，也必须逐任务推进。
+按已选择的任务进行开发。此阶段一次只执行一个任务，并先判定开发模式。
 
-核心顺序：
+开发模式：
 
-1. BDD：把任务翻译成 Given / When / Then 行为契约。
-2. RED：先写失败测试，并确认失败原因正确。
-3. GREEN：写最小实现让测试通过。
-4. REFACTOR：只在测试保持通过时清理代码。
-5. VERIFY：用新鲜证据证明任务完成。
+- SIMPLE：模型判断可以一次稳定完成、范围清楚、风险低、可直接验证；不强制 BDD/TDD。
+- BDD_TDD：模型判断无法一次稳定完成、容易偏离、跨模块、高风险或需要新行为测试证明；使用 BDD + RED/GREEN/REFACTOR。
 
 ## 进入条件
 
@@ -23,12 +20,46 @@ description: Use when a CCDawn task has been selected and the user confirms ente
 
 - 用户确认进入开发；
 - 一个明确的 `ccdawn-task-splitting` 任务；
-- 任务的 Goal、Files、BDD Anchor、TDD Anchor、Verification；
+- 任务的 Goal/Output、Files、Development Mode、Verification；
 - 当前工作区状态已检查，不覆盖无关用户改动。
 
-如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。如果用户授权连续执行全部 Critical Path，必须同时有有序 Task Graph、每个 critical task 的 BDD/TDD/Verification，以及当前下一个任务。
+如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。如果用户授权连续执行全部 Critical Path，必须同时有有序 Task Graph、每个 critical task 的 Development Mode/Verification，以及当前下一个任务。
 
-## BDD 契约
+## 模式判定
+
+保持 `SIMPLE`，当任务同时满足：
+
+- 输出和文件范围清楚；
+- 不涉及迁移、删除、权限、安全、持久化、公共 API 或发布风险；
+- 不需要多步设计或跨模块协调；
+- 失败可快速回滚；
+- 一个验证命令、结构检查或人工验收足以证明结果。
+
+升级到 `BDD_TDD`，当任一条件成立：
+
+- 模型判断一次实现容易漏边界或偏离意图；
+- 行为、状态流转、失败路径或数据契约不清；
+- 涉及多模块协作、持久化、权限、安全、迁移、公共 API、发布或回滚；
+- 需要新增行为测试才能相信修复；
+- 之前类似问题已经回归；
+- 用户明确要求严格 BDD/TDD。
+
+如果任务拆分给出的模式与当前判断冲突，先更新 Ledger，并用一句话说明升级或降级原因。
+
+## SIMPLE 执行
+
+SIMPLE 任务只需要：
+
+1. 确认当前任务、文件范围和验证方式。
+2. 做最小实现，不扩大范围。
+3. 运行必要验证或结构检查。
+4. 简短报告变更、证据和风险。
+
+不要为了形式化而输出 Given/When/Then、RED/GREEN 或完整任务卡。
+
+## BDD/TDD 执行
+
+仅 `BDD_TDD` 模式使用本节。
 
 实现前先输出或内部确认：
 
@@ -42,7 +73,7 @@ Behavior Contract:
 
 如果 BDD 契约会改变用户预期，先问用户；如果只是把已确认任务转成测试语言，可以继续。
 
-## TDD 铁律
+### TDD 铁律
 
 ```
 没有先失败的测试，就不要写生产代码。
@@ -67,18 +98,18 @@ Behavior Contract:
 ## 执行边界
 
 - 只执行当前任务；除非用户明确授权连续 Critical Path，否则不顺手做下一个任务。
-- 连续 Critical Path 授权只允许自动选择下一个 critical task；不得合并任务、跳过测试、跳过验证或扩大范围。停止条件以 `ccdawn-brt/references/runtime.md` 为准。
+- 连续 Critical Path 授权只允许自动选择下一个 critical task；不得合并任务、跳过验证或扩大范围。SIMPLE 任务按轻量验证执行，BDD_TDD 任务按 RED/GREEN 执行。停止条件以 `ccdawn-brt/references/runtime.md` 为准。
 - 不扩大范围，不重构无关区域。
 - 不覆盖用户或其他 agent 的无关改动。
 - 不把失败测试改成适配实现；修实现或修测试意图，不能抹掉行为要求。
-- 不用“手动看起来可以”替代要求中的测试命令。
+- 不用“手动看起来可以”替代要求中的验证证据。
 
 ## Execution Loop
 
 执行循环归入本阶段。每个任务按这个顺序执行：
 
-1. BEFORE：确认当前任务、BDD/TDD Anchor、文件范围、工作区状态和无阻塞歧义。
-2. DURING：只执行当前任务，不扩大范围，不顺手执行下一个任务。
+1. BEFORE：确认当前任务、Development Mode、验证方式、文件范围、工作区状态和无阻塞歧义。
+2. DURING：按 SIMPLE 或 BDD_TDD 执行当前任务，不扩大范围，不顺手执行下一个任务。
 3. AFTER：验证输出契约，对比 expected vs actual，检查副作用，更新 Workflow Ledger。
 
 连续 Critical Path 模式下，AFTER 通过后自动选择下一个未完成 critical task 继续；如果没有未完成 critical task，进入 `ccdawn-completion-summary`。连续模式不是跳过阶段交接，而是用户预先授权后续交接。
@@ -98,25 +129,26 @@ Behavior Contract:
 
 ```text
 Task N 开发结果:
-- BDD: Given... When... Then...
-- RED: 命令...；失败原因...
-- GREEN: 命令...；通过结果...
+- Development Mode: SIMPLE / BDD_TDD
+- BDD/TDD: SIMPLE 写“未使用，原因...”；BDD_TDD 写 Given/When/Then、RED、GREEN
 - 变更: 文件/模块...
-- 自审: 行为契约 PASS/NEEDS_CHANGE；副作用 PASS/ACCEPT_RISK；测试 PASS/NEEDS_CHANGE
+- 验证: 命令/检查...；结果...
+- 自审: 输出契约 PASS/NEEDS_CHANGE；副作用 PASS/ACCEPT_RISK；验证 PASS/NEEDS_CHANGE
 - 剩余风险: ...
 
 Ledger Update:
 - Current Stage: DEVELOPING
 - Current Task: Task N
+- Development Mode: SIMPLE / BDD_TDD
 - Completed Tasks: Task X..., Task N DONE/PARTIAL/BLOCKED
-- Verification Evidence: RED..., GREEN...
+- Verification Evidence: ...
 - Unresolved Risks: ...
 - Recommended Next Stage: 下一个任务 / ccdawn-completion-summary
 
 下一步:
 Task N 已完成。是否继续？
 A. 执行下一个任务（如果还有任务，推荐）...
-B. 连续执行剩余 Critical Path（需要明确授权；逐任务 BDD/TDD/验证，遇阻立刻停）...
+B. 连续执行剩余 Critical Path（需要明确授权；逐任务按 SIMPLE 或 BDD_TDD 执行，遇阻立刻停）...
 C. 进入 ccdawn-completion-summary 做阶段总结（所有关键任务完成时推荐）...
 D. 回到 ccdawn-task-splitting 调整任务...
 E. 暂停...
@@ -126,11 +158,12 @@ E. 暂停...
 
 任务完成前必须有：
 
-- BDD 契约；
-- 至少一个 RED 证据；
-- GREEN 后的验证证据；
+- Development Mode 判定；
 - 与任务 Goal 对齐的变更摘要；
+- 新鲜验证证据；
 - 对副作用和范围偏离的自审结论。
+
+`BDD_TDD` 任务还必须有 BDD 契约、RED 证据和 GREEN 后验证证据。
 
 缺任一项，都不能声称任务完成。
 
@@ -139,8 +172,9 @@ E. 暂停...
 每完成或阻塞一个任务，都必须更新账本：
 
 - `Current Task` 是刚执行的任务。
+- `Development Mode` 记录 `SIMPLE / BDD_TDD`。
 - `Completed Tasks` 记录 `DONE / PARTIAL / BLOCKED`，不能只写“已处理”。
-- `Verification Evidence` 写入 RED 和 GREEN 的命令与结果，或替代证据及风险。
+- `Verification Evidence` 写入验证命令与结果；BDD_TDD 任务写入 RED 和 GREEN。
 - `Unresolved Risks` 写剩余风险和后续验证方式。
 - 如果还有未完成 critical task，`Recommended Next Stage` 是下一个任务；如果已授权连续 Critical Path，写成 `继续下一个 critical task`；否则是 `ccdawn-completion-summary`。
 - 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。

@@ -1,6 +1,6 @@
 interface:
   display_name: "CCDawn BRT"
   short_description: "主动揣测用户真实意图，用有判断价值的候选项、高信号问题和证据化多角度自审完成需求对齐。"
-  default_prompt: "使用 $ccdawn-brt：主动揣测用户心里真正想要的结果，给出有判断价值的候选意图、推荐方案和多个高信号选择题，让用户选择或确认后，再形成行为契约、证据化多角度自审结论、测试锚点和下一阶段路由。"
+  default_prompt: "使用 $ccdawn-brt：主动揣测用户心里真正想要的结果，给出有判断价值的候选意图、推荐方案和高信号选择题；对齐后判定 FAST_PATH、COMPACT_FLOW 或 FULL_FLOW，简单任务轻量实现，复杂任务再路由到方案、拆分或 BDD/TDD。"
 
 

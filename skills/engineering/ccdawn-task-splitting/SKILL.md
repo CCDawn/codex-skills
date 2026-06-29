@@ -1,6 +1,6 @@
 ---
 name: ccdawn-task-splitting
-description: Use after a CCDawn implementation plan is accepted and the user confirms entering task splitting, before development starts; applies when work must be decomposed into ordered, reviewable, independently verifiable tasks with dependencies, BDD/TDD anchors, and handoff decisions.
+description: Use after a CCDawn implementation plan is accepted and the user confirms entering task splitting, before development starts; applies when work must be decomposed into ordered, reviewable, independently verifiable tasks with dependencies, development mode decisions, verification anchors, and handoff decisions.
 ---
 
 # CCDawn Task Splitting
@@ -13,7 +13,7 @@ description: Use after a CCDawn implementation plan is accepted and the user con
 
 - 先做哪一项，为什么；
 - 每个任务的输入、输出和依赖；
-- 每个任务如何用 BDD/TDD 验证；
+- 每个任务适合轻量实现还是需要 BDD/TDD；
 - 哪些任务是关键路径，哪些是可选优化；
 - 完成一个任务后怎样判断可以进入下一个任务。
 
@@ -36,6 +36,8 @@ description: Use after a CCDawn implementation plan is accepted and the user con
 - 测试、脚手架、配置和文档不要单独漂浮；并入产出依赖它们的任务。
 - 不把多个无关模块塞进同一个任务。
 - 不把一次微小改动拆成无意义的小碎片。
+- 简单任务标记为 `SIMPLE`，只要求明确产出和必要验证。
+- 只有模型判断无法一次稳定完成、容易偏离、跨模块或高风险的任务，才标记为 `BDD_TDD`。
 
 ## Task Graph
 
@@ -67,11 +69,22 @@ Task N: 名称
 - Files: 预计创建/修改/测试的路径
 - Dependencies: 无 / Task X
 - Criticality: critical / optional
-- BDD Anchor: Given / When / Then
-- TDD Anchor: 先写哪个失败测试，失败原因应是什么
+- Development Mode: SIMPLE / BDD_TDD
+- BDD/TDD Anchor: SIMPLE 写“无需，原因...”；BDD_TDD 写 Given / When / Then 和先失败测试
 - Verification: 要运行的命令或结构性检查
 - Review Gate: 任务完成后审什么
 - Risk: 本任务最可能出偏差的点
+```
+
+简单任务可用压缩卡片：
+
+```text
+Task N: 名称
+- Output:
+- Files:
+- Development Mode: SIMPLE
+- Verification:
+- Risk:
 ```
 
 ## 输出契约
@@ -95,7 +108,7 @@ Ledger Update:
 - Verification Evidence: 拆分自审...
 - Decisions: ...
 - Unresolved Risks: ...
-- Recommended Next Stage: ccdawn-bdd-tdd-development（Task 1 / 授权后连续 Critical Path）
+- Recommended Next Stage: 轻量执行 Task 1 / ccdawn-bdd-tdd-development（仅 BDD_TDD 任务）/ 授权后连续 Critical Path
 
 拆分自审:
 - 覆盖方案: PASS/NEEDS_CHANGE，证据...
@@ -105,17 +118,18 @@ Ledger Update:
 
 下一步:
 任务拆分已完成。建议先执行 Task 1；如果用户希望 agent 连续推进，也可以授权按 Critical Path 一次性执行到完成总结。
-A. 执行 Task 1（推荐，风险最低）...
-B. 连续执行全部 Critical Path（需要明确授权；逐任务 BDD/TDD/验证，遇阻立刻停）...
-C. 调整任务拆分...
-D. 先指定另一个任务...
-E. 暂停...
+A. 轻量执行 Task 1（SIMPLE 任务推荐）...
+B. 使用 ccdawn-bdd-tdd-development 执行 Task 1（仅 BDD_TDD 任务推荐）...
+C. 连续执行全部 Critical Path（需要明确授权；逐任务按 SIMPLE 或 BDD_TDD 执行，遇阻立刻停）...
+D. 调整任务拆分...
+E. 先指定另一个任务...
+F. 暂停...
 ```
 
 ## 质量门槛
 
-- 没有 BDD Anchor 的任务不合格。
-- 没有 TDD Anchor 的开发任务不合格；如果确实不能自动测试，必须说明原因和替代证据。
+- `BDD_TDD` 任务没有 BDD/TDD Anchor 不合格。
+- `SIMPLE` 任务不要补形式化 BDD/TDD；只要说明为什么轻量验证足够。
 - 任务不能只写“实现功能”“添加测试”“更新文档”。
 - 不能在拆分阶段改代码。
 - 如果拆分发现方案不可执行，回到 `ccdawn-planning`，不要硬拆。
@@ -127,17 +141,17 @@ E. 暂停...
 - `Accepted Plan` 必须来自 `ccdawn-planning`。
 - `Task Graph` 必须包含 critical path、optional path 和任务依赖。
 - `Current Task` 默认推荐第一个未完成 critical task，除非用户指定其他任务。
-- `Recommended Next Stage` 默认是 `ccdawn-bdd-tdd-development` 的 Task 1；同时提供“连续执行全部 Critical Path”的明确授权选项。
+- `Recommended Next Stage` 默认是第一个未完成 critical task，并标明 `SIMPLE` 或 `BDD_TDD`；同时提供“连续执行全部 Critical Path”的明确授权选项。
 - 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 
 ## 阶段交接
 
 每次完成任务拆分后必须停下并询问是否进入下一阶段。
 
-如果用户确认进入开发，使用 `ccdawn-bdd-tdd-development`，并只交付用户选择的任务。不要默认连续执行全部任务，除非用户明确选择“连续执行全部 Critical Path”。
+如果用户确认进入开发，按任务的 `Development Mode` 执行：`SIMPLE` 任务轻量实现和验证；`BDD_TDD` 任务使用 `ccdawn-bdd-tdd-development`。不要默认连续执行全部任务，除非用户明确选择“连续执行全部 Critical Path”。
 
 如果用户选择连续执行全部 Critical Path：
 
 - 把该选择写入 `Decisions`：`Continuous Critical Path authorized`。
-- 后续执行细节和停止条件以 `ccdawn-brt/references/runtime.md` 的 Continuous Critical Path 规则为准。
+- 后续执行细节、开发模式和停止条件以 `ccdawn-brt/references/runtime.md` 为准。
 - 全部 critical tasks 完成后，默认路由到 `ccdawn-completion-summary`，不要停在中间等待用户重复确认。

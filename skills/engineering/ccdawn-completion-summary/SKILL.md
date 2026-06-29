@@ -24,7 +24,7 @@ description: Use after CCDawn development, verification, or a workflow stage end
 - 可以运行或检查的验证证据；
 - 需要汇报给用户的下一步决策。
 
-如果发现关键任务没做完，回到 `ccdawn-bdd-tdd-development` 或 `ccdawn-task-splitting`，不要把未完成包装成总结。
+如果发现关键任务没做完，按任务的 Development Mode 回到轻量开发或 `ccdawn-bdd-tdd-development`；如果任务本身不清楚，回到 `ccdawn-task-splitting`，不要把未完成包装成总结。
 
 ## 验证门槛
 
@@ -84,7 +84,7 @@ Ledger Update:
 下一步:
 A. 进入 ccdawn-pr-review 做 PR/diff 审阅（准备提交、推送、PR 或合并时推荐）...
 B. 提交/推送/准备 PR（仅当用户明确跳过审阅或本轮无需 PR）...
-C. 回到 ccdawn-bdd-tdd-development 补任务...
+C. 回到对应开发模式补任务（SIMPLE 轻量补；BDD_TDD 使用 ccdawn-bdd-tdd-development）...
 D. 回到 ccdawn-planning 或 ccdawn-brt 调整方向...
 E. 暂停...
 ```
@@ -117,4 +117,4 @@ E. 暂停...
 
 每次总结后必须给下一步选择。
 
-如果用户选择继续开发，使用 `ccdawn-bdd-tdd-development`。如果用户发现需求方向不对，回到 `ccdawn-brt`。如果用户要进入 PR、提交、推送、合并或发布前审阅，使用 `ccdawn-pr-review`。
+如果用户选择继续开发，按任务的 Development Mode 执行；复杂任务使用 `ccdawn-bdd-tdd-development`。如果用户发现需求方向不对，回到 `ccdawn-brt`。如果用户要进入 PR、提交、推送、合并或发布前审阅，使用 `ccdawn-pr-review`。
