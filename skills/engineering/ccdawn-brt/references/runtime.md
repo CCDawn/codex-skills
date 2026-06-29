@@ -18,7 +18,7 @@ State is a routing signal, not decoration.
 - INTENT_CONVERGENCE: `ccdawn-brt` is comparing candidate intents and asking high-signal questions.
 - PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
 - PLANNING: `ccdawn-planning` is producing an implementation plan.
-- TASK_SPLITTING: `ccdawn-task-splitting` is producing a task graph.
+- TASK_SPLITTING: `ccdawn-task-splitting` is deciding `NO_SPLIT` or producing a task graph with per-task development modes.
 - DEVELOPING: `ccdawn-bdd-tdd-development` is executing one selected task.
 - SUMMARIZING: `ccdawn-completion-summary` is checking evidence and reporting status.
 - PR_REVIEWING: `ccdawn-pr-review` is checking a PR, branch, commit range, or local diff against requirements and evidence.
@@ -39,15 +39,22 @@ Transition rules:
 - Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
 - Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means implementation evidence passed; `MERGE_READY` means integration review passed.
 
-## Execution Mode Gate
+## Flow and Task Mode Gates
 
-Before planning, splitting, or development, classify the work:
+BRT and planning only decide the flow route:
 
-- `FAST_PATH`: clear, low-risk, reversible, locally verifiable, and the model expects it can finish in one implementation pass. Use light implementation and necessary verification. Do not require BDD/TDD.
-- `COMPACT_FLOW`: multiple related low-risk tasks under one theme. Use one continuous workspace/context and compact task list. Upgrade only the complex tasks to BDD/TDD.
-- `FULL_FLOW`: the model expects the work cannot be completed safely in one pass, has unclear behavior, crosses modules, touches state/API/security/data/migration/release, or has high regression risk. Use planning, task splitting, and BDD/TDD for complex tasks.
+- `FAST_PATH`: clear, low-risk, reversible, locally verifiable, and can finish in one implementation pass. Use light implementation and necessary verification.
+- `COMPACT_FLOW`: multiple related work units under one theme. Use one continuous workspace/context. Enter task splitting only when split/no-split or per-subtask mode is unclear.
+- `FULL_FLOW`: needs a plan and likely split/no-split decision because it crosses modules, has unclear sequencing, or touches state/API/security/data/migration/release.
 
-Upgrade a task to `BDD_TDD` only when at least one signal is present:
+Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
+
+`ccdawn-task-splitting` owns the split decision:
+
+- `NO_SPLIT`: one low-risk execution unit, clear verification, no staged dependencies, no BDD/TDD need.
+- `SPLIT`: create subtasks and classify each subtask as `SIMPLE` or `BDD_TDD`.
+
+Inside `SPLIT`, upgrade a subtask to `BDD_TDD` only when at least one signal is present:
 
 - behavior is new or ambiguous enough that a one-pass implementation is likely to drift;
 - failure path, state transition, persistence, permission, migration, API, or integration contract matters;
@@ -56,7 +63,7 @@ Upgrade a task to `BDD_TDD` only when at least one signal is present:
 - verification requires a new behavior test to be trustworthy;
 - user explicitly asks for strict BDD/TDD.
 
-Keep `SIMPLE` mode when the task is a small localized edit with clear expected output, no risky state/API/data change, and a direct verification command or structural check is enough.
+Keep a subtask `SIMPLE` when it is localized, has clear expected output, has no risky state/API/data change, and a direct verification command or structural check is enough.
 
 ## Workflow Ledger
 
@@ -93,7 +100,7 @@ Ledger rules:
 Stage skills should not repeat the full ledger when a compact update is enough. Output only the changed fields plus the next recommended stage.
 
 - `ccdawn-planning`: `Current Stage`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
-- `ccdawn-task-splitting`: `Current Stage`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-task-splitting`: `Current Stage`, `Split Decision`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Development Mode`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-completion-summary`: `Current Stage`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-pr-review`: `Current Stage`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.

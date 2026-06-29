@@ -117,4 +117,4 @@ E. 暂停...
 
 每次总结后必须给下一步选择。
 
-如果用户选择继续开发，按任务的 Development Mode 执行；复杂任务使用 `ccdawn-bdd-tdd-development`。如果用户发现需求方向不对，回到 `ccdawn-brt`。如果用户要进入 PR、提交、推送、合并或发布前审阅，使用 `ccdawn-pr-review`。
+如果用户选择继续开发，按任务的 Development Mode 执行；`BDD_TDD` 子任务使用 `ccdawn-bdd-tdd-development`。如果用户发现需求方向不对，回到 `ccdawn-brt`。如果用户要进入 PR、提交、推送、合并或发布前审阅，使用 `ccdawn-pr-review`。

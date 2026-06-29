@@ -7,7 +7,7 @@ description: Use when a selected CCDawn task is not safe to finish in one pass, 
 
 ## 目标
 
-按已选择的任务进行开发。此阶段一次只执行一个任务，并先判定开发模式。
+按已选择的任务进行开发。此阶段一次只执行一个任务，并遵循 `ccdawn-task-splitting` 给出的 Development Mode。
 
 开发模式：
 
@@ -25,9 +25,11 @@ description: Use when a selected CCDawn task is not safe to finish in one pass, 
 
 如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。如果用户授权连续执行全部 Critical Path，必须同时有有序 Task Graph、每个 critical task 的 Development Mode/Verification，以及当前下一个任务。
 
-## 模式判定
+## 模式来源
 
-保持 `SIMPLE`，当任务同时满足：
+Development Mode 主要由 `ccdawn-task-splitting` 在拆分子任务时判定；不要在开发阶段重新给整个需求分类。
+
+接受 `SIMPLE`，当子任务同时满足：
 
 - 输出和文件范围清楚；
 - 不涉及迁移、删除、权限、安全、持久化、公共 API 或发布风险；
@@ -35,7 +37,7 @@ description: Use when a selected CCDawn task is not safe to finish in one pass, 
 - 失败可快速回滚；
 - 一个验证命令、结构检查或人工验收足以证明结果。
 
-升级到 `BDD_TDD`，当任一条件成立：
+升级到 `BDD_TDD`，当当前子任务任一条件成立：
 
 - 模型判断一次实现容易漏边界或偏离意图；
 - 行为、状态流转、失败路径或数据契约不清；
@@ -44,7 +46,7 @@ description: Use when a selected CCDawn task is not safe to finish in one pass, 
 - 之前类似问题已经回归；
 - 用户明确要求严格 BDD/TDD。
 
-如果任务拆分给出的模式与当前判断冲突，先更新 Ledger，并用一句话说明升级或降级原因。
+如果任务拆分给出的模式与当前判断冲突，先更新 Ledger，并用一句话说明升级或降级原因。没有拆分出来的 `NO_SPLIT` 直接执行单元通常不需要使用本技能，除非执行中发现必须升级为复杂子任务。
 
 ## SIMPLE 执行
 

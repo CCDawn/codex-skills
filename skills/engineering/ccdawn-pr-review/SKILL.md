@@ -32,7 +32,7 @@ description: Use when CCDawn development has completed or a PR/diff is ready for
 
 - 默认只读：不要编辑文件、不要移动 HEAD、不要改 index、不要改分支状态。
 - 可以运行只读检查、测试、构建或 lint；如果命令会写缓存或产物，说明影响并避免把产物当代码改动提交。
-- 不用审阅阶段顺手修复问题。需要修复时，路由到 `ccdawn-bdd-tdd-development`。
+- 不用审阅阶段顺手修复问题。需要修复时，按原任务的 Development Mode 路由；复杂子任务才回到 `ccdawn-bdd-tdd-development`。
 - 不扩大评审范围到用户未要求的重构、风格统一或架构重写。
 - 不把缺少证据包装成通过。
 
@@ -119,10 +119,10 @@ Ledger Update:
 - Current Stage: PR_REVIEWING / MERGE_READY / BLOCKED
 - Verification Evidence: ...
 - Unresolved Risks: ...
-- Recommended Next Stage: ccdawn-bdd-tdd-development / ccdawn-completion-summary / 提交/推送/合并 / 暂停
+- Recommended Next Stage: 对应开发模式 / ccdawn-task-splitting / ccdawn-completion-summary / 提交/推送/合并 / 暂停
 
 下一步:
-A. 回到 ccdawn-bdd-tdd-development 修复 P0/P1（有阻塞问题时推荐）...
+A. 回到对应开发模式修复 P0/P1（复杂子任务使用 ccdawn-bdd-tdd-development）...
 B. 回到 ccdawn-completion-summary 补证据或重做完成判断...
 C. 提交/推送/合并/发布（READY 时推荐）...
 D. 回到 ccdawn-brt 或 ccdawn-planning 调整方向...
@@ -137,7 +137,7 @@ D. 回到 ccdawn-brt 或 ccdawn-planning 调整方向...
 
 ## 路由规则
 
-- 代码问题：回到 `ccdawn-bdd-tdd-development`，按任务和 TDD 修。
+- 代码问题：回到对应开发模式；如果原任务缺少拆分或模式不清，先回到 `ccdawn-task-splitting` 判定子任务 `SIMPLE / BDD_TDD`。
 - 任务拆分错误：回到 `ccdawn-task-splitting`。
 - 方案错误：回到 `ccdawn-planning`。
 - 需求方向错误：回到 `ccdawn-brt`。

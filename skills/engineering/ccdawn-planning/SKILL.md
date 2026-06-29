@@ -36,7 +36,7 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 3. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
 4. 写方案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
 5. 自审：从范围、可实施性、风险、验证四个角度检查方案。
-6. 更新 Workflow Ledger，询问用户是否进入 `ccdawn-task-splitting`。
+6. 更新 Workflow Ledger，询问用户是否进入 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
 
 ## 输出契约
 
@@ -62,7 +62,7 @@ Ledger Update:
 - Decisions: ...
 - Assumptions: ...
 - Unresolved Risks: ...
-- Recommended Next Stage: ccdawn-task-splitting
+- Recommended Next Stage: ccdawn-task-splitting（判定拆分/不拆分） / 直接执行
 
 方案自审:
 - 范围: PASS/NEEDS_CHANGE，证据...
@@ -71,17 +71,18 @@ Ledger Update:
 - 验证: PASS/NEEDS_CHANGE，证据...
 
 下一步:
-方案已完成。是否进入 ccdawn-task-splitting 拆分任务？
-A. 进入任务拆分（推荐）...
-B. 调整方案...
-C. 暂停在方案阶段...
+方案已完成。建议下一步: ccdawn-task-splitting / 直接执行，因为...
+A. 进入 ccdawn-task-splitting 判定拆分/不拆分（多步或不确定时推荐）...
+B. 不拆分，直接按方案执行（明确单步低风险时选择）...
+C. 调整方案...
+D. 暂停在方案阶段...
 ```
 
 ## 质量门槛
 
 - 不写占位词：`TBD`、`TODO`、`后续补充`、`适当处理` 都不合格。
 - 不只写方向：每个关键点都要落到文件、模块、接口、状态、测试或可观察行为。
-- 不过早拆任务：任务粒度留给 `ccdawn-task-splitting`。
+- 不过早拆任务：是否拆分和子任务模式留给 `ccdawn-task-splitting`；本阶段只提供可执行方案。
 - 不实现：本阶段不编辑业务代码，除非用户明确改变阶段目标。
 - 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
 
@@ -91,9 +92,9 @@ C. 暂停在方案阶段...
 
 - `Confirmed Intent` 来自 `ccdawn-brt`，不能重新发明。
 - `Accepted Plan` 写成一句可执行方案摘要。
-- `Task Graph` 在本阶段标为未生成，留给 `ccdawn-task-splitting`。
+- `Task Graph` 在本阶段标为未判定，留给 `ccdawn-task-splitting` 决定拆分或不拆分。
 - `Decisions` 只记录会影响实现、测试、风险或范围的决定。
-- `Recommended Next Stage` 默认是 `ccdawn-task-splitting`。
+- `Recommended Next Stage` 默认是 `ccdawn-task-splitting` 做拆分判定；只有明确低风险直接执行时才写直接执行。
 - 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 
 ## 高风险方案审查
@@ -104,6 +105,6 @@ C. 暂停在方案阶段...
 
 每次完成方案后必须停下并询问是否进入下一阶段。
 
-如果用户确认进入下一步，使用 `ccdawn-task-splitting`。如果用户要求继续对齐需求，回到 `ccdawn-brt`。
+如果用户确认进入下一步，默认进入 `ccdawn-task-splitting` 判定拆分/不拆分。只有用户明确要求直接执行，且方案是单步、低风险、可验证、可回滚时，才跳过任务拆分。若用户要求继续对齐需求，回到 `ccdawn-brt`。
 
-如果用户要求直接实现，必须先套用 BRT 直接路径条件：用户明确选择、影响范围可枚举、无迁移/删除/权限/发布风险、可快速验证、失败可回滚。不满足时，默认进入 `ccdawn-task-splitting`；满足时也要保留当前方案和验证锚点，避免实现偏离。
+如果用户要求直接实现，必须先套用 BRT 直接路径条件：用户明确选择、影响范围可枚举、无迁移/删除/权限/发布风险、可快速验证、失败可回滚。不满足时进入 `ccdawn-task-splitting`，由拆分阶段决定不拆、拆成简单子任务，或拆出需要 BDD/TDD 的复杂子任务。
