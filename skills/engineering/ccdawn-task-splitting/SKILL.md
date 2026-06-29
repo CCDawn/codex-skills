@@ -88,16 +88,12 @@ Task 1: ...
 Task 2: ...
 Task 3: ...
 
-Workflow Ledger:
-- Confirmed Intent: ...
+Ledger Update:
 - Current Stage: TASK_SPLITTING
-- Accepted Plan: ...
 - Task Graph: Critical Path..., Optional Path...
 - Current Task: 推荐 Task 1
-- Completed Tasks: 无
 - Verification Evidence: 拆分自审...
 - Decisions: ...
-- Assumptions: ...
 - Unresolved Risks: ...
 - Recommended Next Stage: ccdawn-bdd-tdd-development（Task 1 / 授权后连续 Critical Path）
 
@@ -126,13 +122,13 @@ E. 暂停...
 
 ## Workflow Ledger
 
-任务拆分完成时必须更新账本：
+任务拆分完成时必须更新账本增量：
 
 - `Accepted Plan` 必须来自 `ccdawn-planning`。
 - `Task Graph` 必须包含 critical path、optional path 和任务依赖。
 - `Current Task` 默认推荐第一个未完成 critical task，除非用户指定其他任务。
-- `Completed Tasks` 在本阶段通常为空；如果是续接拆分，保留已有完成记录。
 - `Recommended Next Stage` 默认是 `ccdawn-bdd-tdd-development` 的 Task 1；同时提供“连续执行全部 Critical Path”的明确授权选项。
+- 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 
 ## 阶段交接
 
@@ -143,6 +139,5 @@ E. 暂停...
 如果用户选择连续执行全部 Critical Path：
 
 - 把该选择写入 `Decisions`：`Continuous Critical Path authorized`。
-- 后续仍按 Task Graph 顺序逐个任务执行，不合并任务、不跳过 BDD/TDD、不跳过验证。
-- 任何任务出现阻塞、验证失败、需求偏移、范围扩大、工作区冲突或高风险未确认，都必须停止并报告。
-- 全部 critical tasks 完成后，默认进入 `ccdawn-completion-summary`，不要停在中间等待用户重复确认。
+- 后续执行细节和停止条件以 `ccdawn-brt/references/runtime.md` 的 Continuous Critical Path 规则为准。
+- 全部 critical tasks 完成后，默认路由到 `ccdawn-completion-summary`，不要停在中间等待用户重复确认。

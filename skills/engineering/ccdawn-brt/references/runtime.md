@@ -69,6 +69,18 @@ Ledger rules:
 - If code reality conflicts with the ledger, update the ledger and explain the mismatch before continuing.
 - Compress the ledger for small tasks: output one `Ledger Update` line when no stage handoff, blocker, or resumed work depends on the full ledger.
 
+## Stage Delta Ledger
+
+Stage skills should not repeat the full ledger when a compact update is enough. Output only the changed fields plus the next recommended stage.
+
+- `ccdawn-planning`: `Current Stage`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-task-splitting`: `Current Stage`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-completion-summary`: `Current Stage`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-pr-review`: `Current Stage`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
+
+Use the full ledger when resuming, blocked, handing off to another agent, or when a missing field would change the route.
+
 ## Probe
 
 Use a low-risk probe when intent, environment, or implementation path is unstable.
@@ -101,12 +113,8 @@ Ask one blocking question only. If several questions are useful but not required
 
 Only `ccdawn-completion-summary` can mark implementation `COMPLETED`. Only `ccdawn-pr-review` can mark a PR or diff `MERGE_READY`.
 
-Completion requires:
+Runtime owns the state transition; the stage skills own the detailed criteria.
 
-- all critical tasks completed or explicitly removed from scope.
-- verification evidence is fresh and passed.
-- expected vs actual behavior is aligned.
-- no unresolved blocker remains.
-- Review Matrix or stage self-review has no unresolved `NEEDS_CLARIFICATION` or `NEEDS_CHANGE`.
-- accepted residual risks are listed.
-- next action is explicit: commit/PR, stop, or return to a prior stage.
+- Do not mark `COMPLETED` without `ccdawn-completion-summary` evidence.
+- Do not mark `MERGE_READY` without `ccdawn-pr-review` evidence.
+- If evidence is missing, stale, or contradicted by the diff, route to the owning stage instead of claiming readiness.

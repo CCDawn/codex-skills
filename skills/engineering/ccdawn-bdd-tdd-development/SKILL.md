@@ -67,7 +67,7 @@ Behavior Contract:
 ## 执行边界
 
 - 只执行当前任务；除非用户明确授权连续 Critical Path，否则不顺手做下一个任务。
-- 连续 Critical Path 授权不允许合并任务、跳过测试、跳过验证或扩大范围。
+- 连续 Critical Path 授权只允许自动选择下一个 critical task；不得合并任务、跳过测试、跳过验证或扩大范围。停止条件以 `ccdawn-brt/references/runtime.md` 为准。
 - 不扩大范围，不重构无关区域。
 - 不覆盖用户或其他 agent 的无关改动。
 - 不把失败测试改成适配实现；修实现或修测试意图，不能抹掉行为要求。
@@ -90,7 +90,7 @@ Behavior Contract:
 - 给出可选修复；
 - 只问一个真正阻塞的问题，其他问题放入风险或可选修复。
 
-连续 Critical Path 模式遇到验证失败、需求偏移、范围扩大、工作区冲突、高风险未确认或用户新指令时，必须停止连续推进并报告当前任务状态。
+连续 Critical Path 模式遇到 runtime 定义的停止条件时，必须停止连续推进并报告当前任务状态。
 
 ## 输出契约
 
@@ -105,16 +105,11 @@ Task N 开发结果:
 - 自审: 行为契约 PASS/NEEDS_CHANGE；副作用 PASS/ACCEPT_RISK；测试 PASS/NEEDS_CHANGE
 - 剩余风险: ...
 
-Workflow Ledger:
-- Confirmed Intent: ...
+Ledger Update:
 - Current Stage: DEVELOPING
-- Accepted Plan: ...
-- Task Graph: ...
 - Current Task: Task N
 - Completed Tasks: Task X..., Task N DONE/PARTIAL/BLOCKED
 - Verification Evidence: RED..., GREEN...
-- Decisions: ...
-- Assumptions: ...
 - Unresolved Risks: ...
 - Recommended Next Stage: 下一个任务 / ccdawn-completion-summary
 
@@ -148,6 +143,7 @@ E. 暂停...
 - `Verification Evidence` 写入 RED 和 GREEN 的命令与结果，或替代证据及风险。
 - `Unresolved Risks` 写剩余风险和后续验证方式。
 - 如果还有未完成 critical task，`Recommended Next Stage` 是下一个任务；如果已授权连续 Critical Path，写成 `继续下一个 critical task`；否则是 `ccdawn-completion-summary`。
+- 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 
 ## 阶段交接
 
@@ -155,4 +151,4 @@ E. 暂停...
 
 如果还有未完成关键任务，默认建议执行下一个任务，并提供“连续执行剩余 Critical Path”的授权选项。如果所有关键任务完成，默认建议进入 `ccdawn-completion-summary`。
 
-如果用户已经授权连续执行全部 Critical Path，在每个任务完成后输出短 checkpoint 并继续下一个 critical task；只有遇到停止条件或全部 critical tasks 完成时才停下。
+如果用户已经授权连续执行全部 Critical Path，在每个任务完成后输出短 checkpoint，并按 runtime 规则继续或停止。

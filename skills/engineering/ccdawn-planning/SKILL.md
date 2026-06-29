@@ -55,13 +55,9 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 - 验证策略: ...
 - 需要保留的假设: ...
 
-Workflow Ledger:
-- Confirmed Intent: ...
+Ledger Update:
 - Current Stage: PLANNING
 - Accepted Plan: ...
-- Task Graph: 未生成
-- Current Task: 无
-- Completed Tasks: 无
 - Verification Evidence: ...
 - Decisions: ...
 - Assumptions: ...
@@ -98,6 +94,7 @@ C. 暂停在方案阶段...
 - `Task Graph` 在本阶段标为未生成，留给 `ccdawn-task-splitting`。
 - `Decisions` 只记录会影响实现、测试、风险或范围的决定。
 - `Recommended Next Stage` 默认是 `ccdawn-task-splitting`。
+- 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 
 ## 高风险方案审查
 
@@ -107,4 +104,6 @@ C. 暂停在方案阶段...
 
 每次完成方案后必须停下并询问是否进入下一阶段。
 
-如果用户确认进入下一步，使用 `ccdawn-task-splitting`。如果用户要求继续对齐需求，回到 `ccdawn-brt`。如果用户要求直接实现，先提醒缺少任务拆分会增加执行偏差，再按用户最新指令执行。
+如果用户确认进入下一步，使用 `ccdawn-task-splitting`。如果用户要求继续对齐需求，回到 `ccdawn-brt`。
+
+如果用户要求直接实现，必须先套用 BRT 直接路径条件：用户明确选择、影响范围可枚举、无迁移/删除/权限/发布风险、可快速验证、失败可回滚。不满足时，默认进入 `ccdawn-task-splitting`；满足时也要保留当前方案和验证锚点，避免实现偏离。

@@ -79,8 +79,7 @@ BRT 检查点:
 - 关键风险:
 - 自审结论:
 - 测试锚点:
-- Workflow Ledger:
-  - Confirmed Intent:
+- Ledger Update:
   - Current Stage: PLANNING_READY
   - Seed From Requirement Ledger: 已确认意图 / 显式假设 / 剩余风险 / 验证锚点
   - Assumptions:
