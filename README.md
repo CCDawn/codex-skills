@@ -22,16 +22,16 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
   The Behavior / Review / Test workflow skill. It proactively infers what the user likely means, offers candidate intents and high-signal questions with recommendations, and then turns the aligned behavior into examples, review lenses, task graphs, execution gates, acceptance criteria, and test intentions.
 
 - **`ccdawn-planning`**
-  A copied planning-stage skill package for turning aligned requirements into an implementation plan before code changes.
+  The planning-stage skill for turning aligned requirements into an implementation plan before code changes.
 
 - **`ccdawn-task-splitting`**
-  A copied task-splitting-stage skill package for breaking an accepted plan into reviewable, independently verifiable work units.
+  The task-splitting-stage skill for breaking an accepted plan into reviewable, independently verifiable work units.
 
 - **`ccdawn-bdd-tdd-development`**
-  A copied development-stage skill package for behavior-anchored implementation with TDD discipline.
+  The development-stage skill for behavior-anchored implementation with TDD discipline.
 
 - **`ccdawn-completion-summary`**
-  A copied completion-stage skill package for fresh verification evidence, requirement comparison, and concise handoff summaries.
+  The completion-stage skill for fresh verification evidence, requirement comparison, and concise handoff summaries.
 
 - **`ccdawn-dawn-agent-html-memory`**  
   A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.

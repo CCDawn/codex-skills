@@ -1,371 +1,112 @@
 ---
 name: ccdawn-bdd-tdd-development
-description: Use when a CCDawn task or plan has been accepted and the user confirms entering development; before implementation, anchor behavior expectations and enforce TDD for features, bug fixes, refactors, or behavior changes.
+description: Use when a CCDawn task has been selected and the user confirms entering development; applies before implementing behavior changes, features, bug fixes, refactors, or tests that need BDD behavior anchors, TDD red-green-refactor discipline, task-scoped execution, and evidence before moving on.
 ---
 
 # CCDawn BDD/TDD Development
 
-## Overview
+## 目标
 
-Anchor the expected behavior first, then write the test first. Watch it fail. Write minimal code to pass.
+按已选择的任务进行开发。此阶段一次只执行一个任务，先锁定行为，再用 TDD 实现。
 
-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
+核心顺序：
 
-**Violating the letter of the rules is violating the spirit of the rules.**
+1. BDD：把任务翻译成 Given / When / Then 行为契约。
+2. RED：先写失败测试，并确认失败原因正确。
+3. GREEN：写最小实现让测试通过。
+4. REFACTOR：只在测试保持通过时清理代码。
+5. VERIFY：用新鲜证据证明任务完成。
 
-## When to Use
+## 进入条件
 
-**Always:**
-- New features
-- Bug fixes
-- Refactoring
-- Behavior changes
+使用前确认已有：
 
-**Exceptions (ask your human partner):**
-- Throwaway prototypes
-- Generated code
-- Configuration files
+- 用户确认进入开发；
+- 一个明确的 `ccdawn-task-splitting` 任务；
+- 任务的 Goal、Files、BDD Anchor、TDD Anchor、Verification；
+- 当前工作区状态已检查，不覆盖无关用户改动。
 
-Thinking "skip TDD just this once"? Stop. That's rationalization.
+如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。
 
-## The Iron Law
+## BDD 契约
 
-```
-NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
-```
+实现前先输出或内部确认：
 
-Write code before the test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-
-Implement fresh from tests. Period.
-
-## Red-Green-Refactor
-
-```dot
-digraph tdd_cycle {
-    rankdir=LR;
-    red [label="RED\nWrite failing test", shape=box, style=filled, fillcolor="#ffcccc"];
-    verify_red [label="Verify fails\ncorrectly", shape=diamond];
-    green [label="GREEN\nMinimal code", shape=box, style=filled, fillcolor="#ccffcc"];
-    verify_green [label="Verify passes\nAll green", shape=diamond];
-    refactor [label="REFACTOR\nClean up", shape=box, style=filled, fillcolor="#ccccff"];
-    next [label="Next", shape=ellipse];
-
-    red -> verify_red;
-    verify_red -> green [label="yes"];
-    verify_red -> red [label="wrong\nfailure"];
-    green -> verify_green;
-    verify_green -> refactor [label="yes"];
-    verify_green -> green [label="no"];
-    refactor -> verify_green [label="stay\ngreen"];
-    verify_green -> next;
-    next -> red;
-}
+```text
+Behavior Contract:
+- Given: 初始条件、权限、数据、状态
+- When: 用户动作、系统事件或调用
+- Then: 可观察结果
+- And: 失败路径、边界或副作用约束
 ```
 
-### RED - Write Failing Test
+如果 BDD 契约会改变用户预期，先问用户；如果只是把已确认任务转成测试语言，可以继续。
 
-Write one minimal test showing what should happen.
-
-<Good>
-```typescript
-test('retries failed operations 3 times', async () => {
-  let attempts = 0;
-  const operation = () => {
-    attempts++;
-    if (attempts < 3) throw new Error('fail');
-    return 'success';
-  };
-
-  const result = await retryOperation(operation);
-
-  expect(result).toBe('success');
-  expect(attempts).toBe(3);
-});
-```
-Clear name, tests real behavior, one thing
-</Good>
-
-<Bad>
-```typescript
-test('retry works', async () => {
-  const mock = jest.fn()
-    .mockRejectedValueOnce(new Error())
-    .mockRejectedValueOnce(new Error())
-    .mockResolvedValueOnce('success');
-  await retryOperation(mock);
-  expect(mock).toHaveBeenCalledTimes(3);
-});
-```
-Vague name, tests mock not code
-</Bad>
-
-**Requirements:**
-- One behavior
-- Clear name
-- Real code (no mocks unless unavoidable)
-
-### Verify RED - Watch It Fail
-
-**MANDATORY. Never skip.**
-
-```bash
-npm test path/to/test.test.ts
-```
-
-Confirm:
-- Test fails (not errors)
-- Failure message is expected
-- Fails because feature missing (not typos)
-
-**Test passes?** You're testing existing behavior. Fix test.
-
-**Test errors?** Fix error, re-run until it fails correctly.
-
-### GREEN - Minimal Code
-
-Write simplest code to pass the test.
-
-<Good>
-```typescript
-async function retryOperation<T>(fn: () => Promise<T>): Promise<T> {
-  for (let i = 0; i < 3; i++) {
-    try {
-      return await fn();
-    } catch (e) {
-      if (i === 2) throw e;
-    }
-  }
-  throw new Error('unreachable');
-}
-```
-Just enough to pass
-</Good>
-
-<Bad>
-```typescript
-async function retryOperation<T>(
-  fn: () => Promise<T>,
-  options?: {
-    maxRetries?: number;
-    backoff?: 'linear' | 'exponential';
-    onRetry?: (attempt: number) => void;
-  }
-): Promise<T> {
-  // YAGNI
-}
-```
-Over-engineered
-</Bad>
-
-Don't add features, refactor other code, or "improve" beyond the test.
-
-### Verify GREEN - Watch It Pass
-
-**MANDATORY.**
-
-```bash
-npm test path/to/test.test.ts
-```
-
-Confirm:
-- Test passes
-- Other tests still pass
-- Output pristine (no errors, warnings)
-
-**Test fails?** Fix code, not test.
-
-**Other tests fail?** Fix now.
-
-### REFACTOR - Clean Up
-
-After green only:
-- Remove duplication
-- Improve names
-- Extract helpers
-
-Keep tests green. Don't add behavior.
-
-### Repeat
-
-Next failing test for next feature.
-
-## Good Tests
-
-| Quality | Good | Bad |
-|---------|------|-----|
-| **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
-| **Clear** | Name describes behavior | `test('test1')` |
-| **Shows intent** | Demonstrates desired API | Obscures what code should do |
-
-## Why Order Matters
-
-**"I'll write tests after to verify it works"**
-
-Tests written after code pass immediately. Passing immediately proves nothing:
-- Might test wrong thing
-- Might test implementation, not behavior
-- Might miss edge cases you forgot
-- You never saw it catch the bug
-
-Test-first forces you to see the test fail, proving it actually tests something.
-
-**"I already manually tested all the edge cases"**
-
-Manual testing is ad-hoc. You think you tested everything but:
-- No record of what you tested
-- Can't re-run when code changes
-- Easy to forget cases under pressure
-- "It worked when I tried it" ≠ comprehensive
-
-Automated tests are systematic. They run the same way every time.
-
-**"Deleting X hours of work is wasteful"**
-
-Sunk cost fallacy. The time is already gone. Your choice now:
-- Delete and rewrite with TDD (X more hours, high confidence)
-- Keep it and add tests after (30 min, low confidence, likely bugs)
-
-The "waste" is keeping code you can't trust. Working code without real tests is technical debt.
-
-**"TDD is dogmatic, being pragmatic means adapting"**
-
-TDD IS pragmatic:
-- Finds bugs before commit (faster than debugging after)
-- Prevents regressions (tests catch breaks immediately)
-- Documents behavior (tests show how to use code)
-- Enables refactoring (change freely, tests catch breaks)
-
-"Pragmatic" shortcuts = debugging in production = slower.
-
-**"Tests after achieve the same goals - it's spirit not ritual"**
-
-No. Tests-after answer "What does this do?" Tests-first answer "What should this do?"
-
-Tests-after are biased by your implementation. You test what you built, not what's required. You verify remembered edge cases, not discovered ones.
-
-Tests-first force edge case discovery before implementing. Tests-after verify you remembered everything (you didn't).
-
-30 minutes of tests after ≠ TDD. You get coverage, lose proof tests work.
-
-## Common Rationalizations
-
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-| "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
-| "Deleting X hours is wasteful" | Sunk cost fallacy. Keeping unverified code is technical debt. |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
-| "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
-| "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
-| "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
-| "Existing code has no tests" | You're improving it. Add tests for existing code. |
-
-## Red Flags - STOP and Start Over
-
-- Code before test
-- Test after implementation
-- Test passes immediately
-- Can't explain why test failed
-- Tests added "later"
-- Rationalizing "just this once"
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing code"
-- "Already spent X hours, deleting is wasteful"
-- "TDD is dogmatic, I'm being pragmatic"
-- "This is different because..."
-
-**All of these mean: Delete code. Start over with TDD.**
-
-## Example: Bug Fix
-
-**Bug:** Empty email accepted
-
-**RED**
-```typescript
-test('rejects empty email', async () => {
-  const result = await submitForm({ email: '' });
-  expect(result.error).toBe('Email required');
-});
-```
-
-**Verify RED**
-```bash
-$ npm test
-FAIL: expected 'Email required', got undefined
-```
-
-**GREEN**
-```typescript
-function submitForm(data: FormData) {
-  if (!data.email?.trim()) {
-    return { error: 'Email required' };
-  }
-  // ...
-}
-```
-
-**Verify GREEN**
-```bash
-$ npm test
-PASS
-```
-
-**REFACTOR**
-Extract validation for multiple fields if needed.
-
-## Verification Checklist
-
-Before marking work complete:
-
-- [ ] Every new function/method has a test
-- [ ] Watched each test fail before implementing
-- [ ] Each test failed for expected reason (feature missing, not typo)
-- [ ] Wrote minimal code to pass each test
-- [ ] All tests pass
-- [ ] Output pristine (no errors, warnings)
-- [ ] Tests use real code (mocks only if unavoidable)
-- [ ] Edge cases and errors covered
-
-Can't check all boxes? You skipped TDD. Start over.
-
-## When Stuck
-
-| Problem | Solution |
-|---------|----------|
-| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
-| Test too complicated | Design too complicated. Simplify interface. |
-| Must mock everything | Code too coupled. Use dependency injection. |
-| Test setup huge | Extract helpers. Still complex? Simplify design. |
-
-## Debugging Integration
-
-Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
-
-Never fix bugs without a test.
-
-## Testing Anti-Patterns
-
-When adding mocks or test utilities, read [testing-anti-patterns.md](testing-anti-patterns.md) to avoid common pitfalls:
-- Testing mock behavior instead of real behavior
-- Adding test-only methods to production classes
-- Mocking without understanding dependencies
-
-## Final Rule
+## TDD 铁律
 
 ```
-Production code → test exists and failed first
-Otherwise → not TDD
+没有先失败的测试，就不要写生产代码。
 ```
 
-No exceptions without your human partner's permission.
+必须做到：
+
+- 先写一个最小失败测试；
+- 运行测试并确认失败原因是目标行为缺失，不是拼写、导入或环境错误；
+- 只写让该测试通过的最小实现；
+- 重新运行测试并确认通过；
+- 再进入下一个行为或重构。
+
+如果任务确实无法自动化测试，必须在写实现前说明：
+
+- 为什么无法自动化；
+- 用什么结构性检查、人工验收或可逆 probe 代替；
+- 这个替代证据的风险。
+
+写测试、mock 或测试工具时，如出现 mock 断言、test-only production API、过度 mock，读取 `testing-anti-patterns.md`。
+
+## 执行边界
+
+- 只执行当前任务，不顺手做下一个任务。
+- 不扩大范围，不重构无关区域。
+- 不覆盖用户或其他 agent 的无关改动。
+- 不把失败测试改成适配实现；修实现或修测试意图，不能抹掉行为要求。
+- 不用“手动看起来可以”替代要求中的测试命令。
+
+## 输出契约
+
+开发阶段输出保持短，只报告关键证据：
+
+```text
+Task N 开发结果:
+- BDD: Given... When... Then...
+- RED: 命令...；失败原因...
+- GREEN: 命令...；通过结果...
+- 变更: 文件/模块...
+- 自审: 行为契约 PASS/NEEDS_CHANGE；副作用 PASS/ACCEPT_RISK；测试 PASS/NEEDS_CHANGE
+- 剩余风险: ...
+
+下一步:
+Task N 已完成。是否继续？
+A. 执行下一个任务（如果还有任务，推荐）...
+B. 进入 ccdawn-completion-summary 做阶段总结（所有关键任务完成时推荐）...
+C. 回到 ccdawn-task-splitting 调整任务...
+D. 暂停...
+```
+
+## 完成门槛
+
+任务完成前必须有：
+
+- BDD 契约；
+- 至少一个 RED 证据；
+- GREEN 后的验证证据；
+- 与任务 Goal 对齐的变更摘要；
+- 对副作用和范围偏离的自审结论。
+
+缺任一项，都不能声称任务完成。
+
+## 阶段交接
+
+每次完成一个任务后必须停下并询问是否继续。
+
+如果还有未完成关键任务，默认建议执行下一个任务。如果所有关键任务完成，默认建议进入 `ccdawn-completion-summary`。

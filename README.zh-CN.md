@@ -20,16 +20,16 @@
   Behavior / Review / Test 工作流 skill。它会主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和高信号选择题，让用户选择或确认后，再把模糊功能想法收束成清晰的行为定义、评审视角、Task Graph、执行闸门、验收标准和测试意图。
 
 - **`ccdawn-planning`**
-  复制出来的方案制定阶段 skill 包，用来在需求对齐后、动代码前形成实施方案。
+  方案制定阶段 skill，用来在需求对齐后、动代码前形成实施方案。
 
 - **`ccdawn-task-splitting`**
-  复制出来的任务拆分阶段 skill 包，用来把已确认方案拆成可审阅、可独立验证的任务单元。
+  任务拆分阶段 skill，用来把已确认方案拆成可审阅、可独立验证的任务单元。
 
 - **`ccdawn-bdd-tdd-development`**
-  复制出来的开发阶段 skill 包，用来围绕行为预期执行 BDD/TDD 风格开发。
+  开发阶段 skill，用来围绕行为预期执行 BDD/TDD 风格开发。
 
 - **`ccdawn-completion-summary`**
-  复制出来的完成总结阶段 skill 包，用来做新鲜验证、需求对照和简洁交接总结。
+  完成总结阶段 skill，用来做新鲜验证、需求对照和简洁交接总结。
 
 - **`ccdawn-dawn-agent-html-memory`**  
   这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它支持按职责拆分的多会话共享 lane，生成会聚合这些 lane 的 HTML 总览页，并在项目根目录生成一个 `PROJECT_MEMORY.html` 快捷入口。

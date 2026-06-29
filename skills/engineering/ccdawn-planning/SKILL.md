@@ -1,174 +1,87 @@
 ---
 name: ccdawn-planning
-description: Use when ccdawn-brt has aligned requirements and the user confirms entering planning; create an implementation plan before touching code, with scope, architecture, files, tests, risks, and handoff decisions.
+description: Use when requirements or intent have been aligned by ccdawn-brt and the user confirms entering planning, before implementation starts; applies when work needs architecture choices, scope boundaries, file impact, risk decisions, validation strategy, or an implementation handoff plan.
 ---
 
 # CCDawn Planning
 
-## Overview
+## 目标
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+把已经对齐的需求转成可实施方案。此阶段只制定方案，不拆成执行任务，不写代码。
 
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+方案必须回答：
 
-**Announce at start:** "我正在使用 ccdawn-planning，把已对齐需求整理成实施方案。"
+- 要达成什么行为结果；
+- 本轮做什么、不做什么；
+- 采用哪条实现路径，为什么；
+- 会影响哪些文件、模块、状态或接口；
+- 如何验证成功；
+- 哪些风险需要在执行前知道。
 
-**Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
+## 进入条件
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
-- (User preferences for plan location override this default)
+使用前确认已有：
 
-## Scope Check
+- 来自 `ccdawn-brt` 的已确认意图或行为契约；
+- 用户允许进入方案阶段；
+- 已知范围边界、关键约束、验证锚点；
+- 必要的本地上下文：代码、文档、测试、配置、日志或历史决策。
 
-If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+如果缺少会改变方案的需求信息，先回到 `ccdawn-brt` 继续需求对齐，不要硬写方案。
 
-## File Structure
+## 工作方式
 
-Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
+1. 读取上下文：检查相关文件、测试、文档、配置和已有模式。
+2. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
+3. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
+4. 写方案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
+5. 自审：从范围、可实施性、风险、验证四个角度检查方案。
+6. 收口：询问用户是否进入 `ccdawn-task-splitting`。
 
-- Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
-- You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
-- Files that change together should live together. Split by responsibility, not by technical layer.
-- In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure - but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
+## 输出契约
 
-This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
+默认输出：
 
-## Task Right-Sizing
+```text
+实施方案:
+- 目标: ...
+- 范围: 本轮做...；不做...
+- 推荐路径: ...
+- 备选路径: A ... / B ...
+- 影响面:
+  - 文件/模块: ...
+  - 接口/状态/数据: ...
+- 风险决策: ...
+- 验证策略: ...
+- 需要保留的假设: ...
 
-A task is the smallest unit that carries its own test cycle and is worth a
-fresh reviewer's gate. When drawing task boundaries: fold setup,
-configuration, scaffolding, and documentation steps into the task whose
-deliverable needs them; split only where a reviewer could meaningfully
-reject one task while approving its neighbor. Each task ends with an
-independently testable deliverable.
+方案自审:
+- 范围: PASS/NEEDS_CHANGE，证据...
+- 可实施性: PASS/NEEDS_CHANGE，证据...
+- 风险: PASS/ACCEPT_RISK/NEEDS_CLARIFICATION，证据...
+- 验证: PASS/NEEDS_CHANGE，证据...
 
-## Bite-Sized Task Granularity
-
-**Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
-
-## Plan Document Header
-
-**Every plan MUST start with this header:**
-
-```markdown
-# [Feature Name] Implementation Plan
-
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
-**Goal:** [One sentence describing what this builds]
-
-**Architecture:** [2-3 sentences about approach]
-
-**Tech Stack:** [Key technologies/libraries]
-
-## Global Constraints
-
-[The spec's project-wide requirements — version floors, dependency limits,
-naming and copy rules, platform requirements — one line each, with exact
-values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
-
----
+下一步:
+方案已完成。是否进入 ccdawn-task-splitting 拆分任务？
+A. 进入任务拆分（推荐）...
+B. 调整方案...
+C. 暂停在方案阶段...
 ```
 
-## Task Structure
+## 质量门槛
 
-````markdown
-### Task N: [Component Name]
+- 不写占位词：`TBD`、`TODO`、`后续补充`、`适当处理` 都不合格。
+- 不只写方向：每个关键点都要落到文件、模块、接口、状态、测试或可观察行为。
+- 不过早拆任务：任务粒度留给 `ccdawn-task-splitting`。
+- 不实现：本阶段不编辑业务代码，除非用户明确改变阶段目标。
+- 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
 
-**Files:**
-- Create: `exact/path/to/file.py`
-- Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
+## 高风险方案审查
 
-**Interfaces:**
-- Consumes: [what this task uses from earlier tasks — exact signatures]
-- Produces: [what later tasks rely on — exact function names, parameter
-  and return types. A task's implementer sees only their own task; this
-  block is how they learn the names and types neighboring tasks use.]
+当方案涉及权限、安全、数据删除、迁移、发布、回滚、公共 API 或多模块重构时，可以读取 `plan-document-reviewer-prompt.md`，用它组织一次计划审查。审查只阻塞真实缺口，不阻塞措辞偏好。
 
-- [ ] **Step 1: Write the failing test**
+## 阶段交接
 
-```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
-```
+每次完成方案后必须停下并询问是否进入下一阶段。
 
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
-
-- [ ] **Step 3: Write minimal implementation**
-
-```python
-def function(input):
-    return expected
-```
-
-- [ ] **Step 4: Run test to verify it passes**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature"
-```
-````
-
-## No Placeholders
-
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
-- "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
-
-## Remember
-- Exact file paths always
-- Complete code in every step — if a step changes code, show the code
-- Exact commands with expected output
-- DRY, YAGNI, TDD, frequent commits
-
-## Self-Review
-
-After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
-
-**1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
-
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
-
-**3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
-
-If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
-
-## Execution Handoff
-
-After saving the plan, offer execution choice:
-
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
-
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
-
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
-
-**Which approach?"**
-
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
-
-**If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
-- Batch execution with checkpoints for review
+如果用户确认进入下一步，使用 `ccdawn-task-splitting`。如果用户要求继续对齐需求，回到 `ccdawn-brt`。如果用户要求直接实现，先提醒缺少任务拆分会增加执行偏差，再按用户最新指令执行。
