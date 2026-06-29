@@ -34,6 +34,8 @@ Transition rules:
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
 - If a selected task is unclear, return to `ccdawn-task-splitting`.
+- A user may authorize continuous Critical Path execution after task splitting. This authorizes repeated task handoff only; each task still runs through BDD, RED, GREEN, VERIFY, ledger update, and stop-on-blocker checks.
+- Continuous Critical Path execution must stop on blocker, failed verification, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
 - Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
 - Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means implementation evidence passed; `MERGE_READY` means integration review passed.
 

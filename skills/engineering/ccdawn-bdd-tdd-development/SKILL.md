@@ -7,7 +7,7 @@ description: Use when a CCDawn task has been selected and the user confirms ente
 
 ## 目标
 
-按已选择的任务进行开发。此阶段一次只执行一个任务，先锁定行为，再用 TDD 实现。
+按已选择的任务进行开发。此阶段一次只执行一个任务，先锁定行为，再用 TDD 实现。即使用户授权连续执行全部 Critical Path，也必须逐任务推进。
 
 核心顺序：
 
@@ -26,7 +26,7 @@ description: Use when a CCDawn task has been selected and the user confirms ente
 - 任务的 Goal、Files、BDD Anchor、TDD Anchor、Verification；
 - 当前工作区状态已检查，不覆盖无关用户改动。
 
-如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。
+如果没有明确任务，不要开始开发，先回到 `ccdawn-task-splitting`。如果用户授权连续执行全部 Critical Path，必须同时有有序 Task Graph、每个 critical task 的 BDD/TDD/Verification，以及当前下一个任务。
 
 ## BDD 契约
 
@@ -66,7 +66,8 @@ Behavior Contract:
 
 ## 执行边界
 
-- 只执行当前任务，不顺手做下一个任务。
+- 只执行当前任务；除非用户明确授权连续 Critical Path，否则不顺手做下一个任务。
+- 连续 Critical Path 授权不允许合并任务、跳过测试、跳过验证或扩大范围。
 - 不扩大范围，不重构无关区域。
 - 不覆盖用户或其他 agent 的无关改动。
 - 不把失败测试改成适配实现；修实现或修测试意图，不能抹掉行为要求。
@@ -80,12 +81,16 @@ Behavior Contract:
 2. DURING：只执行当前任务，不扩大范围，不顺手执行下一个任务。
 3. AFTER：验证输出契约，对比 expected vs actual，检查副作用，更新 Workflow Ledger。
 
+连续 Critical Path 模式下，AFTER 通过后自动选择下一个未完成 critical task 继续；如果没有未完成 critical task，进入 `ccdawn-completion-summary`。连续模式不是跳过阶段交接，而是用户预先授权后续交接。
+
 如果验证失败：
 
 - 标记当前任务为 `PARTIAL` 或 `BLOCKED`；
 - 写清失败命令、失败原因和影响范围；
 - 给出可选修复；
 - 只问一个真正阻塞的问题，其他问题放入风险或可选修复。
+
+连续 Critical Path 模式遇到验证失败、需求偏移、范围扩大、工作区冲突、高风险未确认或用户新指令时，必须停止连续推进并报告当前任务状态。
 
 ## 输出契约
 
@@ -116,9 +121,10 @@ Workflow Ledger:
 下一步:
 Task N 已完成。是否继续？
 A. 执行下一个任务（如果还有任务，推荐）...
-B. 进入 ccdawn-completion-summary 做阶段总结（所有关键任务完成时推荐）...
-C. 回到 ccdawn-task-splitting 调整任务...
-D. 暂停...
+B. 连续执行剩余 Critical Path（需要明确授权；逐任务 BDD/TDD/验证，遇阻立刻停）...
+C. 进入 ccdawn-completion-summary 做阶段总结（所有关键任务完成时推荐）...
+D. 回到 ccdawn-task-splitting 调整任务...
+E. 暂停...
 ```
 
 ## 完成门槛
@@ -141,10 +147,12 @@ D. 暂停...
 - `Completed Tasks` 记录 `DONE / PARTIAL / BLOCKED`，不能只写“已处理”。
 - `Verification Evidence` 写入 RED 和 GREEN 的命令与结果，或替代证据及风险。
 - `Unresolved Risks` 写剩余风险和后续验证方式。
-- 如果还有未完成 critical task，`Recommended Next Stage` 是下一个任务；否则是 `ccdawn-completion-summary`。
+- 如果还有未完成 critical task，`Recommended Next Stage` 是下一个任务；如果已授权连续 Critical Path，写成 `继续下一个 critical task`；否则是 `ccdawn-completion-summary`。
 
 ## 阶段交接
 
-每次完成一个任务后必须停下并询问是否继续。
+没有连续授权时，每次完成一个任务后必须停下并询问是否继续。
 
-如果还有未完成关键任务，默认建议执行下一个任务。如果所有关键任务完成，默认建议进入 `ccdawn-completion-summary`。
+如果还有未完成关键任务，默认建议执行下一个任务，并提供“连续执行剩余 Critical Path”的授权选项。如果所有关键任务完成，默认建议进入 `ccdawn-completion-summary`。
+
+如果用户已经授权连续执行全部 Critical Path，在每个任务完成后输出短 checkpoint 并继续下一个 critical task；只有遇到停止条件或全部 critical tasks 完成时才停下。
