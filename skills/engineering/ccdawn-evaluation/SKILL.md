@@ -16,18 +16,25 @@ description: Use when CCDawn workflow needs a Chinese-first evaluation adapter a
 - 外部 review 反馈是否采纳：`receiving-code-review`。
 - bug、失败测试、异常行为：`systematic-debugging`，必要时叠加 `root-cause-tracing`。
 - 完成状态和证据：`ccdawn-completion-summary` 或 `verification-before-completion`。
-- 需求/意图/流程重量：`ccdawn-brt` 的 Review Matrix 和流程重量自评。
+- 需求/真实目标/执行深度/流程重量：由 `ccdawn-brt` 判定；如果这些不清楚，先回 BRT。
 - 方案制定前后的可实施性：`ccdawn-planning`。
 - 目标是否可执行：`ccdawn-goal-loop`。
 
-只有当用户要评价的是方案、流程、skill、当前状态、输出质量、合理性、灵活性、噪声、取舍或下一步价值，且没有更具体 skill 时，才在本 skill 内做轻量多维评价。
+只有当用户要评价的是方案、流程、skill、当前状态、输出质量、合理性、灵活性、噪声、取舍或下一步价值，且用户目标已经清楚、没有更具体 skill 时，才在本 skill 内做轻量多维评价。
+
+Owner 边界：
+
+- `ccdawn-brt` 负责判断用户到底想评价什么、要不要评价、评价深度是否过重。
+- `ccdawn-evaluation` 负责在评价对象和目标已知后给出证据化判断。
+- 进入本 skill 后，只在评价目标或对象不明时回到 BRT；不要因为“流程重量”这类主题本身就回 BRT。
 
 ## 评价方式
 
 1. 先写一句 `复用检查`：是否已有更具体 skill；有则路由，不继续评价。
-2. 没有更具体 skill 时，选 3-5 个真正会改变行动的维度。
-3. Evidence 必须来自文件、代码、测试、日志、用户要求、运行结果或明确假设。
-4. 给出总评、必须调整、可选优化和下一步路由。
+2. 确认评价目标和对象已知；未知时只问 1 个问题或回 BRT。
+3. 没有更具体 skill 时，选 2-4 个真正会改变行动的维度。
+4. Evidence 必须来自文件、代码、测试、日志、用户要求、运行结果或明确假设。
+5. 给出总评、必须调整、可选优化和下一步路由。
 
 ## 默认维度
 
@@ -69,4 +76,3 @@ D. 暂停...
 - 不给空泛建议；每条建议必须说明影响和触发条件。
 - 不把“更完整/更严谨/更简洁”当结论，必须落到行为、成本、风险或证据。
 - 不为了展示全面而输出低相关维度。
-

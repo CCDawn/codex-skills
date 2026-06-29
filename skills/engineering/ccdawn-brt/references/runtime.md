@@ -35,7 +35,7 @@ Transition rules:
 
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
 - Prefer existing specialized skills before CCDawn wrapper skills. Route bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
-- `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user explicitly chooses a direct path that is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk.
+- `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
@@ -57,11 +57,18 @@ Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
 
 Self-assess process weight before routing:
 
+- Use intent confidence before asking: `HIGH` acts, `MEDIUM` acts with stated assumptions, `LOW` asks or probes, `BLOCKED` asks one blocking question.
 - If the main value is judgment, comparison, or audit, route to the most specific existing review skill; use `ccdawn-evaluation` only when none fits.
 - If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
 - If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
 - If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.
 - Reuse the current worktree for one theme. Create a new worktree only for parallel work, conflict isolation, high-risk isolation, or explicit user request.
+
+Owner boundaries:
+
+- `ccdawn-brt` owns intent alignment, response depth, execution permission, and process weight.
+- `ccdawn-evaluation` owns quality judgment of a plan, workflow, skill, result, or current state after the user goal is known.
+- Once routed to `ccdawn-evaluation`, return to BRT only when the user's goal or evaluation object is unclear.
 
 `ccdawn-task-splitting` owns the split decision:
 

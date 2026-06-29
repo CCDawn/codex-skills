@@ -218,9 +218,9 @@ F. 暂停...
 
 ## 阶段交接
 
-每次完成拆分判定后必须停下并询问是否进入下一动作。
+完成拆分判定后遵守 `ccdawn-brt/references/runtime.md` 的自然闸门规则：用户目标已包含执行许可时，按推荐任务继续；只有阻塞、高风险动作、验证失败、范围变化、目标变化、发布/合并/迁移/删除/权限动作前，才停下等用户选择。
 
-如果用户确认进入开发，按任务的 `Development Mode` 执行：`SIMPLE` 任务轻量实现和验证；`BDD_TDD` 任务使用 `ccdawn-bdd-tdd-development`。不要默认连续执行全部任务，除非用户明确选择“连续执行全部 Critical Path”。
+进入开发时，按任务的 `Development Mode` 执行：`SIMPLE` 任务轻量实现和验证；`BDD_TDD` 任务使用 `ccdawn-bdd-tdd-development`。只有用户明确选择“连续执行全部 Critical Path”或原始目标已经是完成整个 critical path 时，才连续执行全部任务；否则执行推荐的下一个任务。
 
 如果用户选择连续执行全部 Critical Path：
 
