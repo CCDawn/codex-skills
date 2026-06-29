@@ -5,10 +5,12 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
+ccdawn-brt -> [ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
+ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
 ```
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
+`ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment. `ccdawn-bug-review` applies when the current need is evidence-led bug or regression diagnosis.
 
 ## Workflow State
 
@@ -17,6 +19,8 @@ State is a routing signal, not decoration.
 - INTENT_DISCOVERY: `ccdawn-brt` is identifying the user text, likely intent, and risks.
 - INTENT_CONVERGENCE: `ccdawn-brt` is comparing candidate intents and asking high-signal questions.
 - PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
+- EVALUATING: `ccdawn-evaluation` is judging a plan, workflow, skill, implementation, result, or current state.
+- BUG_REVIEWING: `ccdawn-bug-review` is inspecting a bug, regression, failing test, or abnormal behavior before choosing a fix path.
 - PLANNING: `ccdawn-planning` is producing an implementation plan.
 - TASK_SPLITTING: `ccdawn-task-splitting` is deciding `NO_SPLIT` or producing a task graph with per-task development modes.
 - DEVELOPING: `ccdawn-bdd-tdd-development` is executing one selected task.
@@ -29,8 +33,9 @@ State is a routing signal, not decoration.
 Transition rules:
 
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
+- Route to `ccdawn-evaluation`, `ccdawn-bug-review`, or `ccdawn-pr-review` when the task is primarily evaluation, bug diagnosis, or PR/diff review; do not force those tasks through planning.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user explicitly chooses a direct path that is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk.
-- Each stage stops after its output contract and asks whether to enter the next stage.
+- Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
 - If a selected task is unclear, return to `ccdawn-task-splitting`.
@@ -48,6 +53,14 @@ BRT and planning only decide the flow route:
 - `FULL_FLOW`: needs a plan and likely split/no-split decision because it crosses modules, has unclear sequencing, or touches state/API/security/data/migration/release.
 
 Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
+
+Self-assess process weight before routing:
+
+- If the main value is judgment, comparison, or audit, route to `ccdawn-evaluation`.
+- If the main value is diagnosing a failing behavior, route to `ccdawn-bug-review`.
+- If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
+- If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.
+- Reuse the current worktree for one theme. Create a new worktree only for parallel work, conflict isolation, high-risk isolation, or explicit user request.
 
 `ccdawn-task-splitting` owns the split decision:
 

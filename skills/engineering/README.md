@@ -7,4 +7,6 @@
 - **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Behavior-anchored development using TDD.
 - **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Evidence-backed completion checks and stage summaries.
 - **[ccdawn-pr-review](./ccdawn-pr-review/SKILL.md)** - PR, branch, commit-range, or diff review against requirements, evidence, regression risk, and merge readiness.
+- **[ccdawn-bug-review](./ccdawn-bug-review/SKILL.md)** - Evidence-led bug, regression, failing-test, and root-cause review before choosing a fix path.
+- **[ccdawn-evaluation](./ccdawn-evaluation/SKILL.md)** - Evaluation of plans, workflows, skills, implementations, and results against evidence, risk, noise, and next-step value.
 - **[ccdawn-goal-loop](./ccdawn-goal-loop/SKILL.md)** - Goal contract, evidence checks, constraints, and stop-on-blocker iteration.

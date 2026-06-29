@@ -1,0 +1,5 @@
+interface:
+  display_name: "CCDawn Bug Review"
+  short_description: "Evidence-led bug, regression, and failing-test review before choosing a fix path."
+  default_prompt: "Use ccdawn-bug-review to inspect the reported bug or failed behavior, identify evidence and likely root cause, then route to the right CCDawn fix stage."
+

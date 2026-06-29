@@ -36,6 +36,12 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 - **`ccdawn-pr-review`**
   The PR-review-stage skill for checking a PR, branch, commit range, or local diff against aligned requirements, task evidence, regression risk, and merge readiness.
 
+- **`ccdawn-bug-review`**
+  The bug-review skill for evidence-led inspection of bugs, regressions, failing tests, abnormal behavior, and likely root causes before choosing a fix path.
+
+- **`ccdawn-evaluation`**
+  The evaluation skill for judging plans, workflows, skills, implementations, and results against user goals, evidence, risk, noise, flexibility, and next-step value.
+
 - **`ccdawn-dawn-agent-html-memory`**  
   A persistent project-memory skill for creating and maintaining `.docs/project-memory/` inside real software projects. It supports shared multi-session work lanes under `.docs/project-memory/lanes/`, a generated HTML overview that aggregates those lanes, and a root `PROJECT_MEMORY.html` shortcut for humans.
 
@@ -101,6 +107,8 @@ skills/
     ccdawn-bdd-tdd-development/
     ccdawn-completion-summary/
     ccdawn-pr-review/
+    ccdawn-bug-review/
+    ccdawn-evaluation/
     ccdawn-goal-loop/
   research/
     README.md
@@ -222,6 +230,8 @@ Invoke the skills in chat with prompts such as:
 - `Help me run this competition through a full research lifecycle`
 - `Use ccdawn-goal-loop to turn this objective into a verified execution contract`
 - `Use ccdawn-pr-review to review this PR before merge`
+- `Use ccdawn-bug-review to inspect this regression before fixing it`
+- `Use ccdawn-evaluation to evaluate whether this workflow is too heavy`
 - `Use ccdawn-huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
 - `Use ccdawn-creative-toolbox to generate new concept cards from this context`
 - `Initialize project memory for this repo`

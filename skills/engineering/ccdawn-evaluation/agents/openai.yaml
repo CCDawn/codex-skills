@@ -1,0 +1,5 @@
+interface:
+  display_name: "CCDawn Evaluation"
+  short_description: "Evidence-led evaluation of plans, workflows, skills, implementations, and results."
+  default_prompt: "Use ccdawn-evaluation to judge the object against the user's real goal, evidence, risk, noise, flexibility, and next-step value."
+
