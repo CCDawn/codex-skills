@@ -77,6 +77,7 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 
 - 具体 bug 或失败测试 -> `systematic-debugging` / `ccdawn-bug-review`
 - PR/diff 合并前 -> `ccdawn-pr-review`
+- 复杂新增功能、模块替换、开源库/项目复用价值评估 -> `ccdawn-feature-reuse-research`
 - 需要方案 -> `ccdawn-planning`
 - 需要任务拆分 -> `ccdawn-task-splitting`
 - 完成状态/证据 -> `ccdawn-completion-summary`

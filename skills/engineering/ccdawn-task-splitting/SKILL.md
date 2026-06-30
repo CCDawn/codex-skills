@@ -26,6 +26,7 @@ description: Use after a CCDawn implementation plan is accepted and the user con
 - 已接受的 `ccdawn-planning` 方案；
 - 用户确认进入任务拆分，或 planning 阶段建议进入本阶段做拆分/不拆分判定；
 - 方案中的目标、范围、文件影响、风险和验证策略；
+- 复杂新增功能的复用决策：REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped；
 - 必要的代码或文档上下文。
 
 如果方案本身还没被用户接受，不要拆任务，先回到 `ccdawn-planning`。
@@ -113,6 +114,7 @@ Task N: 名称
 - Outputs: 后续任务依赖的产物
 - Files: 预计创建/修改/测试的路径
 - Boundary: 本任务拥有的修改面；明确不碰的相邻文件、行为或清理项
+- Reuse: 本任务继承的复用决策、候选模块/库、禁止误用边界；无则写“无”
 - Dependencies: 无 / Task X
 - Criticality: critical / optional
 - Development Mode: SIMPLE / BDD_TDD
@@ -128,6 +130,7 @@ Task N: 名称
 Task N: 名称
 - Output:
 - Files/Boundary:
+- Reuse:
 - Development Mode: SIMPLE
 - Verification:
 - Risk:
@@ -205,6 +208,7 @@ F. 暂停...
 - `SIMPLE` 任务不要补形式化 BDD/TDD；只要说明为什么轻量验证足够。
 - 任务不能只写“实现功能”“添加测试”“更新文档”。
 - 有误改风险的任务缺少 Boundary 不合格。
+- 复杂新增功能缺少 Reuse 字段不合格；如果选择自研，必须说明已研究或已跳过复用研究的原因。
 - 不能在拆分阶段改代码。
 - 如果拆分发现方案不可执行，回到 `ccdawn-planning`，不要硬拆。
 

@@ -27,17 +27,20 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 - 用户允许进入方案阶段；
 - 已知范围边界、关键约束、验证锚点；
 - 必要的本地上下文：代码、文档、测试、配置、日志或历史决策。
+- 若目标是复杂新增功能且外部/内部复用可能改变方案，已有 `ccdawn-feature-reuse-research` 的复用决策，或已明确跳过复用研究并记录原因。
 
 如果缺少会改变方案的需求信息，先回到 `ccdawn-brt` 继续需求对齐，不要硬写方案。
+如果缺少会改变方案的复用研究，先进入 `ccdawn-feature-reuse-research`，不要默认自研。
 
 ## 工作方式
 
 1. 读取上下文：检查相关文件、测试、文档、配置和已有模式。
-2. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
-3. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
-4. 写方案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
-5. 自审：从范围、可实施性、风险、验证四个角度检查方案。
-6. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
+2. 检查复用决策：复杂新增功能必须说明 `REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped`。
+3. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
+4. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
+5. 写方案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
+6. 自审：从范围、可实施性、风险、验证四个角度检查方案。
+7. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
 
 ## 输出契约
 
@@ -49,6 +52,7 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 - 范围: 本轮做...；不做...
 - 推荐路径: ...
 - 备选路径: A ... / B ...
+- 复用决策: REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped；证据...
 - 影响面:
   - 文件/模块: ...
   - 接口/状态/数据: ...
@@ -88,6 +92,7 @@ D. 暂停在方案阶段...
 - 不实现：本阶段不编辑业务代码，除非用户明确改变阶段目标。
 - 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
 - 不写“相关文件都可能调整”这类无限边界；无法枚举影响面时，必须说明需要先 probe 或进入任务拆分降低误改风险。
+- 复杂新增功能不能默认自研；必须引用复用研究结论，或说明为什么本次跳过 `ccdawn-feature-reuse-research`。
 
 ## Workflow Ledger
 
@@ -95,6 +100,7 @@ D. 暂停在方案阶段...
 
 - `Confirmed Intent` 来自 `ccdawn-brt`，不能重新发明。
 - `Accepted Plan` 写成一句可执行方案摘要。
+- `Reuse Decision` 若存在，必须写入 `Decisions` 或 `Assumptions`，供拆分和开发阶段继承。
 - `Task Graph` 在本阶段标为未判定，留给 `ccdawn-task-splitting` 决定拆分或不拆分。
 - `Decisions` 只记录会影响实现、测试、风险或范围的决定。
 - `Unresolved Risks` 必须包含仍不清楚的影响面或保护边界。

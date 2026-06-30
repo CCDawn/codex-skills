@@ -2,11 +2,13 @@
 
 - **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Shared HTML project memory with lane-based session updates.
 - **[ccdawn-brt](./ccdawn-brt/SKILL.md)** - Proactive user-intent alignment with candidate intents, high-signal questions, behavior contracts, review lenses, test anchors, and workflow routing.
+- **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research before complex feature planning, comparing existing projects, libraries, examples, and in-project modules.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
 - **[ccdawn-task-splitting](./ccdawn-task-splitting/SKILL.md)** - Task decomposition from an accepted implementation plan.
 - **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Behavior-anchored development using TDD.
 - **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Evidence-backed completion checks and stage summaries.
 - **[ccdawn-pr-review](./ccdawn-pr-review/SKILL.md)** - PR, branch, commit-range, or diff review against requirements, evidence, regression risk, and merge readiness.
+- **[ccdawn-project-review](./ccdawn-project-review/SKILL.md)** - Repository, architecture, technical debt, test gap, and project health review.
 - **[ccdawn-bug-review](./ccdawn-bug-review/SKILL.md)** - CCDawn adapter that reuses systematic-debugging and root-cause-tracing for bug review handoffs.
 - **[ccdawn-evaluation](./ccdawn-evaluation/SKILL.md)** - CCDawn evaluation adapter used only after checking more specific review, debug, planning, verification, feedback, or goal skills.
 - **[ccdawn-goal-loop](./ccdawn-goal-loop/SKILL.md)** - Goal contract, evidence checks, constraints, and stop-on-blocker iteration.

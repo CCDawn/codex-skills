@@ -12,6 +12,7 @@ description: Use when CCDawn workflow needs a Chinese-first evaluation adapter a
 先复用现有 skill：
 
 - PR、diff、分支、提交范围：`ccdawn-pr-review`。
+- 复杂功能新增前的项目/库/模块搜索、技术选型、复用价值评估：`ccdawn-feature-reuse-research`。
 - 项目、代码库、架构、技术债、测试缺口、风险模块、接手摸底：`ccdawn-project-review`。
 - 独立代码审阅：`requesting-code-review`。
 - 外部 review 反馈是否采纳：`receiving-code-review`。
@@ -21,7 +22,7 @@ description: Use when CCDawn workflow needs a Chinese-first evaluation adapter a
 - 方案制定前后的可实施性：`ccdawn-planning`。
 - 目标是否可执行：`ccdawn-goal-loop`。
 
-只有当用户要评价的是方案、流程、skill、当前状态、输出质量、合理性、灵活性、噪声、取舍或下一步价值，且用户目标已经清楚、没有更具体 skill 时，才在本 skill 内做轻量多维评价。项目级审查默认交给 `ccdawn-project-review`，不要在本 skill 里重写项目审查流程。
+只有当用户要评价的是方案、流程、skill、当前状态、输出质量、合理性、灵活性、噪声、取舍或下一步价值，且用户目标已经清楚、没有更具体 skill 时，才在本 skill 内做轻量多维评价。项目级审查默认交给 `ccdawn-project-review`，复用价值评估默认交给 `ccdawn-feature-reuse-research`，不要在本 skill 里重写这些专项流程。
 
 Owner 边界：
 
