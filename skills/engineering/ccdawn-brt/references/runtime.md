@@ -21,6 +21,7 @@ State is a routing signal, not decoration.
 
 - INTENT_DISCOVERY: `ccdawn-brt` is identifying the user text, likely intent, and risks.
 - INTENT_CONVERGENCE: `ccdawn-brt` is comparing candidate intents and asking high-signal questions.
+- BUNDLE_ROUTING: `ccdawn-brt` is grouping multiple user intents into Primary, Secondary, and Deferred actions before choosing stage routes.
 - FEATURE_REUSE_RESEARCHING: `ccdawn-feature-reuse-research` is searching and evaluating reusable projects, libraries, examples, or modules before implementation planning.
 - PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
 - PROJECT_REVIEWING: `ccdawn-project-review` is reviewing a repository, subsystem, architecture, technical debt, test gaps, or project health.
@@ -38,6 +39,9 @@ State is a routing signal, not decoration.
 Transition rules:
 
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
+- When one user message contains multiple goals, build an Intent Bundle before routing: Primary blocks or best satisfies the current goal, Secondary can be covered in the same theme or next step, and Deferred depends on results, has different scope, or adds risk/noise.
+- Route by Primary first. Carry Secondary only when it is same-theme, low-risk, and does not change the Primary contract. Defer or ask when bundled intents conflict.
+- Parallelize only independent read-only research, review, audit, search, or evaluation work. Any write action, shared file/module, shared verification, migration, release, or permission-sensitive work stays sequential in one current contract.
 - Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
@@ -63,6 +67,7 @@ Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
 Self-assess process weight before routing:
 
 - Use intent confidence before asking: `HIGH` acts, `MEDIUM` acts with stated assumptions, `LOW` asks or probes, `BLOCKED` asks one blocking question.
+- If there are multiple intents, choose `COMPACT_FLOW` when they share a theme and can be ordered in one context; choose separate routing only when owner, risk, or verification truly differs.
 - If the main value is adding a complex feature where external or internal reuse may change the plan, route to `ccdawn-feature-reuse-research` before `ccdawn-planning`.
 - If the main value is judgment, comparison, or audit, route to the most specific existing review skill; use `ccdawn-evaluation` only when none fits.
 - If the main value is project health, architecture, technical debt, test gaps, onboarding, or risk-module triage, route to `ccdawn-project-review`.
@@ -131,6 +136,7 @@ Minimum fields:
 ```text
 Workflow Ledger:
 - Confirmed Intent:
+- Intent Bundle:
 - Current Stage:
 - Accepted Plan:
 - Task Graph:
@@ -146,6 +152,7 @@ Workflow Ledger:
 Ledger rules:
 
 - When `ccdawn-brt` enters planning, seed `Workflow Ledger` from the requirement ledger: confirmed intent, assumptions, unresolved risks, and verification anchors.
+- When an Intent Bundle exists, carry it as `Primary / Secondary / Deferred`; stage skills may execute only the part covered by their current contract and must preserve deferred items as next-stage context.
 - Update the ledger at every stage boundary.
 - Treat the ledger as the handoff contract for "continue".
 - Do not invent missing entries. If a field is unknown, mark it as unknown and route to the stage that can resolve it.
@@ -157,7 +164,8 @@ Ledger rules:
 
 Stage skills should not repeat the full ledger when a compact update is enough. Output only the changed fields plus the next recommended stage.
 
-- `ccdawn-planning`: `Current Stage`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-brt`: `Current Stage`, `Intent Bundle`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-planning`: `Current Stage`, `Intent Bundle`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-feature-reuse-research`: `Current Stage`, `Reuse Decision`, `Candidate Evidence`, `Rejected Alternatives`, `Verification Strategy`, `Recommended Next Stage`.
 - `ccdawn-task-splitting`: `Current Stage`, `Split Decision`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Development Mode`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
