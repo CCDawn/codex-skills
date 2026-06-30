@@ -5,11 +5,12 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> [existing skill reuse | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
+ccdawn-brt -> [existing skill reuse | ccdawn-project-review | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
 ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
 ```
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
+`ccdawn-project-review` applies when the current need is whole-project, repository, architecture, technical debt, test gap, maintainability, onboarding, or risk-module review.
 `systematic-debugging` is the primary bug/failure route; `root-cause-tracing` is added when the source is hidden deep in a call chain. `ccdawn-bug-review` is only a CCDawn adapter around those existing skills.
 `ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment and no more specific existing skill owns the task.
 
@@ -20,6 +21,7 @@ State is a routing signal, not decoration.
 - INTENT_DISCOVERY: `ccdawn-brt` is identifying the user text, likely intent, and risks.
 - INTENT_CONVERGENCE: `ccdawn-brt` is comparing candidate intents and asking high-signal questions.
 - PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
+- PROJECT_REVIEWING: `ccdawn-project-review` is reviewing a repository, subsystem, architecture, technical debt, test gaps, or project health.
 - EVALUATING: `ccdawn-evaluation` is judging a plan, workflow, skill, implementation, result, or current state.
 - BUG_REVIEWING: `ccdawn-bug-review` is inspecting a bug, regression, failing test, or abnormal behavior before choosing a fix path.
 - PLANNING: `ccdawn-planning` is producing an implementation plan.
@@ -34,7 +36,7 @@ State is a routing signal, not decoration.
 Transition rules:
 
 - Do not leave `INTENT_CONVERGENCE` until at least one intent is stable or a reversible probe has reduced uncertainty.
-- Prefer existing specialized skills before CCDawn wrapper skills. Route bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
+- Prefer existing specialized skills before CCDawn wrapper skills. Route whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
@@ -60,6 +62,7 @@ Self-assess process weight before routing:
 
 - Use intent confidence before asking: `HIGH` acts, `MEDIUM` acts with stated assumptions, `LOW` asks or probes, `BLOCKED` asks one blocking question.
 - If the main value is judgment, comparison, or audit, route to the most specific existing review skill; use `ccdawn-evaluation` only when none fits.
+- If the main value is project health, architecture, technical debt, test gaps, onboarding, or risk-module triage, route to `ccdawn-project-review`.
 - If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
 - If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
 - If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.

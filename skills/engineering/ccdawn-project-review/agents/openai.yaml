@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn Project Review"
+  short_description: "Evidence-led repository, architecture, technical debt, and project health review."
+  default_prompt: "Use ccdawn-project-review to review the current project or subsystem for architecture risks, technical debt, test gaps, high-risk modules, and next CCDawn routes."
