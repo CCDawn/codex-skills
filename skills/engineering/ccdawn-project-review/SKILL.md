@@ -104,6 +104,17 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 - 建议：下一步最小有效动作；
 - 路由：该回哪个 skill 或阶段。
 
+## 行动队列
+
+当 findings 指向多个后续动作时，先转成行动队列，再给下一步：
+
+- Immediate Guardrail：低风险保护动作，例如关闭 stale claim、阻止误合、补发布/权限/删除防线。
+- Primary Fix：证据最充分、最影响当前目标或用户可见链路的修复。
+- Telemetry Gap：现有证据不足以定性为 bug，需要补日志、指标、probe 或复测。
+- Deferred Refactor：维护性或结构性治理，当前目标不依赖时延后。
+
+`WATCHLIST` 必须有退出条件：哪些指标、日志、测试、运行证据或时间窗口能证明关闭、降级或升级。Telemetry Gap 不要和确认型 P1 混在同一严重度里。
+
 ## 输出契约
 
 ```text
@@ -130,10 +141,11 @@ Findings:
 - 缺口:
 - 建议补强:
 
-优先行动:
-1. ...
-2. ...
-3. ...
+行动队列:
+- Immediate Guardrail: 证据...；动作...；路由...
+- Primary Fix: 证据...；动作...；路由...
+- Telemetry Gap: 证据缺口...；补证方式...；退出 WATCHLIST 条件...
+- Deferred Refactor: 延后原因...；触发条件...
 
 下一步:
 A. 进入 ccdawn-planning 制定修复/重构方案（推荐，当存在 P0/P1/P2 需要落地）...

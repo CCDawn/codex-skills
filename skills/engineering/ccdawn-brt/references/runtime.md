@@ -44,6 +44,7 @@ Transition rules:
 - Route by Primary first. Carry Secondary only when it is same-theme, low-risk, and does not change the Primary contract. Defer or ask when bundled intents conflict.
 - Show the bundle only when it changes execution order, skill owner, risk boundary, visible scope, or requires user tradeoff. Otherwise keep it internal.
 - Parallelize only independent read-only research, review, audit, search, or evaluation work, and only when the speedup is worth the coordination cost. Any write action, shared file/module, shared verification, migration, release, or permission-sensitive work stays sequential in one current contract.
+- When a review or audit produces multiple follow-up actions, create an Action Queue before choosing the next stage: Immediate Guardrail, Primary Fix, Telemetry Gap, Deferred Refactor. Do not mix confirmed defects, evidence gaps, governance risks, and maintenance refactors in one severity bucket.
 - Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
@@ -139,6 +140,7 @@ Minimum fields:
 Workflow Ledger:
 - Confirmed Intent:
 - Intent Bundle:
+- Action Queue:
 - Current Stage:
 - Accepted Plan:
 - Task Graph:
@@ -155,6 +157,7 @@ Ledger rules:
 
 - When `ccdawn-brt` enters planning, seed `Workflow Ledger` from the requirement ledger: confirmed intent, assumptions, unresolved risks, and verification anchors.
 - When an Intent Bundle exists, carry it as `Primary / Secondary / Deferred`; stage skills may execute only the part covered by their current contract and must preserve deferred items as next-stage context.
+- When an Action Queue exists, preserve `Immediate Guardrail / Primary Fix / Telemetry Gap / Deferred Refactor`; the next stage should execute or plan only the selected queue item and keep the rest as deferred context.
 - Update the ledger at every stage boundary.
 - Treat the ledger as the handoff contract for "continue".
 - Do not invent missing entries. If a field is unknown, mark it as unknown and route to the stage that can resolve it.
@@ -166,7 +169,7 @@ Ledger rules:
 
 Stage skills should not repeat the full ledger when a compact update is enough. Output only the changed fields plus the next recommended stage.
 
-- `ccdawn-brt`: `Current Stage`, `Intent Bundle`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-brt`: `Current Stage`, `Intent Bundle`, `Action Queue`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-planning`: `Current Stage`, `Intent Bundle`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-feature-reuse-research`: `Current Stage`, `Reuse Decision`, `Candidate Evidence`, `Rejected Alternatives`, `Verification Strategy`, `Recommended Next Stage`.
 - `ccdawn-task-splitting`: `Current Stage`, `Split Decision`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.

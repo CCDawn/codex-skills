@@ -98,6 +98,24 @@ user message -> intent guess -> intent bundle -> response depth -> skill routing
 执行顺序: 先 ...，再 ...；并行/延后原因 ...
 ```
 
+## 审查结果行动路由
+
+当回复来自项目审查、PR 审查、bug 审查、链路审查或流程评价，且发现包含多个后续动作时，不要只平铺 P1/P2。先把发现转成行动队列：
+
+- Immediate Guardrail：先做的低风险保护动作，防止误合、误删、回退、发布或权限风险。
+- Primary Fix：当前最能改善用户目标或核心链路的确认型修复。
+- Telemetry Gap：证据不足但值得补 probe、日志、指标或复测的观察项；不要和确认型 P1 混排。
+- Deferred Refactor：维护性、结构性或后端治理项；不影响当前目标时延后。
+
+每项只保留：`evidence / impact / route / success evidence`。如果结论是 `WATCHLIST`，必须写明退出条件，例如哪条日志、指标、测试或运行证据出现后降级或关闭。
+
+需要输出时用压缩形态：
+
+```text
+行动队列: Guardrail = ...；Primary Fix = ...；Telemetry Gap = ...；Deferred = ...
+推荐下一步: A ...（推荐）/ B ... / C ...
+```
+
 ## 执行契约、防误改、恢复
 
 执行或写入前内部建立 Execution Contract：`Target / Desired Outcome / Allowed Actions / Out of Scope / Success Evidence / Recovery Signal`。SILENT/MICRO 不必输出；ALIGN/FULL、交接、恢复或高误改风险时才摘要展示。
@@ -188,6 +206,7 @@ Owner Matrix：
 - 只是评价、审查或诊断：路由到最具体的现有 skill，不进入开发流程。
 - 多个独立只读审查、搜索、评估可以并行；任何写入、同模块或共享验证的任务默认顺序执行。
 - 新 worktree 只在并行、冲突、高风险隔离或用户明确要求时使用。
+- 审查结果含多条后续动作时，先形成行动队列；确认型修复、证据缺口、治理保护和延后重构不要混在同一严重度里。
 
 阶段交接规则：
 
@@ -410,6 +429,7 @@ Evidence 必须来自用户选择、本地上下文、可执行验证、可逆 p
 - 剩余风险；
 - 下一步：按自适应路由推荐最具体的现有 skill、`FAST_PATH`、`ccdawn-planning` 或暂停。
 - 复合意图且会影响顺序、owner、风险、范围或用户取舍时，说明 Primary / Secondary / Deferred 和默认执行顺序。
+- 审查类输出含多个后续动作时，说明 Guardrail / Primary Fix / Telemetry Gap / Deferred 和推荐下一步。
 
 推荐收口问题：
 

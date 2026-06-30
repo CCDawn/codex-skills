@@ -38,6 +38,8 @@ Owner 边界：
 4. Evidence 必须来自文件、代码、测试、日志、用户要求、运行结果或明确假设。
 5. 给出总评、必须调整、可选优化和下一步路由。
 
+如果评价对象是审查报告、流程结果或多发现输出，必须先把后续动作归入 `Immediate Guardrail / Primary Fix / Telemetry Gap / Deferred Refactor`，再推荐下一步。不要把确认型问题、证据缺口、治理风险和维护性重构混成同一类建议。
+
 ## 默认维度
 
 按对象选择，不要全量输出：
@@ -66,6 +68,12 @@ Owner 边界：
 
 必须调整:
 - ...
+
+行动队列（仅多后续动作时）:
+- Immediate Guardrail: ...
+- Primary Fix: ...
+- Telemetry Gap: ...
+- Deferred Refactor: ...
 
 下一步:
 A. 按推荐调整（推荐）...
