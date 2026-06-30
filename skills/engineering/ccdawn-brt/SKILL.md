@@ -74,20 +74,22 @@ user message -> intent guess -> intent bundle -> response depth -> skill routing
 
 ## 复合意图动态组合
 
-当一句话包含多个任务、多个对象或多个动词时，先内部建立 Intent Bundle，再决定是否展示：
+当一句话包含多个交付物、多个 skill owner、不同风险边界或不同验证契约时，先内部建立 Intent Bundle，再决定是否展示。普通的“修复并验证”“安装并检查”“实现并汇报”默认是一个任务的验证或收口，不单独拆成 Bundle。
 
-- Primary：最能满足用户当前真实目标、最阻塞后续动作或风险最高的意图。
+- Primary：当前最该推进的意图。优先级为：先处理阻塞证据或安全/破坏性风险；再处理用户明确要求的交付目标；最后处理可顺带覆盖的验证、汇报或整理。
 - Secondary：可在同一主题下顺手完成、验证或汇总的意图。
 - Deferred：依赖 Primary 结果、范围不同、风险更高或会明显增加噪声的意图。
 
 组合规则：
 
 - 默认按依赖顺序推进 Primary，再处理 Secondary；不要把无依赖关系说成任务图。
+- 验证、测试、安装检查、总结和汇报默认并入 Primary 的完成证据，除非它们本身有独立交付物或风险边界。
 - 只有独立、只读、可并行验证的搜索、审查、评估或信息收集，才允许并行或多 agent。
 - 写入任务、同一文件/模块任务、会改变需求或验证结果的任务，必须顺序执行。
 - 如果多个意图属于不同 owner，先路由 Primary；Secondary 只作为下一步或同阶段压缩动作。
 - 如果 Secondary 能通过当前验证自然覆盖，就不要单独开阶段。
 - 如果多个意图冲突，输出一个高信号问题；如果只是顺序问题，由 agent 自行排序。
+- 只有组合会改变执行顺序、skill owner、风险边界、用户可见范围或需要用户取舍时，才向用户展示 Bundle；否则内部处理。
 
 需要输出时用压缩形态：
 
@@ -139,7 +141,7 @@ ccdawn-brt
 
 BRT 每轮先做内部路由判断，不需要等用户主动说“请路由”：
 
-- 用户一句话包含多个任务或多个 skill owner：先做 Intent Bundle，分出 `Primary / Secondary / Deferred`，按依赖顺序组合，不直接展开完整任务图。
+- 用户一句话包含多个交付物、多个 skill owner、不同风险边界或不同验证契约：先做 Intent Bundle，分出 `Primary / Secondary / Deferred`，按依赖顺序组合，不直接展开完整任务图。
 - 需求/意图不清：留在 `ccdawn-brt`，用候选意图和高信号问题对齐。
 - 用户要添加复杂功能、模块、工作流、UI 组件、集成、解析器、编辑器、搜索、可视化、导入导出、算法或可复用子系统，且外部生态可能影响方案：路由到 `ccdawn-feature-reuse-research`。
 - 用户要审项目、审代码库、架构体检、技术债盘点、测试缺口、接手摸底或风险模块排序：路由到 `ccdawn-project-review`。
@@ -218,7 +220,7 @@ Owner Matrix：
 
 1. 读上下文：先看相关代码、测试、文档、日志、配置或历史决策。
 2. 判断任务性质：需求对齐、评价、bug 审查、PR 审阅、方案制定、开发执行或总结交接。
-3. 识别 Intent Bundle：多个目标时分出 Primary / Secondary / Deferred，并判断依赖、冲突和 owner。
+3. 识别 Intent Bundle：只有多交付物、多 owner、不同风险边界或不同验证契约时才分出 Primary / Secondary / Deferred，并判断依赖、冲突和 owner。
 4. 判断意图置信度：HIGH / MEDIUM / LOW / BLOCKED。
 5. 建立 Execution Contract：明确 Target、Desired Outcome、Allowed Actions、Out of Scope、Success Evidence、Recovery Signal。
 6. 做 Wrong-Edit Guard：识别 owning surface、预计文件、保护边界和已有改动。
@@ -407,7 +409,7 @@ Evidence 必须来自用户选择、本地上下文、可执行验证、可逆 p
 - 验证锚点；
 - 剩余风险；
 - 下一步：按自适应路由推荐最具体的现有 skill、`FAST_PATH`、`ccdawn-planning` 或暂停。
-- 复合意图时，说明 Primary / Secondary / Deferred 和默认执行顺序。
+- 复合意图且会影响顺序、owner、风险、范围或用户取舍时，说明 Primary / Secondary / Deferred 和默认执行顺序。
 
 推荐收口问题：
 

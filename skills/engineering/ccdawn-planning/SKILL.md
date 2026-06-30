@@ -1,6 +1,6 @@
 ---
 name: ccdawn-planning
-description: Use when requirements or intent have been aligned by ccdawn-brt and the user confirms entering planning, before implementation starts; applies when work needs architecture choices, scope boundaries, file impact, risk decisions, validation strategy, or an implementation handoff plan.
+description: Use when aligned requirements need an implementation plan before coding; applies when ccdawn-brt or a prior stage routes to planning, or when work needs architecture choices, scope boundaries, file impact, risk decisions, validation strategy, or an implementation handoff plan.
 ---
 
 # CCDawn Planning
@@ -24,7 +24,7 @@ description: Use when requirements or intent have been aligned by ccdawn-brt and
 使用前确认已有：
 
 - 来自 `ccdawn-brt` 的已确认意图或行为契约；
-- 用户允许进入方案阶段；
+- BRT、上一阶段或用户已允许进入方案阶段；用户原始目标已包含执行许可时，可按自然闸门连续进入；
 - 已知范围边界、关键约束、验证锚点；
 - 必要的本地上下文：代码、文档、测试、配置、日志或历史决策。
 - 若目标是复杂新增功能且外部/内部复用可能改变方案，已有 `ccdawn-feature-reuse-research` 的复用决策，或已明确跳过复用研究并记录原因。

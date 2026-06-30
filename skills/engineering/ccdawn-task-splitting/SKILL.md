@@ -1,6 +1,6 @@
 ---
 name: ccdawn-task-splitting
-description: Use after a CCDawn implementation plan is accepted and the user confirms entering task splitting or split/no-split routing, before development starts; applies when work may need decomposition, when it may be valid to choose NO_SPLIT, or when subtasks need SIMPLE vs BDD_TDD development mode decisions, verification anchors, dependencies, and handoff decisions.
+description: Use after a CCDawn implementation plan is accepted and split/no-split routing is needed before development; applies when ccdawn-planning or ccdawn-brt routes to decomposition, when NO_SPLIT may be valid, or when subtasks need SIMPLE vs BDD_TDD decisions, verification anchors, dependencies, and handoff decisions.
 ---
 
 # CCDawn Task Splitting
@@ -24,7 +24,7 @@ description: Use after a CCDawn implementation plan is accepted and the user con
 使用前确认已有：
 
 - 已接受的 `ccdawn-planning` 方案；
-- 用户确认进入任务拆分，或 planning 阶段建议进入本阶段做拆分/不拆分判定；
+- BRT、planning 阶段或用户已路由到拆分/不拆分判定；用户原始目标已包含执行许可时，可按自然闸门连续进入；
 - 方案中的目标、范围、文件影响、风险和验证策略；
 - 复杂新增功能的复用决策：REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped；
 - 必要的代码或文档上下文。
