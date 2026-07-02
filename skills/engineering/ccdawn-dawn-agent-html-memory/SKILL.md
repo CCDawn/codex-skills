@@ -25,13 +25,13 @@ Create a project-local memory system under `.docs/project-memory/` and keep it c
 
 Treat project memory maintenance as part of the definition of done.
 
-- Before meaningful development, read `INDEX.md`, `memory.json`, `profile.json`, and any lane files relevant to the current responsibility.
+- Before meaningful development or continuation work where memory can change the answer, read `INDEX.md`, `memory.json`, `profile.json`, and only the lane files relevant to the current responsibility.
 - When another agent may be working in the same project, run the work guard status/check before editing and claim the active lane when overlap risk exists.
 - During development, place raw findings in `inbox.json` when needed.
 - After meaningful development, update only the current lane file plus the global recent-updates feed, then run the sync command.
 - Do not end a task with stale project memory unless the user explicitly says to skip it.
 
-If the repository contains `.docs/project-memory/`, assume this skill is active even when the user did not mention it by name.
+If the repository contains `.docs/project-memory/`, treat this skill as available for meaningful repository work, continuation, cross-session decisions, or memory updates. Do not automatically read or update it for trivial read-only questions, tiny one-off edits, or reviews where project memory cannot change the conclusion.
 
 ## Relationship to built-in memory and other context
 

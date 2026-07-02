@@ -9,6 +9,14 @@ description: Use when the user gives a goal-oriented request that needs explicit
 
 它不是泛泛的 brainstorming，也不是 BRT 的替代品。它关注的是：目标是否清楚、证据是否足够、约束是否被守住、下一步是否值得做、以及什么时候必须停下来报告。
 
+## BRT interface
+
+- Context Boundary: 当前目标、可用输入/工具/文件范围、明确约束、已获得证据和本轮迭代对象。
+- Output Contract: goal contract、当前行动、advance/iterate/stop 决策、证据和 Route Out。
+- Success Evidence: 当前行动产出能满足或推进 `Evidence` 字段的可检查证据。
+- Stop Condition: 约束会被突破、没有有效下一步、缺少必须信息/权限、连续失败无法产生新证据、或用户要求暂停。
+- Route Out: 继续 goal loop、回到 `ccdawn-brt` 重新对齐目标、进入具体 owner skill、`ccdawn-completion-summary`，或 BLOCKED。
+
 ## Goal contract
 
 先把下面 6 个字段补齐：

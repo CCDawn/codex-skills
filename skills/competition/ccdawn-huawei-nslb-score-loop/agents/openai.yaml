@@ -1,5 +1,5 @@
 interface:
   display_name: "CCDawn Huawei NSLB Score Loop"
-  short_description: "Huawei NSLB scoring loop and autonomous epoch router."
-  default_prompt: "Use $ccdawn-huawei-nslb-score-loop to run doctor/drift checks, initialize online-offline weights, prepare or run an autonomous epoch, gate child-agent results, rank candidates, and record online score calibration for the active Huawei NSLB baseline."
+  short_description: "Huawei NSLB 项目适配层，基于通用 score loop 执行 epoch、gate、packaging 和 online feedback。"
+  default_prompt: "Use $ccdawn-huawei-nslb-score-loop as the Huawei NSLB adapter over $ccdawn-score-loop: run current status/doctor/drift checks, apply the project profile, prepare or run an epoch, gate child-agent results, rank candidates, register short packages, and record online score calibration for the active baseline."
 

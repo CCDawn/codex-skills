@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn BDD/TDD Development"
+  short_description: "执行已选择任务：简单任务轻量实现，复杂任务按 BDD/TDD 和新鲜验证推进。"
+  default_prompt: "使用 $ccdawn-bdd-tdd-development：执行当前已选择任务，先确认 Development Mode、文件边界、保护范围和 Success Evidence；SIMPLE 用最小实现和验证，BDD_TDD 先给行为契约和失败测试，再实现、重验并输出证据。"

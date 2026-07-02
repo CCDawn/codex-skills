@@ -163,10 +163,10 @@ Ledger Update:
 - Route Out: FAST_PATH 轻量执行 / ccdawn-completion-summary / ccdawn-planning
 
 下一步:
-A. 不拆分，直接执行（推荐）...
-B. 强制拆分任务...
-C. 回到 ccdawn-planning 调整方案...
-D. 暂停...
+推荐下一步：不拆分，直接执行。
+- 如果用户目标已经包含执行许可：直接进入轻量执行，不停下等确认。
+- 如果执行许可或风险边界缺失：只问一个阻塞问题。
+- 只有用户要求选择、方案有真实分叉、或存在高风险动作时，才列出“强制拆分 / 回到 planning / 暂停”等选项。
 ```
 
 `SPLIT` 输出：
@@ -200,13 +200,10 @@ Ledger Update:
 - 验证可行: PASS/NEEDS_CHANGE，证据...
 
 下一步:
-任务拆分已完成。建议先执行 Task 1；如果用户希望 agent 连续推进，也可以授权按 Critical Path 一次性执行到完成总结。
-A. 轻量执行 Task 1（SIMPLE 任务推荐）...
-B. 使用 ccdawn-bdd-tdd-development 执行 Task 1（仅 BDD_TDD 任务推荐）...
-C. 连续执行全部 Critical Path（需要明确授权；逐任务按 SIMPLE 或 BDD_TDD 执行，遇阻立刻停）...
-D. 调整任务拆分...
-E. 先指定另一个任务...
-F. 暂停...
+任务拆分已完成。推荐下一步：执行 Task 1（按其 Development Mode 路由）。
+- 如果用户原始目标是完成整个方案、修复整个问题、或已说“继续/按推荐来”：进入 Task 1，不反复请求确认。
+- 如果连续执行全部 Critical Path 还没有授权，且一次性推进会改变用户授权边界：给出连续授权选项。
+- 如果用户要求选择、任务顺序有真实分叉、或存在高风险动作：再列出调整拆分、指定其他任务或暂停。
 ```
 
 ## 质量门槛
@@ -228,7 +225,7 @@ F. 暂停...
 - `NO_SPLIT` 时，`Task Graph` 写“不需要”，`Current Task` 写“直接执行单元”，`Recommended Next Stage` 写轻量执行或完成总结。
 - `SPLIT` 时，`Task Graph` 必须包含 critical path、optional path 和任务依赖。
 - `SPLIT` 时，`Current Task` 默认推荐第一个未完成 critical task，除非用户指定其他任务。
-- `SPLIT` 时，`Recommended Next Stage` 默认是第一个未完成 critical task，并标明 `SIMPLE` 或 `BDD_TDD`；同时提供“连续执行全部 Critical Path”的明确授权选项。
+- `SPLIT` 时，`Recommended Next Stage` 默认是第一个未完成 critical task，并标明 `SIMPLE` 或 `BDD_TDD`；只有授权边界确实需要用户选择时，才提供“连续执行全部 Critical Path”的明确授权选项。
 - 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
 
 ## 阶段交接

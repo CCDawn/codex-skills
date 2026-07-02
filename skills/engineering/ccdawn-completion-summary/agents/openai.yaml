@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn Completion Summary"
+  short_description: "阶段或任务完成后的证据化总结：需求覆盖、验证结果、剩余风险和下一路由。"
+  default_prompt: "使用 $ccdawn-completion-summary：基于新鲜验证证据总结完成状态，对照原始需求、任务结果、风险和副作用，给出是否完成、缺口、Route Out，以及是否适合进入 PR review、提交或暂停。"

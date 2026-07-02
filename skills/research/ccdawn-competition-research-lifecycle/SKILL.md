@@ -13,6 +13,14 @@ description: Use when coordinating a research competition lifecycle, Kaggle-styl
 
 `paper-claim-traceability` 是论文写作和提交打包阶段默认的证据审计层。
 
+## BRT interface
+
+- Context Boundary: 竞赛规则、数据/metric、active baseline/evidence、实验账本、论文/提交工件和当前阶段。
+- Output Contract: 阶段诊断、阶段行动、并行 lane、恢复计划、提交/论文证据审计或下一阶段路由。
+- Success Evidence: 阶段 artifact、run log、metric 表、claim map、submission checklist、leaderboard/外部反馈记录或复现实验证据。
+- Stop Condition: 数据/metric 漂移、active baseline 不一致、证据链缺失、提交格式不确定、claim 无来源、leaderboard 与 validation 严重冲突且未解释。
+- Route Out: 当前阶段继续、`ccdawn-score-loop`、工程类 owner skill、paper/claim 审计、`ccdawn-completion-summary`，或 BLOCKED。
+
 ## 核心原则
 
 - 不从聊天记忆推进项目。优先读取当前项目里的规则、数据说明、实验日志、run records、论文草稿和提交要求。

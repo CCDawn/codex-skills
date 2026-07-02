@@ -1,0 +1,40 @@
+{
+  "project": {
+    "name": "",
+    "root": "",
+    "metric": "",
+    "scoreDirection": "higher-is-better",
+    "activeBaseline": "",
+    "bestKnownScore": null
+  },
+  "surfaces": {
+    "allowedWrites": [],
+    "protectedFiles": [],
+    "ledgerPaths": [],
+    "artifactPaths": []
+  },
+  "commands": {
+    "status": "",
+    "drift": "",
+    "fastValidation": "",
+    "fullValidation": "",
+    "package": "",
+    "registerSubmission": ""
+  },
+  "promotionGate": {
+    "requiredChecks": [],
+    "secondarySignals": [],
+    "blockingFailures": []
+  },
+  "laneDefaults": {
+    "maxParallelWorkers": 1,
+    "resultArtifact": "child_result.json",
+    "firstKillRequired": true
+  },
+  "onlineFeedback": {
+    "enabled": false,
+    "submissionMap": "",
+    "calibrationLedger": "",
+    "acceptBestOnlyOnStrictImprovement": true
+  }
+}

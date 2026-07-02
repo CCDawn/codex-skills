@@ -21,6 +21,9 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 - **`ccdawn-brt`**  
   The Behavior / Review / Test workflow entry skill. It proactively infers what the user likely means, offers candidate intents and high-signal questions with recommendations, and turns aligned intent into behavior contracts, review lenses, test anchors, and next-stage routing.
 
+- **`ccdawn-feature-reuse-research`**
+  The reuse-research skill for complex feature additions where existing projects, libraries, examples, or in-project modules may change the plan.
+
 - **`ccdawn-planning`**
   The planning-stage skill for turning aligned requirements into an implementation plan before code changes.
 
@@ -35,6 +38,9 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 
 - **`ccdawn-pr-review`**
   The PR-review-stage skill for checking a PR, branch, commit range, or local diff against aligned requirements, task evidence, regression risk, and merge readiness.
+
+- **`ccdawn-project-review`**
+  The project-review skill for repository, architecture, technical debt, test gap, maintainability, onboarding, and project health reviews.
 
 - **`ccdawn-bug-review`**
   A CCDawn bug-review adapter that reuses `systematic-debugging` and `root-cause-tracing`, then summarizes evidence, root-cause state, impact, and the next fix route.
@@ -57,8 +63,11 @@ Keep the folder name identical to the `name` field, using the `ccdawn-` namespac
 
 ### Competition
 
+- **`ccdawn-score-loop`**
+  A generic score-loop template for benchmark, leaderboard, validation, baseline promotion, worker-lane, online/offline feedback, and submission-package iteration.
+
 - **`ccdawn-huawei-nslb-score-loop`**  
-  A project-specific score loop skill for the Huawei Algorithm Challenge 37 NSLB workspace. It coordinates isolated worker lanes, local proxy evidence, baseline promotion, package registration, and online score feedback calibration.
+  A Huawei Algorithm Challenge 37 NSLB adapter over the generic score-loop template. It keeps project commands, ledgers, mutation space, online feedback, and package rules in a project-specific profile.
 
 ### Creative
 
@@ -94,6 +103,7 @@ CLAUDE.md
 skills/
   competition/
     README.md
+    ccdawn-score-loop/
     ccdawn-huawei-nslb-score-loop/
   creative/
     README.md
@@ -102,11 +112,13 @@ skills/
     README.md
     ccdawn-dawn-agent-html-memory/
     ccdawn-brt/
+    ccdawn-feature-reuse-research/
     ccdawn-planning/
     ccdawn-task-splitting/
     ccdawn-bdd-tdd-development/
     ccdawn-completion-summary/
     ccdawn-pr-review/
+    ccdawn-project-review/
     ccdawn-bug-review/
     ccdawn-evaluation/
     ccdawn-goal-loop/
@@ -230,8 +242,11 @@ Invoke the skills in chat with prompts such as:
 - `Help me run this competition through a full research lifecycle`
 - `Use ccdawn-goal-loop to turn this objective into a verified execution contract`
 - `Use ccdawn-pr-review to review this PR before merge`
+- `Use ccdawn-project-review to review this repository before refactoring`
+- `Use ccdawn-feature-reuse-research before adding a complex editor module`
 - `Use ccdawn-bug-review to wrap systematic-debugging for this regression`
 - `Use ccdawn-evaluation to evaluate this workflow after checking for a more specific skill`
+- `Use ccdawn-score-loop to run this benchmark optimization loop`
 - `Use ccdawn-huawei-nslb-score-loop to prepare an NSLB epoch and gate child results`
 - `Use ccdawn-creative-toolbox to generate new concept cards from this context`
 - `Initialize project memory for this repo`

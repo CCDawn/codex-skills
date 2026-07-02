@@ -19,6 +19,9 @@
 - **`ccdawn-brt`**  
   Behavior / Review / Test 流程入口 skill。它会主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和高信号选择题，让用户选择或确认后，再把模糊功能想法收束成行为契约、评审视角、测试锚点和下一阶段路由。
 
+- **`ccdawn-feature-reuse-research`**
+  复杂功能新增前的复用调研 skill，用来比较现有项目、库、示例和项目内模块，判断复用价值和实现边界。
+
 - **`ccdawn-planning`**
   方案制定阶段 skill，用来在需求对齐后、动代码前形成实施方案。
 
@@ -33,6 +36,9 @@
 
 - **`ccdawn-pr-review`**
   PR 审阅阶段 skill，用来把 PR、分支、提交范围或本地 diff 对照已确认需求、任务证据、回归风险和合并准备度进行审查。
+
+- **`ccdawn-project-review`**
+  项目审查 skill，用来审查整个仓库、架构、技术债、测试缺口、可维护性、接手状态和项目健康。
 
 - **`ccdawn-bug-review`**
   CCDawn bug 审查适配器，优先复用 `systematic-debugging` 和 `root-cause-tracing`，再总结证据、根因状态、影响范围和修复路由。
@@ -55,8 +61,11 @@
 
 ### Competition
 
+- **`ccdawn-score-loop`**
+  通用 score loop 模板，用来处理 benchmark、榜单、validation、baseline promotion、worker lane、online/offline feedback 和提交包迭代。
+
 - **`ccdawn-huawei-nslb-score-loop`**  
-  这是一个面向 Huawei Algorithm Challenge 37 NSLB 项目的专用 score loop skill，用来协调隔离 worker lane、本地 proxy evidence、baseline promotion、打包登记，以及 online score feedback 校准。
+  Huawei Algorithm Challenge 37 NSLB 项目的 score loop 适配层，基于通用模板保留项目命令、ledger、mutation space、online feedback 和打包规则。
 
 ### Creative
 
@@ -92,6 +101,7 @@ CLAUDE.md
 skills/
   competition/
     README.md
+    ccdawn-score-loop/
     ccdawn-huawei-nslb-score-loop/
   creative/
     README.md
@@ -100,11 +110,13 @@ skills/
     README.md
     ccdawn-dawn-agent-html-memory/
     ccdawn-brt/
+    ccdawn-feature-reuse-research/
     ccdawn-planning/
     ccdawn-task-splitting/
     ccdawn-bdd-tdd-development/
     ccdawn-completion-summary/
     ccdawn-pr-review/
+    ccdawn-project-review/
     ccdawn-bug-review/
     ccdawn-evaluation/
     ccdawn-goal-loop/
@@ -222,8 +234,11 @@ skills/
 - `使用 ccdawn-competition-research-lifecycle 帮我规划这个竞赛项目`
 - `用 ccdawn-goal-loop 把这个目标整理成可验证的执行合同`
 - `用 ccdawn-pr-review 在合并前审阅这个 PR`
+- `用 ccdawn-project-review 在重构前审查这个仓库`
+- `添加复杂编辑器模块前先用 ccdawn-feature-reuse-research 做复用调研`
 - `用 ccdawn-bug-review 包装 systematic-debugging 来审查这个回归`
 - `用 ccdawn-evaluation 在检查更具体 skill 后评估这个流程`
+- `用 ccdawn-score-loop 跑这个 benchmark 优化循环`
 - `用 ccdawn-huawei-nslb-score-loop 准备 NSLB epoch 并 gate child results`
 - `用 ccdawn-creative-toolbox 基于当前上下文生成新概念卡`
 - `帮我给这个仓库初始化项目记忆`

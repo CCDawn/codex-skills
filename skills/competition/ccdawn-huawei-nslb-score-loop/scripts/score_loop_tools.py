@@ -88,6 +88,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_ROOT = SCRIPT_DIR.parent
 DEFAULT_MUTATION_SPACE = SKILL_ROOT / "references" / "mutation_space.json"
 SKILL_MD = SKILL_ROOT / "SKILL.md"
+PROFILE_MD = SKILL_ROOT / "references" / "huawei-nslb-profile.md"
 MAX_SUBMISSION_BASENAME_LENGTH = 48
 DEFAULT_EPOCH_LANE_LIMIT = 6
 DEFAULT_MAX_ACTIVE_WORKERS = 6
@@ -9228,7 +9229,11 @@ def parser_command_names() -> set[str]:
 
 
 def skill_router_mentions() -> set[str]:
-    text = SKILL_MD.read_text(encoding="utf-8-sig").lower() if SKILL_MD.exists() else ""
+    parts = []
+    for path in (SKILL_MD, PROFILE_MD):
+        if path.exists():
+            parts.append(path.read_text(encoding="utf-8-sig"))
+    text = "\n".join(parts).lower()
     return {name for name in parser_command_names() if name in text}
 
 
@@ -9238,6 +9243,7 @@ def command_audit_skill(args: argparse.Namespace) -> int:
     missing_in_skill = sorted(parser_commands - router_mentions)
     required_files = [
         SKILL_ROOT / "SKILL.md",
+        PROFILE_MD,
         SKILL_ROOT / "agents" / "openai.yaml",
         SKILL_ROOT / "scripts" / "score_loop_tools.py",
         DEFAULT_MUTATION_SPACE,

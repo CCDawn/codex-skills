@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn Score Loop"
+  short_description: "通用分数/榜单/benchmark 迭代模板：baseline、单因果变更、验证、晋升、反馈校准。"
+  default_prompt: "使用 $ccdawn-score-loop：先确认项目 profile、score metric、active baseline、允许写入面和验证命令；再把候选改动组织成单因果 lane，运行最小决定性验证，最后给出 promote/reject/hold、ledger 更新和下一条 lane。"

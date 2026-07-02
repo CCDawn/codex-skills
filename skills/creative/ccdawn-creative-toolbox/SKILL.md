@@ -5,745 +5,111 @@ description: "Use when the user wants context-aware concept collision, unknown c
 
 # Creative Toolbox
 
-## 目标
+## Goal
 
-用这个技能帮助 LLM 结合当前上下文，把已有材料碰撞成未知的新概念，并在最后把新概念压缩成可理解、可检验、可继续发展的方向。
+Use current context to generate genuinely new, nameable concepts instead of ordinary suggestion lists.
 
-这个技能不是普通头脑风暴。不要只列出一组“合理想法”。先抽取上下文中的概念原子、隐含张力、证据缺口、反常信号和未命名需求，再进行远距碰撞，生成当前对话里尚未明确存在的新概念。
+This skill should reduce creative noise: extract the useful tension, run a small set of high-yield operators, then return concept cards that can be judged, tested, or routed into planning.
 
-核心原则：
+## Default behavior
 
-- 先发散，后判断。
-- 先利用上下文，再引入外部类比。
-- 先生成“未命名概念”，再给它命名。
-- 命名是发现过程的一部分，不是最后的包装。新概念、思想、现象、未知物体都必须被命名。
-- 先破坏默认假设，再生成方案。
-- 每次至少组合 3 个创意算子。
-- 每次必须使用 Context Collision。
-- 每次生成新概念时必须使用 Naming Forge。
-- 至少使用 1 个跨域或远距联想算子。
-- 至少使用 1 个反常、反向或极端约束算子。
-- 最终输出必须包含 3-7 个“新概念卡”，而不是只输出建议列表。
-- 最后必须用新颖性、可用性、惊喜度和延展性筛选结果。
-- 收敛前必须进行多视角评估。每次从跨领域角色牌组中抽取不同角色，用不同标准审查同一组想法。
-- 发散过程中支持可选交流碰撞环节。默认先询问用户是否开启，不要擅自展开长讨论。
+- Do not turn every creative request into a long ritual.
+- Do not ask whether to enable role collision by default.
+- Default `Collision Forum` is `skipped`.
+- Enable `Collision Forum` only when the user explicitly asks for it, the creative quality clearly depends on multi-role debate, or BRT routes the request as deep co-creation.
+- Use 3-5 operators, not the whole toolbox.
+- Every final new concept must have a name, a mechanism, a source collision, and a next experiment.
 
-## 快速流程
+## Minimal flow
 
-当用户要求创意思考时，按以下顺序执行：
+1. Identify the creative target: product idea, research direction, naming, story/world concept, strategy, interface, or problem reframing.
+2. Extract context materials: concept atoms, hidden tensions, evidence gaps, abnormal signals, unnamed needs, and hard boundaries.
+3. Choose 3-5 operators:
+   - required: `Context Collision`
+   - required for new concepts/names: `Naming Forge`
+   - at least one distant analogy or cross-domain mechanism
+   - at least one assumption breaker, reversal, extreme constraint, or contradiction solver
+4. Generate unnamed concept embryos before naming or judging.
+5. Name and refine the strongest embryos.
+6. Evaluate with 2-4 relevant perspectives; use top-talent role cards only when the task needs strong adversarial judgment.
+7. Return 3-7 concept cards plus one recommended next step.
 
-1. 重述创意目标，确认要生成的是新概念、新框架、新问题定义还是新方向。
-2. 扫描当前上下文，抽取概念原子、隐含张力、证据缺口、反常信号、未命名需求和边界条件。
-3. 判断任务需要的创意节奏，选择一种编排模式。
-4. 从工具箱中选择 3-5 个创意算子，其中必须包含 Context Collision 和 Naming Forge。
-5. 明确说明本轮使用的编排模式、算子组合和上下文材料。
-6. 先生成一批“未命名概念胚胎”，不要急着命名或评价。
-7. 询问用户是否开启交流碰撞；如果用户确认，运行 Collision Forum。
-8. 对最有潜力的概念胚胎、思想、现象或未知物体运行 Naming Forge，再做变异、交叉、反转和框架化。
-9. 聚类并筛选结果。
-10. 随机抽取本轮评估角色，运行多视角评估，暴露支持、反对、风险和机会。
-11. 输出新概念卡、安全概念、锋利概念、怪异概念和推荐概念。
+Load `references/full-toolbox.md` only when the user asks for a full creative run, needs detailed operator rules, wants Collision Forum, or the short flow is not enough.
 
-## 创意调用语法
+Load `references/role-deck.md` only when running `Perspective Jury` with top-talent role cards.
 
-每次调用工具箱时，先声明：
+## Operator menu
 
-```text
-编排模式：<Pipeline | Parallel | Braid | Evolution | Provocation | Remix>
-创意算子：<3-5 个算子，必须包含 Context Collision 和 Naming Forge>
-上下文材料：<概念原子 | 张力 | 缺口 | 反常信号 | 未命名需求>
-评估视角：<4-7 个随机抽取的角色视角>
-交流碰撞：<询问 | 开启 | 跳过>
-输出形态：<新概念卡 | 新思想卡 | 现象命名卡 | 未知物体命名卡 | 概念谱系树 | 概念实验清单 | 新框架 | 新命名系统 | 故事概念种子>
-```
+| Operator | Use when | Output |
+|---|---|---|
+| Context Collision | Always | Source materials plus new mechanism |
+| Naming Forge | Naming or new concepts | Main name, alternatives, rejected names |
+| Assumption Breaker | Brief is conventional | Reversed assumptions and opportunities |
+| Cross-Domain Analogy | Need fresh structure | Borrowed mechanism, not surface style |
+| Extreme Constraint | Need sharper ideas | Designs that survive a hard limit |
+| Concept Fusion | Two ideas can combine | Third concept with a new mechanism |
+| Mutation | Existing idea is close | Variants with changed user, scale, medium, or interaction |
+| Contradiction Solver | Goals conflict | Layered or staged resolution |
+| Novelty Filter | Output feels generic | Removed obvious ideas and survivors |
+| Perspective Jury | Need self-review | Challenge, evidence, verdict |
+| Collision Forum | User wants debate | Short multi-role exchange and second-generation ideas |
 
-示例：
+## Concept quality gate
 
-```text
-编排模式：Braid
-创意算子：Context Collision, Naming Forge, Assumption Breaker, Cross-Domain Analogy, Extreme Constraint, Concept Fusion, Novelty Filter
-上下文材料：当前对话中的目标、限制、已有方案、反复出现的词、未解决冲突
-评估视角：用户、专家、怀疑者、实现者、投资人
-交流碰撞：询问
-输出形态：3-5 张新概念卡，每张包含名称、词源、定义、来源碰撞、核心机制、陌生 twist、为什么现在需要、下一步实验
-```
+A concept is eligible only when it:
 
-## 编排模式
+- comes from at least two current context materials;
+- changes a mechanism or relationship, not just wording;
+- names something the user could not previously discuss clearly;
+- can generate a follow-up function, experiment, story beat, metric, or decision;
+- survives a usefulness check and at least one skeptical challenge.
 
-### Pipeline 串联模式
+Downgrade it to a normal idea if it is only an existing feature with a prettier name.
 
-用于把一个模糊问题逐步推向可用方案。适合产品功能、策略、工作流、工具设计。
-
-调用顺序：
+## Compact output
 
 ```text
-Assumption Breaker
--> Cross-Domain Analogy
--> SCAMPER
--> Concept Fusion
--> Novelty Filter
--> Convergent Selection
+创意调用:
+- Target: ...
+- Operators: ...
+- Collision Forum: skipped / enabled, because ...
+- Context Materials: ...
+
+概念胚胎:
+| Embryo | Source Collision | New Mechanism | Why It Is Not Generic |
+
+新概念卡:
+| Name | Definition | Source Collision | Mechanism | Newness | Next Experiment |
+
+筛选:
+- Safe:
+- Sharp:
+- Strange:
+- Recommended:
+
+Review:
+- Challenge:
+- Evidence:
+- Verdict:
+
+Route Out:
+- ccdawn-planning / ccdawn-feature-reuse-research / ccdawn-evaluation / pause
 ```
 
-输出要求：
-
-- 给出 5-8 个候选方向。
-- 标出每个方向来自哪个关键转化。
-- 最后选择 1-3 个可推进方案。
-
-### Parallel 并行模式
-
-用于快速扩大搜索空间。适合用户要求“多来点不同方向”“不要常规答案”“发散一下”。
-
-调用顺序：
-
-```text
-Role Storming + Reverse Brainstorming + Extreme Constraint + Cross-Domain Analogy
--> Cluster Ideas
--> Select Strange Winners
-```
-
-输出要求：
-
-- 每个算子独立生成一组想法。
-- 不要提前合并。
-- 最后按主题聚类，保留互相差异最大的方向。
-
-### Braid 编织模式
-
-用于生成既新奇又能落地的方案。让一条路径负责现实可行性，另一条路径负责陌生感。
-
-调用顺序：
-
-```text
-现实路径：User Need -> Constraint Mapping -> Feasible Idea
-奇异路径：Absurd Analogy -> Mutation -> Unexpected Idea
-融合路径：Concept Fusion -> Practical Twist -> Next Experiment
-```
-
-输出要求：
-
-- 每个方案都要说明“现实来源”和“奇异来源”。
-- 不要只保留安全想法。
-- 至少输出 1 个怪异但值得试验的方向。
-
-### Evolution 进化模式
-
-用于大量生成、变异和筛选。适合命名、故事设定、产品点子、营销创意、功能变体。
-
-调用顺序：
-
-```text
-Seed Ideas
--> Mutation
--> Crossbreed
--> Kill the Obvious
--> Select Survivors
-```
-
-输出要求：
-
-- 先生成 10-15 个原始种子。
-- 选择 3-5 个种子做变异。
-- 把不同种子的亮点交叉组合。
-- 淘汰普通、重复、缺乏张力的想法。
-- 保留 3 个幸存概念。
-
-### Provocation 挑衅模式
-
-用于打破惯性思维。适合用户卡住、方案太平、需要“离谱但有启发”的思路。
-
-调用顺序：
-
-```text
-Impossible Claim
--> What Would Need To Be True
--> Constraint Reversal
--> Useful Translation
-```
-
-输出要求：
-
-- 先提出 3-5 个故意不合理的命题。
-- 对每个命题追问：如果它成立，需要什么条件？
-- 把荒谬命题翻译成一个现实设计方向。
-
-### Remix 混音模式
-
-用于把已有材料重组出新东西。适合用户已经有一组想法、功能、文本、故事或方案。
-
-调用顺序：
-
-```text
-Extract Ingredients
--> Recombine
--> Change Medium
--> Change Audience
--> Generate Variants
-```
-
-输出要求：
-
-- 先拆出原材料中的核心元素。
-- 改变组合方式、表现媒介、目标用户或使用场景。
-- 输出多个明显不同的版本。
-
-## 工具箱算子
-
-### Context Collision
-
-把当前上下文拆成可碰撞的材料，再组合出原本没有明确存在的新概念。这是本技能的核心算子，每次使用 ccdawn-creative-toolbox 都必须执行。
-
-上下文材料类型：
-
-- 概念原子：用户反复提到的对象、能力、角色、流程、限制、评价标准。
-- 隐含张力：两个同时存在但互相拉扯的目标，例如“自由发散”和“可落地验证”。
-- 证据缺口：当前上下文里缺少但会影响判断的信息。
-- 反常信号：看起来不协调、过度复杂、命名别扭、用户反复修正的地方。
-- 未命名需求：用户没有直接说出，但从上下文中能推断出的深层需求。
-- 边界条件：时间、工具、系统、UI、工作流、团队、风险、成本等限制。
-
-使用方式：
-
-1. 从上下文中抽取 8-15 个材料，不要只看用户最后一句。
-2. 把材料分成“稳定材料”和“张力材料”。
-3. 选择 3-5 组距离较远但有潜在关系的材料进行碰撞。
-4. 每组碰撞先生成“未命名概念胚胎”，只描述机制，不急着命名。
-5. 对概念胚胎追问：它解决了哪个旧框架无法表达的问题？
-6. 给通过追问的胚胎命名，形成新概念卡。
-
-碰撞公式：
-
-```text
-新概念 = 上下文概念原子 + 隐含张力 + 远距机制 + 新命名
-```
-
-示例：
-
-```text
-概念原子：科研画布、agent trace、候选主题
-隐含张力：用户想自动化，但又需要科研判断透明
-远距机制：金融市场的多空盘
-新概念：主题多空盘
-```
-
-判断一个概念是否足够“新”：
-
-- 它不是已有词的同义改写。
-- 它改变了对象之间的关系，而不是只换了包装。
-- 它让用户能说出一句以前说不清的话。
-- 它能继续长出功能、实验、界面、指标或叙事。
-- 它能暴露新的风险和新的验证路径。
-
-### Naming Forge
-
-为新发现的概念、思想、现象或未知物体命名。命名不是装饰，而是把模糊发现压缩成可讨论、可传播、可检验对象的过程。
-
-适用对象：
-
-- 新概念：一种新的框架、机制、产品范式、研究方向或认知结构。
-- 新思想：一种新的判断原则、哲学立场、策略视角或问题定义。
-- 新现象：上下文中反复出现但尚未被命名的模式、异常、行为、趋势或系统效应。
-- 未知物体：故事、科幻、游戏、世界观、科研假设或设计探索中的未知实体、装置、材料、生命形态、界面或工具。
-
-命名流程：
-
-1. 先写一句临时定义，不要先想酷名字。
-2. 抽取命名核心：对象类型、核心机制、情绪质感、来源隐喻、使用场景。
-3. 生成 8-12 个候选名，覆盖不同命名路线。
-4. 给每个候选名标注词源、含义、优点、误导风险。
-5. 淘汰只是好听但不准确的名字。
-6. 选择 1 个主名称、2 个备用名称、1 个更学术/技术的名称、1 个更口语/传播的名称。
-
-命名路线：
-
-- 机制命名：直接命名它如何运作，例如“风险驱动路由”。
-- 隐喻命名：借用可感知结构，例如“主题多空盘”。
-- 现象命名：命名反复出现的模式，例如“证据雾化”。
-- 物体命名：像命名新物种或新装置，例如“回声棱镜”。
-- 学术命名：更精确、可引用，例如“上下文张力再组合”。
-- 传播命名：短、锋利、容易被复述，例如“概念熔炉”。
-- 反常命名：保留陌生感，让人停顿一下，例如“会审判的画布”。
-
-命名质量标准：
-
-- 准确：名字能指向核心机制，不只是好听。
-- 可解释：一句话能解释。
-- 可传播：别人能记住并复述。
-- 可扩展：能长出子概念、指标、界面或实验。
-- 不误导：不会让人以为它是另一个已有概念。
-- 有张力：能保留一点陌生感或认知摩擦。
-
-输出模板：
-
-```markdown
-**命名锻造**
-对象类型：<新概念 | 新思想 | 新现象 | 未知物体>
-临时定义：
-
-| 候选名 | 路线 | 词源/含义 | 优点 | 误导风险 |
-|---|---|---|---|---|
-
-主名称：
-备用名称：
-学术/技术名称：
-口语/传播名称：
-淘汰名称：
-- ...
-```
-
-### Assumption Breaker
-
-拆掉默认假设。
-
-使用方式：
-
-1. 列出 3-5 个隐含假设。
-2. 对每个假设问：如果它不成立，会怎样？
-3. 从被打破的假设中生成新方向。
-
-提示句：
-
-```text
-这个问题默认相信了什么？
-如果这个默认条件反过来，会出现什么机会？
-```
-
-### Reverse Brainstorming
-
-反向头脑风暴。先想如何让目标失败，再把失败机制翻转为解决方案。
-
-使用方式：
-
-1. 问：怎样才能让这个方案彻底失败？
-2. 生成失败方式。
-3. 把失败方式反转为设计原则或创意机会。
-
-### SCAMPER
-
-用替代、组合、改造、放大、缩小、换用途、删除、重排生成变化。
-
-检查项：
-
-- Substitute：能替代什么？
-- Combine：能和什么组合？
-- Adapt：能借用什么结构？
-- Modify：能改造什么特征？
-- Put to another use：能换到什么场景？
-- Eliminate：能删除什么？
-- Reverse：能反过来吗？
-
-### Cross-Domain Analogy
-
-从远处领域借结构，而不是借表面风格。
-
-使用方式：
-
-1. 选择 3 个远距领域，如厨房、剧场、金融市场、城市交通、游戏、急诊室、园艺、音乐制作。
-2. 提取每个领域的机制。
-3. 把机制迁移回当前问题。
-
-注意：不要只说“像某某一样”。必须说明借来的机制是什么。
-
-### Extreme Constraint
-
-添加极端限制，逼出新路径。
-
-示例限制：
-
-- 如果只能用 1 个按钮怎么办？
-- 如果用户只有 10 秒怎么办？
-- 如果预算为 0 怎么办？
-- 如果不能使用文字怎么办？
-- 如果必须离线工作怎么办？
-- 如果要给完全不懂该领域的人用怎么办？
-
-### Role Storming
-
-从不同身份生成想法。
-
-常用角色：
-
-- 新手用户
-- 专家用户
-- 怀疑者
-- 竞争对手
-- 维护者
-- 投资人
-- 教师
-- 黑客
-- 极端挑剔的用户
-
-要求：每个角色必须带来不同的优先级，而不是换个称呼说同样的话。
-
-### Perspective Jury
-
-让不同视角评估同一组候选想法。这个算子用于收敛阶段，也可以在发散后提前插入，避免 agent 只用单一价值观判断创意。
-
-不要每次使用固定角色。每次都从角色牌组中抽取一组新的评估者。用户指定角色时，保留用户指定角色，再补抽随机角色。
-
-使用方式：
-
-1. 判断任务领域和风险类型。
-2. 从角色牌组中抽取 4-7 个评估角色。
-3. 至少 2 个角色必须来自任务领域之外。
-4. 至少 1 个角色必须是反对者、风险审查者或边缘用户。
-5. 至少 1 个角色必须关注落地成本。
-6. 为每个角色设定不同的关注点、偏见和否决条件。
-7. 让每个角色分别给出支持理由、反对理由、最大担忧和改进建议。
-8. 汇总角色冲突，找出共识、分歧和需要实验验证的问题。
-
-抽取方法：
-
-- 如果运行环境能产生随机数，用随机数抽取角色。
-- 如果不能真正随机，用当前日期、用户原文关键词、任务领域、上一轮已用角色来做伪随机选择。
-- 同一会话内不要连续复用完全相同的角色组合。
-- 如果抽出的角色过于相似，替换其中 1-2 个为远距领域角色。
-
-角色牌组：
-
-- 运行 Perspective Jury 时，必须读取 `references/role-deck.md`，从完整的顶尖人才角色牌组中抽取角色。
-- 角色必须是“顶尖人才原型”，例如诺奖级研究者、顶会审稿主席、世界级系统架构师、顶级产品负责人、顶级风控专家。
-- 不要使用普通泛化角色做最终评估。不要只写“用户、工程师、投资人”这种低分辨率称呼。
-- 不要声称自己就是某个真实人物。使用领域顶尖人才原型，除非用户明确要求使用具体人物作为类比视角。
-- 每次抽取角色时，优先选择对当前任务有强评判力、强反对能力或强落地经验的人才原型。
-
-最小备用牌组：
-
-| 领域 | 顶尖人才原型 | 主要关注 | 典型否决条件 |
-|---|---|---|---|
-| 科研 | 诺奖级研究者 | 原创问题、可证伪性、理论贡献 | 只是工程拼装，没有科学问题 |
-| 科研 | 顶会审稿主席 | 新颖性、实验严谨性、证据充分性 | 缺 baseline、缺消融、论断过度 |
-| 工程 | 世界级系统架构师 | 可扩展性、复杂度边界、长期维护 | MVP 已经制造架构债 |
-| 产品 | 顶级产品负责人 | 用户价值、路径清晰度、优先级 | 看起来酷但用户不会反复用 |
-| 商业 | 顶级风险投资人 | 市场空间、差异化、回报结构 | 没有护城河或增长叙事 |
-| 风险 | 顶级红队专家 | 失败模式、滥用、安全边界 | 风险不可观测或不可阻断 |
-| 设计 | 世界级交互设计师 | 认知负担、状态可见、体验节奏 | 用户不知道系统为什么这么做 |
-| 反方 | 一流反方辩手 | 反例、替代解释、隐藏前提 | 经不起最强反方攻击 |
-
-领域保底规则：
-
-- 科研、论文、实验、AI Scientist：必须包含研究者或审稿人、怀疑/反方角色、实现者或实验员，再随机抽 2-3 个远距角色。
-- 产品功能：必须包含目标用户、产品经理、实现者，再随机抽 2-3 个远距角色。
-- 商业策略：必须包含客户或销售、投资人或财务、竞争对手，再随机抽 2-3 个远距角色。
-- 故事、命名、视觉概念：必须包含目标受众、编辑或传播者、创作者类角色，再随机抽 2-3 个远距角色。
-
-每个角色必须带着自己的评价函数，不要换个称呼说同样的话：
-
-```text
-角色 = 顶尖人才原型 + 领域经验 + 关注指标 + 专业偏见 + 否决条件
-```
-
-评估输出模板：
-
-```markdown
-**多视角评估**
-本轮抽取角色：...
-
-| 视角 | 支持理由 | 反对理由 | 最大担忧 | 改进建议 |
-|---|---|---|---|---|
-
-**视角冲突**
-- 共识：
-- 分歧：
-- 需要实验验证：
-```
-
-### Collision Forum
-
-让参与本轮的顶尖人才角色在发散过程中进行交流、质询、反驳和组合。这个环节用于把独立想法撞出二代想法，不用于最终裁决。
-
-默认规则：
-
-- 在生成“原始发散”之后，先问用户是否开启交流碰撞。
-- 如果用户说开启、继续、需要、碰撞一下，运行本环节。
-- 如果用户说跳过、不需要、快速输出，跳过本环节，直接进入变异与融合。
-- 如果用户在调用时明确写了“开启交流碰撞”或 `collision=on`，不要再问，直接运行。
-- 如果用户在调用时明确写了“跳过交流碰撞”或 `collision=off`，不要再问，直接跳过。
-
-询问句：
-
-```text
-是否开启“角色交流碰撞”？开启后，本轮抽取的顶尖角色会互相质询、反驳、补强，并产出碰撞后的二代想法。回复“开启”或“跳过”即可。
-```
-
-交流规则：
-
-1. 只使用本轮已经抽取的角色，不临时加入新角色，除非用户要求加人。
-2. 每个角色发言必须基于自己的评价函数，不能泛泛赞同。
-3. 每轮交流必须产生新的变化：合并、拆分、反驳、降级、升级、转向或实验化。
-4. 控制篇幅。默认 2 轮，每个角色每轮 1-2 句。
-5. 不要让讨论变成礼貌会议。必须保留冲突、尖锐反对和未解决分歧。
-
-默认两轮结构：
-
-```text
-第 1 轮：每个角色指出最值得推进的想法和最危险的盲点。
-第 2 轮：角色互相回应，提出合并、修正、杀死或实验化建议。
-主持人综合：提炼 3-5 个碰撞后新想法。
-```
-
-输出模板：
-
-```markdown
-**交流碰撞**
-本轮参与角色：...
-
-第 1 轮：立场与攻击
-- ...
-
-第 2 轮：回应与重组
-- ...
-
-碰撞后新想法：
-- ...
-
-保留冲突：
-- ...
-```
-
-### Concept Fusion
-
-融合两个不相干的想法，生成第三个概念。
-
-使用方式：
-
-1. 选择两个距离较远的概念。
-2. 提取各自最有价值的机制。
-3. 合成一个新概念。
-4. 解释融合后的新价值。
-
-### Mutation
-
-对已有想法做变异。
-
-变异方式：
-
-- 放大一个特征。
-- 删除一个关键部件。
-- 改变目标用户。
-- 改变使用场景。
-- 改变时间尺度。
-- 改变交互方式。
-- 反转价值主张。
-
-### Contradiction Solver
-
-寻找矛盾并转化为创新机会。
-
-使用方式：
-
-1. 找出两个同时想要但互相冲突的目标。
-2. 问：能否在不同时间、不同空间、不同用户、不同层级分别满足？
-3. 生成能同时缓解两边压力的方案。
-
-示例：
-
-```text
-既要功能强，又要简单。
-解决方向：默认简单，逐层展开高级能力。
-```
-
-### Novelty Filter
-
-淘汰平庸答案。
-
-过滤规则：
-
-- 删除行业里最常见的答案。
-- 删除只是换名字的重复答案。
-- 删除没有机制变化的表面创意。
-- 保留让人犹豫但有潜力的想法。
-- 保留能继续生成更多想法的想法。
-
-## 收敛评分
-
-多视角评估后，再用 1-5 分评分：
-
-```text
-新颖性：这个想法是否避开常规答案？
-可用性：它是否能被真实使用或测试？
-惊喜度：它是否带来意料之外的连接？
-延展性：它是否能继续长出更多方案？
-命名力：这个概念是否让一个原本模糊的问题变得可讨论？
-上下文贴合度：它是否确实来自当前上下文，而不是凭空套模板？
-命名准确度：名称是否准确指向对象的机制、思想、现象或物体特征？
-传播性：名称是否容易被记住、引用和复述？
-```
-
-推荐优先级：
-
-```text
-推荐分 = 新颖性 + 可用性 + 惊喜度 + 延展性 + 命名力 + 上下文贴合度 + 命名准确度 + 传播性
-```
-
-如果不同视角出现明显冲突，不要强行平均。保留冲突，并把它转化为下一步实验。
-
-示例：
-
-```text
-研究者认为可证伪性强，但实现者认为成本过高。
-下一步实验：先做无代码实验沙盒预演，验证最小数据需求和 baseline 可行性。
-```
-
-不要只推荐总分最高的方案。还要保留：
-
-- 最安全方案：最容易执行。
-- 最锋利方案：最有差异化。
-- 最怪异方案：最不寻常但可能打开新路。
-- 推荐方案：综合最值得推进。
-
-## 未知概念标准
-
-一个输出只有满足以下条件，才算“未知的新概念”：
-
-- 它来自当前上下文中至少 2 个材料的碰撞。
-- 它解决了一个旧词汇无法准确表达的问题。
-- 它有自己的核心机制，而不是一个漂亮名字。
-- 它有一个能准确压缩核心机制的名称。
-- 它能生成后续问题、功能、实验、指标或叙事。
-- 它至少让一个顶尖人才角色产生明确分歧或强烈反应。
-
-如果概念只是“已有功能 + 新名字”，必须降级为普通想法，不要放入“新概念卡”。
-
-## 输出格式
-
-默认输出：
-
-```markdown
-**创意调用**
-编排模式：
-创意算子：
-上下文材料：
-交流碰撞：
-输出形态：
-
-**上下文拆解**
-- 概念原子：
-- 隐含张力：
-- 证据缺口：
-- 反常信号：
-- 未命名需求：
-- 边界条件：
-
-**原始发散**
-- ...
-
-**未命名概念胚胎**
-| 胚胎 | 来源碰撞 | 解决的表达缺口 | 为什么不是普通想法 |
-|---|---|---|---|
-
-**命名锻造**
-对象类型：
-临时定义：
-
-| 候选名 | 路线 | 词源/含义 | 优点 | 误导风险 |
-|---|---|---|---|---|
-
-主名称：
-备用名称：
-学术/技术名称：
-口语/传播名称：
-淘汰名称：
-- ...
-
-**交流碰撞**
-本轮参与角色：
-- ...
-
-第 1 轮：立场与攻击
-- ...
-
-第 2 轮：回应与重组
-- ...
-
-碰撞后新想法：
-- ...
-
-保留冲突：
-- ...
-
-**变异与融合**
-- ...
-
-**聚类结果**
-- ...
-
-**新概念卡**
-| 名称 | 对象类型 | 一句话定义 | 来源碰撞 | 核心机制 | 新在哪里 | 可验证实验 |
-|---|---|---|---|---|---|---|
-
-**多视角评估**
-| 视角 | 支持理由 | 反对理由 | 最大担忧 | 改进建议 |
-|---|---|---|---|---|
-
-**视角冲突**
-- 共识：
-- 分歧：
-- 需要实验验证：
-
-**精选方案**
-| 方案 | 新颖性 | 可用性 | 惊喜度 | 延展性 | 说明 |
-|---|---:|---:|---:|---:|---|
-
-**四类答案**
-- 最安全概念：
-- 最锋利概念：
-- 最怪异概念：
-- 推荐概念：
-
-**下一步实验**
-- ...
-
-**路由收口**
-- Success Evidence: 新概念卡来自上下文材料碰撞，并通过命名、新颖性、可用性、多视角评估检查
-- Stop Condition: 创意目标不清 / 上下文材料不足 / 用户要求先收敛到方案或实施
-- Route Out: ccdawn-brt / ccdawn-planning / ccdawn-feature-reuse-research / ccdawn-evaluation / 暂停
-```
-
-## 防止平庸的规则
-
-避免以下行为：
-
-- 不要只输出常见建议。
-- 不要在第一轮就收敛到一个方案。
-- 不要把角色扮演当作创意本身。
-- 不要只换包装，不改变机制。
-- 不要把普通功能建议伪装成新概念。
-- 不要只给概念命名而不说明它由哪些上下文材料碰撞而来。
-- 不要只给一个名字。必须给主名称、备用名称、学术/技术名称、口语/传播名称和淘汰名称。
-- 不要保留误导性强或只是好听的名字。
-- 不要因为某个想法怪就立即删除它。
-- 不要只评价可行性，忽略新颖性。
-- 不要未经用户确认就展开长篇角色交流碰撞。
-
-必须执行以下动作：
-
-- 先列出并打破至少 3 个默认假设。
-- 先抽取至少 8 个上下文材料。
-- 至少生成 3 个未命名概念胚胎。
-- 至少为每个入选的新概念、思想、现象或未知物体生成 8 个候选名。
-- 至少从 2 个远距领域借机制。
-- 至少生成 1 个反向或荒谬命题。
-- 至少做 1 次概念融合。
-- 至少使用 3 个不同视角评估候选方案。
-- 最终至少输出 3 张新概念卡。
-- 最后明确说明哪些想法被淘汰，以及为什么。
-
-可选动作：
-
-- 如果用户确认开启交流碰撞，必须让本轮抽取的顶尖角色至少进行 2 轮交流。
-- 如果用户跳过交流碰撞，必须明确写出“交流碰撞：已跳过”，然后继续流程。
-
-## 何时向用户提问
-
-如果创意目标不清楚，只问一个最关键问题。
-
-优先问：
-
-```text
-你更想要哪种创意结果：产品功能、商业策略、命名、故事设定、视觉概念，还是研究方向？
-```
-
-如果目标已经足够清楚，不要停下来问问题，直接运行工具箱。
-
+Use the full output contract in `references/full-toolbox.md` only for deep creative sessions.
+
+## BRT interface
+
+- Context Boundary: user brief, current conversation context, extracted concept materials, and any explicit domain constraints.
+- Output Contract: named concept cards, quality gate result, recommendation, and next route.
+- Success Evidence: each concept has source collision, mechanism, name, novelty reason, and testable next experiment.
+- Stop Condition: creative target unclear, insufficient context materials, user asks to converge into implementation, or safety/ownership constraints block the concept.
+- Route Out: `ccdawn-planning`, `ccdawn-feature-reuse-research`, `ccdawn-evaluation`, or back to `ccdawn-brt` for alignment.
+
+## Common mistakes
+
+- Asking for permission to run a long debate when a compact creative answer would help more.
+- Producing a list of reasonable suggestions without new mechanisms.
+- Naming too early and letting the name hide a weak concept.
+- Using generic roles such as "user" and "engineer" when the task needs sharp expert evaluation.
+- Keeping all weird ideas or deleting all weird ideas; filter by mechanism and testability.

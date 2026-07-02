@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn Planning"
+  short_description: "需求对齐后的实施方案制定：范围、文件影响、风险、验证策略和下一路由。"
+  default_prompt: "使用 $ccdawn-planning：把已对齐需求转换成可实施方案，明确目标、范围边界、文件影响、复用决策、风险、验证策略、执行顺序和 Route Out；如果需求未对齐，先回到 $ccdawn-brt。"

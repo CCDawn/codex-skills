@@ -5,12 +5,13 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> [existing skill reuse | ccdawn-feature-reuse-research | ccdawn-project-review | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
+ccdawn-brt -> [existing skill reuse | ccdawn-feature-reuse-research | ccdawn-score-loop | ccdawn-project-review | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
 ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
 ```
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
 `ccdawn-feature-reuse-research` applies before planning a complex new feature when external projects, libraries, examples, or current-project modules may change the implementation path.
+`ccdawn-score-loop` applies when the current need is benchmark, leaderboard, validation-score, online/offline feedback, baseline promotion, worker-lane, or submission-package iteration.
 `ccdawn-project-review` applies when the current need is whole-project, repository, architecture, technical debt, test gap, maintainability, onboarding, or risk-module review.
 `systematic-debugging` is the primary bug/failure route; `root-cause-tracing` is added when the source is hidden deep in a call chain. `ccdawn-bug-review` is only a CCDawn adapter around those existing skills.
 `ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment and no more specific existing skill owns the task.
@@ -23,6 +24,7 @@ State is a routing signal, not decoration.
 - INTENT_CONVERGENCE: `ccdawn-brt` is comparing candidate intents and asking high-signal questions.
 - BUNDLE_ROUTING: `ccdawn-brt` is grouping multiple user intents into Primary, Secondary, and Deferred actions before choosing stage routes.
 - FEATURE_REUSE_RESEARCHING: `ccdawn-feature-reuse-research` is searching and evaluating reusable projects, libraries, examples, or modules before implementation planning.
+- SCORE_LOOPING: `ccdawn-score-loop` is running score/benchmark lanes, promotion gates, online/offline calibration, or package feedback.
 - PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
 - PROJECT_REVIEWING: `ccdawn-project-review` is reviewing a repository, subsystem, architecture, technical debt, test gaps, or project health.
 - EVALUATING: `ccdawn-evaluation` is judging a plan, workflow, skill, implementation, result, or current state.
@@ -46,7 +48,7 @@ Transition rules:
 - A route is actionable only when it has a Route Contract: Owner, Mode, Next Output, Allowed Action, Success Evidence, and Stop Condition. If the next artifact or success evidence cannot be named, stay in BRT for a probe or one clarifying question.
 - Parallelize only independent read-only research, review, audit, search, or evaluation work, and only when the speedup is worth the coordination cost. Any write action, shared file/module, shared verification, migration, release, or permission-sensitive work stays sequential in one current contract.
 - When a review or audit produces multiple follow-up actions, create an Action Queue before choosing the next stage: Immediate Guardrail, Primary Fix, Telemetry Gap, Deferred Refactor. Do not mix confirmed defects, evidence gaps, governance risks, and maintenance refactors in one severity bucket.
-- Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
+- Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, score/benchmark/leaderboard iteration to `ccdawn-score-loop`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
@@ -73,6 +75,7 @@ Self-assess process weight before routing:
 - Use intent confidence before asking: `HIGH` acts, `MEDIUM` acts with stated assumptions, `LOW` asks or probes, `BLOCKED` asks one blocking question.
 - If there are multiple intents, choose `COMPACT_FLOW` when they share a theme and can be ordered in one context; choose separate routing only when owner, risk, deliverable, or verification truly differs.
 - If the main value is adding a complex feature where external or internal reuse may change the plan, route to `ccdawn-feature-reuse-research` before `ccdawn-planning`.
+- If the main value is measurable score optimization, benchmark/leaderboard feedback, online/offline calibration, baseline promotion, worker lanes, or submission packages, route to `ccdawn-score-loop`.
 - If the main value is judgment, comparison, or audit, route to the most specific existing review skill; use `ccdawn-evaluation` only when none fits.
 - If the main value is project health, architecture, technical debt, test gaps, onboarding, or risk-module triage, route to `ccdawn-project-review`.
 - If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
@@ -175,6 +178,7 @@ Stage skills should not repeat the full ledger when a compact update is enough. 
 - `ccdawn-brt`: `Current Stage`, `Intent Bundle`, `Route Contract`, `Action Queue`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-planning`: `Current Stage`, `Intent Bundle`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-feature-reuse-research`: `Current Stage`, `Reuse Decision`, `Candidate Evidence`, `Rejected Alternatives`, `Verification Strategy`, `Recommended Next Stage`.
+- `ccdawn-score-loop`: `Current Stage`, `Baseline`, `Metric`, `Lane`, `Score Evidence`, `Gate Decision`, `Calibration Lesson`, `Recommended Next Stage`.
 - `ccdawn-task-splitting`: `Current Stage`, `Split Decision`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Development Mode`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-completion-summary`: `Current Stage`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.

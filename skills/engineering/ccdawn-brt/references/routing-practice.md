@@ -28,6 +28,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 | "审测试代码 / 无效约束测试 / 阻碍开发的测试" | `Testing Anti-Patterns` for targeted tests; `ccdawn-project-review` for broad test system | `COMPACT_FLOW` | categorized test constraint review | each item names test file/assertion, stale assumption, dev impact, recommendation, evidence | no test scope, no refactor signal, requested write action |
 | "评价方案 / 这个流程繁琐吗 / skill 是否有效" | most specific owner first; otherwise `ccdawn-evaluation` | `MICRO` or `COMPACT_FLOW` | verdict, tradeoffs, actionable improvement queue | evaluated object named, criteria stated, concrete examples or evidence | object unclear or user wants implementation |
 | "新增复杂功能 / 模块 / 编辑器 / 搜索 / 可视化 / 导入导出" | `ccdawn-feature-reuse-research` before planning | `FULL_FLOW` | reuse candidates and implementation implication | searched current/web ecosystem when needed, candidates compared, reuse value decided | feature is actually small/local, network blocked, user forbids research |
+| "冲榜 / score 回退 / benchmark 优化 / online feedback / baseline promotion" | `ccdawn-score-loop`; Huawei NSLB uses `ccdawn-huawei-nslb-score-loop` adapter | `COMPACT_FLOW` or `FULL_FLOW` | lane, gate decision, online calibration, package record, or recovery artifact | baseline identified, metric/commands parsed, lane has one causal mechanism, promotion/rejection evidence recorded | missing metric/profile, stale baseline, source drift, ambiguous online result |
 | "目标明确但要先定方案" | `ccdawn-planning` | `COMPACT_FLOW` or `FULL_FLOW` | implementation plan with scope, files, risks, validation | plan covers confirmed intent and success evidence | requirement unstable or direct FAST_PATH is enough |
 | "继续 / 按推荐来 / 确认" after a prior stage | route to the recommended next owner in ledger | current flow | next stage artifact, not repeated alignment | ledger fields match current request and no new blocker | user changed goal or previous route lacks success evidence |
 | "多个动作一起做" | Intent Bundle in `ccdawn-brt`; route Primary first | `COMPACT_FLOW` | ordered Primary/Secondary/Deferred or internal sequence | owner/risk/verification boundaries resolved | actions conflict or need user tradeoff |
@@ -42,6 +43,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 - Route splits "实现、验证、汇报" into separate tasks without distinct owners or risks.
 - Route sends review evidence gaps and confirmed defects into the same severity bucket.
 - Route keeps asking for confirmation after the user already said "继续", "确认", or "按推荐来".
+- Route treats leaderboard/benchmark work as ordinary planning and loses baseline, metric, lane, promotion, or online-feedback evidence.
 
 ## Output Shapes
 

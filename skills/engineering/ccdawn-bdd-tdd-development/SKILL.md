@@ -155,12 +155,10 @@ Ledger Update:
 - Route Out: 下一个 SIMPLE 任务 / ccdawn-bdd-tdd-development / ccdawn-completion-summary / ccdawn-task-splitting
 
 下一步:
-Task N 已完成。是否继续？
-A. 执行下一个任务（如果还有任务，推荐）...
-B. 连续执行剩余 Critical Path（需要明确授权；逐任务按 SIMPLE 或 BDD_TDD 执行，遇阻立刻停）...
-C. 进入 ccdawn-completion-summary 做阶段总结（所有关键任务完成时推荐）...
-D. 回到 ccdawn-task-splitting 调整任务...
-E. 暂停...
+Task N 已完成。推荐下一步：<下一个 critical task / ccdawn-completion-summary / 暂停>。
+- 如果原始目标或用户回复已授权完成整个 Critical Path：继续下一个任务，直到自然闸门。
+- 如果尚未授权连续推进，但下一个任务仍在同一目标内：给一个短 checkpoint 和推荐动作，不要把“是否继续”作为固定问题。
+- 只有需要用户授权连续执行、调整任务、暂停、或进入高风险动作时，才列出选项。
 ```
 
 ## 完成门槛
@@ -193,6 +191,6 @@ E. 暂停...
 
 没有连续授权时，完成一个任务后给短 checkpoint 和推荐下一步；如果原始目标已经是完成整个方案或修复整个问题，可继续到下一个自然闸门，不必反复询问。
 
-如果还有未完成关键任务，默认建议执行下一个任务，并提供“连续执行剩余 Critical Path”的授权选项。如果所有关键任务完成，默认建议进入 `ccdawn-completion-summary`。
+如果还有未完成关键任务，默认建议执行下一个任务；只有连续执行会改变用户授权边界时，才提供“连续执行剩余 Critical Path”的授权选项。如果所有关键任务完成，默认进入 `ccdawn-completion-summary` 或给出完成总结入口。
 
 如果用户已经授权连续执行全部 Critical Path，在每个任务完成后输出短 checkpoint，并按 runtime 规则继续或停止。

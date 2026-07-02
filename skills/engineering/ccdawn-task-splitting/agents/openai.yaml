@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn Task Splitting"
+  short_description: "已接受方案后的拆分/不拆分判定，并为子任务选择 SIMPLE 或 BDD_TDD。"
+  default_prompt: "使用 $ccdawn-task-splitting：根据已接受方案判断 NO_SPLIT 或 SPLIT；若拆分，为每个子任务写清 Output、Files/Boundary、Reuse、Development Mode、Verification、Risk 和 Route Out；简单任务不要硬拆。"
