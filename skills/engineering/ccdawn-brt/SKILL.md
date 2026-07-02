@@ -66,7 +66,7 @@ user message -> intent guess -> intent bundle -> response depth -> route contrac
 
 ## 对齐循环
 
-1. 读上下文：先看相关代码、测试、文档、日志、配置或历史决策。
+1. 读上下文：先限定 Context Boundary，再看相关代码、测试、文档、日志、配置或历史决策；memory 和全局规范只在续接、项目规则或历史决策会影响结论时读取。
 2. 判断任务性质：需求对齐、评价、bug 审查、PR 审阅、方案制定、开发执行、总结交接或直接回答。
 3. 识别 Intent Bundle：只有多交付物、多 owner、不同风险边界或不同验证契约时才分出 Primary / Secondary / Deferred。
 4. 判断意图置信度：HIGH / MEDIUM / LOW / BLOCKED。
@@ -126,6 +126,7 @@ Owner Matrix：
 - 需求对齐、真实目标、执行深度、流程重量：`ccdawn-brt`。
 - 复杂功能新增前的外部项目/库/模块复用研究和复用价值评估：`ccdawn-feature-reuse-research`。
 - 项目、代码库、架构、技术债、测试覆盖、风险模块、接手摸底：`ccdawn-project-review`。
+- 测试代码质量、无效约束、过度 mock、重构后阻碍开发的测试：优先用 `Testing Anti-Patterns`；涉及整仓测试体系或覆盖风险时用 `ccdawn-project-review`。
 - 流程、方案、skill、结果质量评价：最具体 owner 优先；没有更具体承接者时用 `ccdawn-evaluation`。
 - bug、失败测试、异常行为：`systematic-debugging`；深层来源隐藏时加 `root-cause-tracing`；CCDawn 阶段交接才加 `ccdawn-bug-review`。
 - PR、diff、分支、提交范围审阅：`ccdawn-pr-review`。
@@ -151,6 +152,14 @@ Owner Matrix：
 ```text
 路由判断: Owner = ...；Mode = ...；Next Output = ...；Success Evidence = ...
 ```
+
+审查、诊断、评价类任务进入 MICRO 或 COMPACT_FLOW 时，首轮最多输出一行审查契约和一行动作，不连续解释流程：
+
+```text
+审查契约: Owner = ...；Mode = ...；Next Output = ...；Success Evidence = ...；Context Boundary = ...
+```
+
+Context Boundary 优先包含用户指定对象、直接相关测试/代码/标准/失败证据；memory、全局规范和大范围项目档案只在会改变结论时读取。
 
 常见路由实践场景见 `references/routing-practice.md`，只有路由犹豫、用户要求审查路由或需要校准新场景时读取。
 

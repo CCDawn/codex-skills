@@ -25,6 +25,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 | "修 bug / 为什么异常 / 测试失败" with target behavior | `systematic-debugging`; add `root-cause-tracing` when source is hidden | `COMPACT_FLOW` or `FAST_PATH` | root cause plus minimal fix | failing evidence reproduced or traced, fix diff, relevant test/log passes | cannot reproduce, ownership unclear, fix crosses scope |
 | "审 PR / 看 diff / 能不能合并" | `ccdawn-pr-review` | `COMPACT_FLOW` | findings ordered by risk and merge readiness | diff inspected, requirement/evidence checked, blockers named or cleared | missing diff, stale branch, merge/release decision |
 | "审项目 / 架构体检 / 技术债 / 接手摸底" | `ccdawn-project-review` | `COMPACT_FLOW` | risk-ranked project review and action queue | source files inspected, evidence-linked findings, recommended next owner | requested write action or scope becomes implementation |
+| "审测试代码 / 无效约束测试 / 阻碍开发的测试" | `Testing Anti-Patterns` for targeted tests; `ccdawn-project-review` for broad test system | `COMPACT_FLOW` | categorized test constraint review | each item names test file/assertion, stale assumption, dev impact, recommendation, evidence | no test scope, no refactor signal, requested write action |
 | "评价方案 / 这个流程繁琐吗 / skill 是否有效" | most specific owner first; otherwise `ccdawn-evaluation` | `MICRO` or `COMPACT_FLOW` | verdict, tradeoffs, actionable improvement queue | evaluated object named, criteria stated, concrete examples or evidence | object unclear or user wants implementation |
 | "新增复杂功能 / 模块 / 编辑器 / 搜索 / 可视化 / 导入导出" | `ccdawn-feature-reuse-research` before planning | `FULL_FLOW` | reuse candidates and implementation implication | searched current/web ecosystem when needed, candidates compared, reuse value decided | feature is actually small/local, network blocked, user forbids research |
 | "目标明确但要先定方案" | `ccdawn-planning` | `COMPACT_FLOW` or `FULL_FLOW` | implementation plan with scope, files, risks, validation | plan covers confirmed intent and success evidence | requirement unstable or direct FAST_PATH is enough |
@@ -48,6 +49,12 @@ Use one line for routine routing:
 
 ```text
 路由判断: Owner = ccdawn-project-review；Mode = COMPACT_FLOW；Next Output = action queue；Success Evidence = evidence-linked findings with selected next route.
+```
+
+Use one line for review starts that may otherwise become noisy:
+
+```text
+审查契约: Owner = Testing Anti-Patterns；Mode = COMPACT_FLOW；Next Output = categorized test constraint review；Success Evidence = test file/assertion/stale assumption/dev impact/recommendation；Context Boundary = targeted tests + direct standards + relevant diff/failure evidence.
 ```
 
 Use a short queue when the user needs to choose:
