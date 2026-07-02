@@ -127,15 +127,8 @@ Owner Matrix：
 - 复杂功能新增前的外部项目/库/模块复用研究和复用价值评估：`ccdawn-feature-reuse-research`。
 - 分数、榜单、benchmark、online/offline feedback、baseline promotion、实验 lane 和提交包迭代：`ccdawn-score-loop`；Huawei NSLB 项目用 `ccdawn-huawei-nslb-score-loop` 作为项目适配层。
 - 项目、代码库、架构、技术债、测试覆盖、风险模块、接手摸底：`ccdawn-project-review`。
-- git 历史热点、bug magnet、bus factor、代码库风险地图：若已安装用 `codebase-recon`；否则用 `ccdawn-project-review` 并把 git history 作为证据源。
 - 测试代码质量、无效约束、过度 mock、重构后阻碍开发的测试：优先用 `Testing Anti-Patterns`；涉及整仓测试体系或覆盖风险时用 `ccdawn-project-review`。
-- 浏览器/UI 运行时验证、DOM/console/network/screenshot/performance trace：若已安装用 `browser-testing-with-devtools`；否则用当前可用浏览器控制 skill 或 Playwright/本地验证。
-- 安全、鉴权、PII、webhook、外部输入、文件上传、支付或第三方集成：若已安装用 `security-and-hardening`；否则用 `Defense-in-Depth Validation` 并升级审查深度。
-- 性能、Core Web Vitals、渲染卡顿、大数据列表、响应时间或疑似回归：若已安装用 `performance-optimization` 或 `react-component-performance`；否则用 `ccdawn-project-review`/浏览器运行时验证收集证据。
-- API、公共接口、模块边界、前后端契约、component props 或 schema 变更：若已安装用 `api-and-interface-design`；否则进入 `ccdawn-planning` 并把接口契约作为高风险边界。
-- 迁移、废弃、替换旧系统、删除旧 API/功能、大规模重构：若已安装用 `deprecation-and-migration` 或 `codebase-migrate`；否则用 `ccdawn-planning` + `ccdawn-task-splitting`，并停在迁移/删除闸门。
-- CI/GitHub Actions 失败、PR 评论处理、Sentry/生产错误：若已安装用 `gh-fix-ci`、`gh-address-comments`、`sentry-triage`；否则分别路由到 `systematic-debugging`、`receiving-code-review`、`systematic-debugging`。
-- 日志、指标、trace、告警和发布可观测性：若已安装用 `observability-and-instrumentation`；否则在 `ccdawn-planning` 或当前开发任务里加入 telemetry contract。
+- CI、PR 评论、Sentry、浏览器验证、安全、性能、API、迁移、可观测性、git 历史风险等专项信号：只在对应外部 skill 已安装时作为 owner；未安装时使用 `references/github-skill-candidates.md` 的 local fallback，并把缺失 skill 记为 optional。
 - 流程、方案、skill、结果质量评价：最具体 owner 优先；没有更具体承接者时用 `ccdawn-evaluation`。
 - bug、失败测试、异常行为：`systematic-debugging`；深层来源隐藏时加 `root-cause-tracing`；CCDawn 阶段交接才加 `ccdawn-bug-review`。
 - PR、diff、分支、提交范围审阅：`ccdawn-pr-review`。

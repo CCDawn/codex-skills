@@ -81,9 +81,9 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 - 需要方案 -> `ccdawn-planning`
 - 需要任务拆分 -> `ccdawn-task-splitting`
 - 完成状态/证据 -> `ccdawn-completion-summary`
-- 安全专项 -> `ccdawn-security-review`（若未安装，先回 `ccdawn-evaluation`）
-- 发布专项 -> `ccdawn-release-readiness`（若未安装，先回 `ccdawn-pr-review` 或 `ccdawn-completion-summary`）
-- 性能专项 -> `ccdawn-performance-review`（若未安装，先回 `ccdawn-evaluation`）
+- 安全专项 -> 已安装 `security-and-hardening` 时使用；否则用 `Defense-in-Depth Validation` 或保留在本 skill 做证据化风险审查
+- 发布、CI 或合并前专项 -> 已安装 `gh-fix-ci` 时处理 CI；否则按对象路由到 `systematic-debugging`、`ccdawn-pr-review` 或 `ccdawn-completion-summary`
+- 性能专项 -> 已安装 `performance-optimization` / `react-component-performance` 时使用；否则保留在本 skill 并要求运行时或浏览器测量证据
 
 ## Findings 规则
 
