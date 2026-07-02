@@ -1,6 +1,6 @@
 ---
 name: ccdawn-creative-toolbox
-description: "用于让 LLM 结合当前上下文进行概念碰撞，生成未知的新概念、新框架、新问题定义、新产品范式或新研究方向。Use when the user wants context-aware concept collision, unknown concept generation, divergent thinking, creative ideation, concept invention, paradigm exploration, unusual alternatives, product ideas, research concepts, strategy concepts, story concepts, or surprising but useful options."
+description: "Use when the user wants context-aware concept collision, unknown concept generation, divergent thinking, creative ideation, concept invention, paradigm exploration, unusual alternatives, product ideas, research concepts, strategy concepts, story concepts, or surprising but useful options."
 ---
 
 # Creative Toolbox
@@ -694,6 +694,11 @@ Extract Ingredients
 
 **下一步实验**
 - ...
+
+**路由收口**
+- Success Evidence: 新概念卡来自上下文材料碰撞，并通过命名、新颖性、可用性、多视角评估检查
+- Stop Condition: 创意目标不清 / 上下文材料不足 / 用户要求先收敛到方案或实施
+- Route Out: ccdawn-brt / ccdawn-planning / ccdawn-feature-reuse-research / ccdawn-evaluation / 暂停
 ```
 
 ## 防止平庸的规则

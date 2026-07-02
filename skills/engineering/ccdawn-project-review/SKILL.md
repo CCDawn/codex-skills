@@ -122,6 +122,7 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 - 范围: 整仓 / 子系统 / 模块...
 - 深度: QUICK / STANDARD / DEEP
 - 结论: HEALTHY / WATCHLIST / NEEDS_ATTENTION / HIGH_RISK / BLOCKED
+- Context Boundary: 本次实际读取的目录、入口、测试、配置、日志、git 信号或 memory...
 - 关键证据: ...
 
 项目地图:
@@ -140,6 +141,8 @@ Findings:
 - 已有证据:
 - 缺口:
 - 建议补强:
+- Success Evidence: findings 均有位置/命令/文件证据，行动队列能路由到具体 skill 或阶段
+- Stop Condition: 审查范围不明 / 需要写代码 / 发现 PR/diff 对象 / 发现具体 bug 需转调试
 
 行动队列:
 - Immediate Guardrail: 证据...；动作...；路由...
@@ -152,6 +155,8 @@ A. 进入 ccdawn-planning 制定修复/重构方案（推荐，当存在 P0/P1/P
 B. 路由到 ccdawn-bug-review / ccdawn-pr-review / ccdawn-completion-summary...
 C. 继续 DEEP 审查指定模块...
 D. 暂停...
+
+Route Out: ccdawn-planning / ccdawn-bug-review / ccdawn-pr-review / ccdawn-completion-summary / ccdawn-evaluation / 暂停
 ```
 
 ## 质量门槛

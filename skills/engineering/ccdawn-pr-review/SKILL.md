@@ -96,6 +96,7 @@ PR 审阅:
   - Base/Head 或 PR:
   - 需求来源:
   - 证据来源:
+- Context Boundary: diff 范围、需求/任务来源、验证证据和禁止编辑边界...
 
 Findings:
 - P0/P1/P2/P3: [文件:行] 问题；影响；建议；回到阶段
@@ -109,6 +110,8 @@ Findings:
 - 已有证据:
 - 新增检查:
 - 缺口:
+- Success Evidence: diff 已审、需求已对照、关键证据已检查、阻塞项已明确或排除
+- Stop Condition: 缺 diff / 缺需求来源 / 验证证据不可得 / 发布合并动作需要用户确认
 
 Review Matrix:
 - 需求覆盖: PASS/NEEDS_CHANGE/ACCEPT_RISK，证据...
@@ -122,6 +125,7 @@ Ledger Update:
 - Verification Evidence: ...
 - Unresolved Risks: ...
 - Recommended Next Stage: 对应开发模式 / ccdawn-task-splitting / ccdawn-completion-summary / 提交/推送/合并 / 暂停
+- Route Out: 对应开发模式 / ccdawn-task-splitting / ccdawn-completion-summary / 提交/推送/合并 / ccdawn-brt / 暂停
 
 下一步:
 A. 回到对应开发模式修复 P0/P1（复杂子任务使用 ccdawn-bdd-tdd-development）...

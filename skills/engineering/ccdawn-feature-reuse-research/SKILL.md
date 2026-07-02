@@ -85,6 +85,7 @@ description: Use when CCDawn workflow is about adding a complex feature, capabil
 复用研究:
 - 目标功能:
 - 搜索范围:
+- Context Boundary: 用户目标、当前项目可复用点、网络/本地搜索范围、排除范围...
 - 当前项目已有复用点:
 - 结论: REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / BLOCKED
 - 推荐原因:
@@ -107,12 +108,16 @@ description: Use when CCDawn workflow is about adding a complex feature, capabil
 - Implementation Boundary:
 - Verification Strategy:
 - Rejected Alternatives:
+- Success Evidence: 当前项目复用点已查、候选有链接/本地证据、许可证/集成风险已判断
+- Stop Condition: 无法搜索 / 许可证不明 / 需求不清 / 复用会改变用户未确认范围
 
 下一步:
 A. 进入 ccdawn-planning，按复用决策制定方案（推荐）...
 B. 继续搜索指定方向...
 C. 放弃复用，直接规划自研...
 D. 回到 ccdawn-brt 重新对齐需求...
+
+Route Out: ccdawn-planning / 继续复用研究 / ccdawn-brt / 暂停
 ```
 
 ## 质量门槛

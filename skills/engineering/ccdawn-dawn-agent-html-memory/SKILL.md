@@ -1,11 +1,19 @@
 ---
 name: ccdawn-dawn-agent-html-memory
-description: Create and maintain project-local persistent memory under `.docs/project-memory/`, including a structured JSON state and generated HTML dashboard. Use when Codex needs a durable repository overview that tracks progress, modules, decisions, issues, todos, technical notes, and recent updates, and when Codex should keep that overview synchronized after development work. Trigger for requests about project memory, project overview HTML, status dashboard, persistent progress tracking, technical detail tracking, "update the project memory page", or any meaningful development session inside a repository that already contains `.docs/project-memory/`. Use this for repository memory, not for user-global personal memory.
+description: Use when Codex needs project-local persistent memory under `.docs/project-memory/`, a generated HTML repository dashboard, durable progress/modules/decisions/issues/todos tracking, project memory initialization, project memory sync after meaningful development, or "update the project memory page" requests.
 ---
 
 # Agent HTML Memory
 
 Create a project-local memory system under `.docs/project-memory/` and keep it current after meaningful work.
+
+## BRT interface
+
+- Context Boundary: target repository root, `.docs/project-memory/`, relevant lane files, project rules, and the current task result.
+- Output Contract: initialized or updated project memory files plus rendered dashboard/index evidence.
+- Success Evidence: changed lane/recent update is present in JSON, `overview.html`, `INDEX.md`, and root `PROJECT_MEMORY.html` when applicable.
+- Stop Condition: missing project root, malformed memory files, overlapping active claim, renderer failure, or user explicitly skips memory.
+- Route Out: return to the current CCDawn stage, `ccdawn-completion-summary`, or BLOCKED with one required fix/input.
 
 ## Load extra references when needed
 

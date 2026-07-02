@@ -1,6 +1,6 @@
 ---
 name: ccdawn-goal-loop
-description: 将用户给出的目标、可验证证据、必须遵守的限制、允许使用的输入和工具边界、下一步判断规则，以及阻塞停止条件整理成一个可执行的 goal contract，并按迭代回合推进。Use when the user provides a goal 达成 request, wants explicit success evidence, strict constraints, bounded scope, next-step selection rules, or stop-on-blocker reporting.
+description: Use when the user gives a goal-oriented request that needs explicit success evidence, strict constraints, bounded scope, allowed inputs or tools, next-step selection rules, iterative progress, or stop-on-blocker reporting.
 ---
 
 # Goal Loop
@@ -50,6 +50,9 @@ Next-step rule:
 Blocker protocol:
 Current action:
 Decision:
+Route Out:
+Success Evidence:
+Stop Condition:
 If blocked:
 - Tried methods:
 - Evidence obtained:

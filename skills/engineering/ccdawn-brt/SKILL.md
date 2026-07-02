@@ -1,6 +1,6 @@
 ---
 name: ccdawn-brt
-description: "Use as the universal Chinese-first pre-response adapter for every user message, especially when intent, routing, response depth, workflow weight, skill choice, requirements, review, testing, planning, debugging, evaluation, continuation, or execution permission must be inferred before acting."
+description: "Use when a user message needs Chinese-first intent alignment, routing, response depth selection, workflow weight control, skill choice, requirements inference, review/testing/planning/debugging/evaluation routing, continuation handling, or execution permission inference before acting."
 ---
 
 # BRT

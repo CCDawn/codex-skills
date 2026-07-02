@@ -23,6 +23,14 @@ Bad outcome: agents write long proposals, role-play panels, or template essays w
 
 Good outcome: each edit lane changes one concrete mechanism in `src/Solution.cpp`, compiles or records a hard blocker, runs the smallest decisive test, and leaves a recoverable diff plus `child_result.json`.
 
+## 0. BRT Interface
+
+- Context Boundary: `C:\Users\17533\Documents\New project 5`, score-loop ledger/search graph, current baseline hash, isolated worker workspace, and the selected command/lane.
+- Output Contract: status, epoch, worker, gate, package, online feedback, or recovery artifact with machine-readable evidence.
+- Success Evidence: command output, `child_result.json`, attempt card, ledger/search-graph update, compiled diff, gate decision, or registered short submission package.
+- Stop Condition: source drift, stale baseline hash, overlapping ledger/pool write, missing child result, invalid package, online feedback ambiguity, or user pause.
+- Route Out: continue score-loop command, launch/recover workers, parent promotion gate, online feedback wait, project memory sync, or BLOCKED with one required input.
+
 ## 1. Core Mandate
 
 Optimize the online hidden score while keeping the execution harness strict.

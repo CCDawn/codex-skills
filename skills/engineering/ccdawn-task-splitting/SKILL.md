@@ -1,6 +1,6 @@
 ---
 name: ccdawn-task-splitting
-description: Use after a CCDawn implementation plan is accepted and split/no-split routing is needed before development; applies when ccdawn-planning or ccdawn-brt routes to decomposition, when NO_SPLIT may be valid, or when subtasks need SIMPLE vs BDD_TDD decisions, verification anchors, dependencies, and handoff decisions.
+description: Use when an accepted CCDawn implementation plan needs split/no-split routing before development, NO_SPLIT may be valid, or subtasks need SIMPLE vs BDD_TDD decisions, verification anchors, dependencies, boundaries, and handoff decisions.
 ---
 
 # CCDawn Task Splitting
@@ -144,11 +144,14 @@ Task N: 名称
 任务拆分判定:
 - Decision: NO_SPLIT
 - 理由: ...
+- Context Boundary: 已接受方案、影响文件、验证策略和风险边界...
 - 直接执行单元:
   - Output:
   - Files:
   - Verification:
   - Risk:
+- Success Evidence: NO_SPLIT 理由成立，直接执行单元有明确输出、文件边界和验证方式
+- Stop Condition: 方案未接受 / 文件边界不清 / 验证条件缺失 / 高风险动作未确认
 
 Ledger Update:
 - Current Stage: TASK_SPLITTING
@@ -157,6 +160,7 @@ Ledger Update:
 - Decisions: NO_SPLIT
 - Unresolved Risks: ...
 - Recommended Next Stage: 轻量执行 / ccdawn-completion-summary
+- Route Out: FAST_PATH 轻量执行 / ccdawn-completion-summary / ccdawn-planning
 
 下一步:
 A. 不拆分，直接执行（推荐）...
@@ -172,6 +176,7 @@ D. 暂停...
 - Critical Path: Task 1 -> Task 2 -> ...
 - Optional Path: ...
 - 并行性: 哪些不能并行，哪些可以独立处理
+- Context Boundary: 已接受方案、复用决策、影响文件、风险和验证策略...
 
 Task 1: ...
 Task 2: ...
@@ -185,6 +190,8 @@ Ledger Update:
 - Decisions: ...
 - Unresolved Risks: ...
 - Recommended Next Stage: 轻量执行 Task 1 / ccdawn-bdd-tdd-development（仅 BDD_TDD 任务）/ 授权后连续 Critical Path
+- Route Out: FAST_PATH 轻量执行 / ccdawn-bdd-tdd-development / ccdawn-completion-summary / ccdawn-planning
+- Stop Condition: critical task 缺验证 / Boundary 不清 / BDD_TDD 缺 Anchor / 方案不可执行
 
 拆分自审:
 - 覆盖方案: PASS/NEEDS_CHANGE，证据...
