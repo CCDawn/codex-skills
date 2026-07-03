@@ -113,6 +113,33 @@ D. 暂停...
 
 每条发现必须写出测试文件、具体过时假设或过度约束、开发影响和证据。不要因为测试难改或不方便就判定它无效。
 
+## Ordered Fix Queue
+
+Use this when a review finds multiple fixable items and the user may want continuous execution.
+
+```text
+严重度排序:
+- P1: ...；影响: ...；证据: ...
+- P2: ...；影响: ...；证据: ...
+
+修复队列:
+1. [SAFE_DIRECT] ...
+   - 为什么先做: 范围小 / 依赖前置 / 能先移除误导 / 验证清楚
+   - Success Evidence: ...
+2. [PLAN_THEN_EXECUTE] ...
+   - 为什么不直接混做: API/迁移/兼容/跨模块/验证面更大
+   - Next Route: ccdawn-planning / ccdawn-task-splitting / specific skill
+   - Success Evidence: ...
+3. [DEFERRED] ...
+   - 延后原因:
+   - 触发条件:
+
+执行规则:
+- 用户说“继续 / 开始修复 / 按顺序修”后，从第 1 项开始连续推进。
+- 每项完成后验证、更新队列，再进入下一项。
+- 只有阻塞、验证失败无法安全恢复、范围扩大、破坏性/发布/迁移/权限动作、冲突或需要用户取舍时暂停。
+```
+
 ## Anti-Patterns
 
 Bad:

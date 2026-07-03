@@ -42,7 +42,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 | "目标明确但要先定方案" | `ccdawn-planning` | `COMPACT_FLOW` or `FULL_FLOW` | implementation plan with scope, files, risks, validation | plan covers confirmed intent and success evidence | requirement unstable or direct FAST_PATH is enough |
 | "继续 / 按推荐来 / 确认" after a prior stage | route to the recommended next owner in ledger | current flow | next stage artifact, not repeated alignment | ledger fields match current request and no new blocker | user changed goal or previous route lacks success evidence |
 | "多个动作一起做" | Intent Bundle in `ccdawn-brt`; route Primary first | `COMPACT_FLOW` | ordered Primary/Secondary/Deferred or internal sequence | owner/risk/verification boundaries resolved | actions conflict or need user tradeoff |
-| Review output has Guardrail, Fix, telemetry, refactor | Action Queue in `ccdawn-brt`; execute Guardrail only if it prevents harm, otherwise Primary Fix | `COMPACT_FLOW` | selected queue item plan or execution | each queue item has evidence/impact/route/success evidence | stale evidence, high-risk merge/release/delete |
+| Review output has Guardrail, Fix, telemetry, refactor | Action Queue plus Ordered Fix Queue in `ccdawn-brt`; execute in queue order after user confirms | `COMPACT_FLOW` | next queue item executed or planned with updated queue | each item has evidence/impact/route/success evidence, and completed items have verification | stale evidence, high-risk merge/release/delete |
 | Clear one-file small edit with verification | `FAST_PATH` | `SILENT` or `MICRO` | minimal diff plus verification | targeted check passes or structural evidence exists | touches state/API/data/migration/release or ownership uncertain |
 
 ## Failure Smells
@@ -52,6 +52,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 - Route creates worktrees or subagents for one-theme sequential work.
 - Route splits "实现、验证、汇报" into separate tasks without distinct owners or risks.
 - Route sends review evidence gaps and confirmed defects into the same severity bucket.
+- Route lists multiple fixable findings but offers only one isolated next step instead of an ordered queue.
 - Route keeps asking for confirmation after the user already said "继续", "确认", or "按推荐来".
 - Route treats leaderboard/benchmark work as ordinary planning and loses baseline, metric, lane, promotion, or online-feedback evidence.
 - Route names an uninstalled GitHub skill as the only owner and provides no local fallback.
@@ -76,6 +77,17 @@ Use a short queue when the user needs to choose:
 ```text
 行动队列: Guardrail = ...；Primary Fix = ...；Telemetry Gap = ...；Deferred = ...
 推荐下一步: A 执行 Primary Fix（推荐）/ B 先补 telemetry / C 暂停
+```
+
+Use an ordered queue when findings should be fixed sequentially:
+
+```text
+严重度排序: P1 ...；P2 ...；P2 ...
+修复队列:
+1. ... [SAFE_DIRECT]；原因 = 范围小/验证清楚/先移除误导
+2. ... [PLAN_THEN_EXECUTE]；原因 = P1 但涉及 API/迁移/兼容，先方案再做
+3. ... [DEFERRED]；原因 = 另一个结构面，触发条件 = ...
+执行规则: 用户说“继续/开始修复/按顺序修”后从 1 开始，完成一项验证一项；遇到自然闸门才停。
 ```
 
 Use a blocking question only when the contract cannot be filled:
