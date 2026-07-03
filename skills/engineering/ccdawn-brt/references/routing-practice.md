@@ -27,6 +27,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 | "审项目 / 架构体检 / 技术债 / 接手摸底" | `ccdawn-project-review` | `COMPACT_FLOW` | risk-ranked project review and action queue | source files inspected, evidence-linked findings, recommended next owner | requested write action or scope becomes implementation |
 | "审测试代码 / 无效约束测试 / 阻碍开发的测试" | `Testing Anti-Patterns` for targeted tests; `ccdawn-project-review` for broad test system | `COMPACT_FLOW` | categorized test constraint review | each item names test file/assertion, stale assumption, dev impact, recommendation, evidence | no test scope, no refactor signal, requested write action |
 | "评价方案 / 这个流程繁琐吗 / skill 是否有效" | most specific owner first; otherwise `ccdawn-evaluation` | `MICRO` or `COMPACT_FLOW` | verdict, tradeoffs, actionable improvement queue | evaluated object named, criteria stated, concrete examples or evidence | object unclear or user wants implementation |
+| "开发 / 添加功能 / 实现 X" before scope is classified | Development Reuse Gate in `ccdawn-brt` | `MICRO` or `COMPACT_FLOW` | `LOCAL_REUSE` / `QUICK_RESEARCH` / `FULL_REUSE_RESEARCH` / `SKIP_WITH_REASON` decision | current project reuse checked, external research used only when it can change plan, skip reason stated when no research | user forbids research, network unavailable, feature scope unclear |
 | "新增复杂功能 / 模块 / 编辑器 / 搜索 / 可视化 / 导入导出" | `ccdawn-feature-reuse-research` before planning | `FULL_FLOW` | reuse candidates and implementation implication | searched current/web ecosystem when needed, candidates compared, reuse value decided | feature is actually small/local, network blocked, user forbids research |
 | "冲榜 / score 回退 / benchmark 优化 / online feedback / baseline promotion" | `ccdawn-score-loop`; Huawei NSLB uses `ccdawn-huawei-nslb-score-loop` adapter | `COMPACT_FLOW` or `FULL_FLOW` | lane, gate decision, online calibration, package record, or recovery artifact | baseline identified, metric/commands parsed, lane has one causal mechanism, promotion/rejection evidence recorded | missing metric/profile, stale baseline, source drift, ambiguous online result |
 | "CI 挂了 / GitHub Actions 红了 / PR checks failing" | installed `gh-fix-ci`; fallback `systematic-debugging` with CI logs | `COMPACT_FLOW` | failing check summary plus fix route or diff | CI log inspected, failing command identified, local repro/fix/verification evidence | no CI access, logs missing, fix crosses release boundary |
@@ -49,6 +50,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 
 - Route says only "建议进入某 skill" but cannot name the next artifact.
 - Route recommends planning even though a low-risk edit can be finished and verified now.
+- Route starts implementing a complex/common feature without first checking local reuse, official examples, package ecosystem, GitHub, or similar projects.
 - Route creates worktrees or subagents for one-theme sequential work.
 - Route splits "实现、验证、汇报" into separate tasks without distinct owners or risks.
 - Route sends review evidence gaps and confirmed defects into the same severity bucket.
@@ -64,6 +66,12 @@ Use one line for routine routing:
 
 ```text
 路由判断: Owner = ccdawn-project-review；Mode = COMPACT_FLOW；Next Output = action queue；Success Evidence = evidence-linked findings with selected next route.
+```
+
+Use a reuse gate line before development:
+
+```text
+复用门控: Decision = QUICK_RESEARCH；Reason = 功能常见且外部实现可能影响方案；Scope = 当前项目已有模块 + 官方文档 + GitHub/包生态；Next Output = 复用决策。
 ```
 
 Use one line for review starts that may otherwise become noisy:
