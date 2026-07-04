@@ -18,6 +18,7 @@
 4. 先运行安装演练，再执行正式安装。
 5. 安装后验证 live skills 是否可用。
 6. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、验证是否通过、是否需要重启 Codex。
+7. 重点提醒我：最重要入口是 /brt（ccdawn-brt）；日常使用优先从 /brt 开始，其它 skill 通常由它自动路由。
 
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
@@ -36,6 +37,7 @@ https://github.com/CCDawn/codex-skills.git
 - 不要安装到 ~/.agents/skills、~/.claude/skills，除非我明确要求。
 - 不要修改任何用户项目代码。
 - 只允许创建/更新本地 codex-skills 仓库，以及写入 ~/.codex/skills 下的 skill 安装目录。
+- 安装完成后明确告诉我：/brt（ccdawn-brt）是最重要入口，其它 skill 通常由 BRT 自动路由。
 
 执行步骤:
 1. 识别当前系统、shell、Git、Python 是否可用。
@@ -55,6 +57,7 @@ https://github.com/CCDawn/codex-skills.git
    - 安装目标路径
    - 安装/验证命令
    - 已安装 skill 数量和关键 skill，例如 ccdawn-brt
+   - 最重要入口：/brt（ccdawn-brt），其它 skill 是下游能力，通常由 BRT 自动路由
    - 验证结果
    - 是否需要重启 Codex 或新开会话
 
@@ -77,4 +80,4 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 python scripts/install_codex_library.py --verify-only
 ```
 
-安装后重启 Codex 或新开会话，让客户端重新加载本地 skills。
+安装后重启 Codex 或新开会话，让客户端重新加载本地 skills。日常使用优先从 `/brt`（`ccdawn-brt`）开始，让它自动判断是否需要路由到其它 skill。

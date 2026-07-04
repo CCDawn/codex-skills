@@ -1,7 +1,7 @@
 # Engineering Skills
 
+- **[ccdawn-brt](./ccdawn-brt/SKILL.md)** - Primary entrypoint for CCDawn workflows. Use first for intent alignment, process weight, and routing to the right downstream skill.
 - **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Shared HTML project memory with lane-based session updates.
-- **[ccdawn-brt](./ccdawn-brt/SKILL.md)** - Proactive user-intent alignment with candidate intents, high-signal questions, behavior contracts, review lenses, test anchors, and workflow routing.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research before complex feature planning, comparing existing projects, libraries, examples, and in-project modules.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
 - **[ccdawn-task-splitting](./ccdawn-task-splitting/SKILL.md)** - Task decomposition from an accepted implementation plan.
