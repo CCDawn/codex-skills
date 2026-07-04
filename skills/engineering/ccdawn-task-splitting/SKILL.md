@@ -19,6 +19,15 @@ description: Use when an accepted CCDawn implementation plan needs split/no-spli
 - 哪些任务是关键路径，哪些是可选优化；
 - 完成一个任务后怎样判断可以进入下一个任务。
 
+## BRT interface
+
+- Context Boundary: 已接受方案、复用决策、影响文件/模块、风险边界、验证策略、任务依赖和明确排除范围。
+- Output Contract: `NO_SPLIT` 直接执行单元，或 `SPLIT` 任务图；每个任务含 output、files/boundary、reuse、dependency、development mode、verification 和 Route Out。
+- Allowed Action: 只做拆分/不拆分判定；不写代码、不改测试、不运行迁移/删除/发布动作；发现方案不可执行时回 `ccdawn-planning`。
+- Success Evidence: `NO_SPLIT` 有明确理由和直接验证；`SPLIT` 的 critical tasks 都有 owner surface、protected boundary、Development Mode 和 verification condition。
+- Stop Condition: 方案未接受、文件边界不清、critical task 缺验证、BDD_TDD 缺 Anchor、高风险动作未确认或方案不可执行。
+- Route Out: `FAST_PATH` 轻量执行、`ccdawn-bdd-tdd-development`、`ccdawn-completion-summary`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认已有：

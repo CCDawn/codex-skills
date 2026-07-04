@@ -14,6 +14,15 @@ description: Use when a selected CCDawn task is not safe to finish in one pass, 
 - SIMPLE：模型判断可以一次稳定完成、范围清楚、风险低、可直接验证；不强制 BDD/TDD。
 - BDD_TDD：模型判断无法一次稳定完成、容易偏离、跨模块、高风险或需要新行为测试证明；使用 BDD + RED/GREEN/REFACTOR。
 
+## BRT interface
+
+- Context Boundary: 当前选定任务、Execution Contract、Task Graph、Development Mode、文件范围、保护边界、工作区状态和已有验证证据。
+- Output Contract: 当前任务的最小实现、BDD/TDD 或轻量验证证据、变更摘要、自审结论、Ledger Update 和 Route Out。
+- Allowed Action: 只写当前任务 owned surface 和必要测试；不顺手执行下个任务、不扩大范围、不覆盖无关用户改动；连续 Critical Path 仅在已授权且无自然闸门时继续。
+- Success Evidence: SIMPLE 有直接验证或结构检查；BDD_TDD 有 Behavior Contract、RED 失败证据、GREEN 通过证据和任务输出对照。
+- Stop Condition: 缺明确任务或 Execution Contract、保护边界冲突、验证失败且不能契约内修复、范围扩大、高风险动作未确认或需求变化。
+- Route Out: 下一个 `SIMPLE` 任务、`ccdawn-bdd-tdd-development`、`ccdawn-completion-summary`、`ccdawn-task-splitting`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认已有：

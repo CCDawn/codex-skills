@@ -17,6 +17,15 @@ description: Use when CCDawn development has completed or a PR/diff is ready for
 没有读 diff、需求和证据，就不要说 ready。
 ```
 
+## BRT interface
+
+- Context Boundary: PR/diff/base-head、需求/方案/任务图/完成总结、验证证据、禁止编辑边界、发布/合并目标和明确排除范围。
+- Output Contract: risk-ranked findings、需求覆盖、验证证据、Review Matrix、merge readiness、修复/补证据/发布前路由和 Route Out。
+- Allowed Action: 默认只读审阅；不编辑文件、不移动 HEAD、不改 index、不合并/推送/发布；需要修复时路由回对应开发阶段。
+- Success Evidence: diff 已审、需求已对照、关键验证证据已检查，每条 finding 都绑定文件/行号/命令证据和回流阶段。
+- Stop Condition: 缺可审阅 diff、缺需求来源、验证证据不可得、审阅对象与用户目标不一致、或提交/推送/合并/发布需要明确权限。
+- Route Out: 对应开发模式、`ccdawn-task-splitting`、`ccdawn-completion-summary`、提交/推送/合并准备、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认至少有：

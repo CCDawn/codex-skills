@@ -17,6 +17,15 @@ description: Use when CCDawn development, verification, or a workflow stage ends
 
 总结阶段不直接补写功能；但发现可恢复缺口时，必须把用户带回最具体的开发、debug 或验证阶段，而不是把半成品包装成最终汇报。
 
+## BRT interface
+
+- Context Boundary: 已确认需求、任务图、完成项、diff、验证命令/日志/截图、保护边界、剩余风险和交付目标。
+- Output Contract: `COMPLETE / PARTIAL / BLOCKED` 结论、需求覆盖、验证证据、保护边界检查、恢复动作、交付状态和 Route Out。
+- Allowed Action: 只验证、读取证据和总结；不补写新功能、不削弱测试、不提交/推送/发布；可恢复缺口必须路由到最具体开发/debug/验证阶段。
+- Success Evidence: 每个完成 claim 都有新鲜命令、检查、日志、截图或结构性证据支撑，并对照 critical tasks 和已确认意图。
+- Stop Condition: 关键任务未完成、新鲜证据缺失、NEEDS_CHANGE 未解决、保护边界越界、需要用户决策或高风险交付动作。
+- Route Out: `ccdawn-pr-review`、提交/PR 准备、对应开发模式、`systematic-debugging`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认已有：

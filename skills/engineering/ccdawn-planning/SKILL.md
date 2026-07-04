@@ -19,6 +19,15 @@ description: Use when aligned requirements need an implementation plan before co
 - 如何验证成功；
 - 哪些风险需要在执行前知道。
 
+## BRT interface
+
+- Context Boundary: 已确认意图、需求账本、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
+- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策和 Route Out。
+- Allowed Action: 只读分析和制定方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
+- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险。
+- Stop Condition: 需求不稳、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、或用户目标变成直接写代码。
+- Route Out: `ccdawn-task-splitting`、`FAST_PATH` 直接执行、`ccdawn-feature-reuse-research`、`ccdawn-brt` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认已有：
