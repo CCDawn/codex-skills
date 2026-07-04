@@ -2,13 +2,34 @@
 
 这是一个本地 skill 仓库，重点覆盖竞赛型研究流程、行为闸门式实现，以及持久化项目记忆。
 
-## 安装
+## 懒人安装
 
-最快方式：把现成提示词复制给 Codex，让 Codex 自动安装：
+适合不想手动 clone、找目录、跑命令的用户：
 
-- [复制给 Codex 的一键安装提示词](INSTALL_PROMPTS.md)
+1. 打开一个新的 Codex 会话。
+2. 把下面整段提示词复制给 Codex。
+3. 等 Codex 自动完成 `dry-run -> install -> verify`。
+4. 安装完成后，按 Codex 提示重启客户端或新开会话。
 
-手动安装：
+```text
+请帮我一键安装 CCDawn 的 Codex skills 技能包。
+
+仓库地址：https://github.com/CCDawn/codex-skills.git
+
+要求：
+1. 如果本机已有这个仓库，就进入仓库并更新到最新 main；如果没有，就 clone 到一个合适的本地目录。
+2. 只安装到当前用户的 Codex live skills 目录：~/.codex/skills。
+3. 不要安装到 ~/.agents/skills，避免重复 slash-command。
+4. 先运行安装演练，再执行正式安装。
+5. 安装后验证 live skills 是否可用。
+6. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、验证是否通过、是否需要重启 Codex。
+
+如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
+```
+
+需要更严格限制写入范围时，用 [强约束版安装提示词](INSTALL_PROMPTS.md#强约束版)。
+
+## 手动安装
 
 ```bash
 git clone https://github.com/CCDawn/codex-skills.git
