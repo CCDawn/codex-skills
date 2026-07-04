@@ -13,6 +13,7 @@ Read this file only when exact output templates, examples, or anti-patterns are 
   - B: [具体行为]（推荐）；适合 [选择信号]；代价 [牺牲/风险]
   - C: [具体行为]；适合 [选择信号]；代价 [牺牲/风险]
 - 关键信号:
+- 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
 
 请选关键项，或直接说“按推荐来”:
 1. [问题]: A [适合/代价] / B（推荐）[适合/代价] / C [适合/代价]
@@ -42,6 +43,7 @@ Read this file only when exact output templates, examples, or anti-patterns are 
   - Required Capability:
   - Choose When:
   - Tradeoff:
+- 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
 ```
 
 ## Intent Lock
@@ -57,6 +59,7 @@ Use this before development when the user intent must be locked before planning 
 - 关键约束:
 - 验收证据:
 - 推荐选择:
+- 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
 
 需要你确认的关键项:
 1. [行为/结果问题]: A ... / B（推荐）... / C ...
@@ -73,6 +76,7 @@ Use this when the agent's interpretation, route, plan, ordering, or tradeoff may
 协作校准:
 - 我的判断:
 - 为什么我建议这样:
+- 意图理由: 信号=...；推断=...；推荐=...；错判代价=...
 - 我排除的做法:
 - 对用户目标的影响:
 - 需要你校准:
@@ -234,6 +238,20 @@ Better:
 - 核心用户: Challenge=是否真的减少重复解释；Evidence=下轮可复用项目上下文；Verdict=PASS
 - 维护者: Challenge=记忆噪声会不会膨胀；Evidence=只写项目级摘要并保留确认门槛；Verdict=ACCEPT_RISK，剩余风险是需要定期清理
 - 测试/QA: Challenge=如何证明不是只改了话术；Evidence=用一次模糊需求对齐样例检查候选项是否都有适用信号和代价；Verdict=PASS
+```
+
+Bad:
+
+```text
+推荐理由: 这样更稳，也更高 ROI。
+```
+
+Why bad: 没有用户信号、推断过程和错判代价，用户无法知道 agent 为什么这样推荐。
+
+Better:
+
+```text
+推荐理由: 信号=用户说“每个小任务都开 worktree 很浪费 token”；推断=真实目标是流程降噪和降低误改，而不是取消所有治理；推荐=COMPACT_FLOW + 子任务级复杂度判断；错判代价=如果直接取消拆分，复杂子任务可能失去保护。
 ```
 
 Bad:

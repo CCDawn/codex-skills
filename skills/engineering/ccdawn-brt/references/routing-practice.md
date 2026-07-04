@@ -65,6 +65,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 ## Failure Smells
 
 - Route says only "建议进入某 skill" but cannot name the next artifact.
+- Route recommends an intent, skill, plan, or execution order but cannot name the user signal, inference, recommendation reason, and risk if wrong.
 - Route starts planning or coding before locking user-visible outcome, owning surface, non-goals, constraints, and acceptance evidence.
 - Route asks library/framework/file-structure questions before behavior, scope, default, failure path, or acceptance questions.
 - Route recommends planning even though a low-risk edit can be finished and verified now.
@@ -92,6 +93,7 @@ Use one line for routine routing:
 
 ```text
 路由判断: Owner = ccdawn-project-review；Mode = COMPACT_FLOW；Next Output = action queue；Success Evidence = evidence-linked findings with selected next route.
+意图理由: 信号=用户要求“审项目”；推断=当前价值是风险排序而不是实现；推荐=ccdawn-project-review；错判代价=直接开发会绕过架构/测试风险。
 ```
 
 Use a reuse gate line before development:

@@ -154,6 +154,7 @@ Minimum fields:
 ```text
 Workflow Ledger:
 - Confirmed Intent:
+- Intent Rationale:
 - Intent Bundle:
 - Route Contract:
 - Action Queue:
@@ -172,6 +173,7 @@ Workflow Ledger:
 Ledger rules:
 
 - When `ccdawn-brt` enters planning, seed `Workflow Ledger` from the requirement ledger: confirmed intent, assumptions, unresolved risks, and verification anchors.
+- When a recommendation, route, plan, or execution order changes, update `Intent Rationale` with user signal, inference, recommendation reason, and risk if wrong.
 - When an Intent Bundle exists, carry it as `Primary / Secondary / Deferred`; stage skills may execute only the part covered by their current contract and must preserve deferred items as next-stage context.
 - When a Route Contract exists, preserve the selected Owner, Mode, Next Output, Allowed Action, Success Evidence, and Stop Condition until the next stage replaces or completes it.
 - When an Action Queue exists, preserve `Immediate Guardrail / Primary Fix / Telemetry Gap / Deferred Refactor`; the next stage should execute or plan only the selected queue item and keep the rest as deferred context.
@@ -186,7 +188,7 @@ Ledger rules:
 
 Stage skills should not repeat the full ledger when a compact update is enough. Output only the changed fields plus the next recommended stage.
 
-- `ccdawn-brt`: `Current Stage`, `Intent Bundle`, `Route Contract`, `Action Queue`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-brt`: `Current Stage`, `Intent Rationale`, `Intent Bundle`, `Route Contract`, `Action Queue`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-planning`: `Current Stage`, `Intent Bundle`, `Accepted Plan`, `Decisions`, `Assumptions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-feature-reuse-research`: `Current Stage`, `Reuse Decision`, `Candidate Evidence`, `Rejected Alternatives`, `Verification Strategy`, `Recommended Next Stage`.
 - `ccdawn-score-loop`: `Current Stage`, `Baseline`, `Metric`, `Lane`, `Score Evidence`, `Gate Decision`, `Calibration Lesson`, `Recommended Next Stage`.
