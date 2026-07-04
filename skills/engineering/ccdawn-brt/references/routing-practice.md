@@ -58,6 +58,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 - Route sends review evidence gaps and confirmed defects into the same severity bucket.
 - Route lists multiple fixable findings but offers only one isolated next step instead of an ordered queue.
 - Route keeps asking for confirmation after the user already said "继续", "确认", or "按推荐来".
+- Route treats the user as an oracle: it blindly obeys or asks "你要什么" without stating the agent's own judgment, recommendation, excluded options, and calibration question.
 - Route treats leaderboard/benchmark work as ordinary planning and loses baseline, metric, lane, promotion, or online-feedback evidence.
 - Route names an uninstalled GitHub skill as the only owner and provides no local fallback.
 - Route handles CI, production errors, security, performance, API, migration, or observability as generic planning without the evidence those domains need.
@@ -104,4 +105,13 @@ Use a blocking question only when the contract cannot be filled:
 
 ```text
 BLOCKED: 路由缺少审阅对象。请选择 A 当前 diff（推荐）/ B 指定 PR URL / C 指定文件范围。
+```
+
+Use collaborative calibration when the agent's own route or plan may be hard for the user to understand:
+
+```text
+协作校准: 我建议先做结构审查而不是直接修；原因是你现在问的是“这样做为什么合理”，不是要马上改代码；我排除直接进入实现，因为那会跳过共同理解。这样判断对吗？
+A. 按推荐先拆解原因（推荐）
+B. 直接进入修复
+C. 暂停
 ```

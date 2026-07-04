@@ -65,6 +65,24 @@ Use this before development when the user intent must be locked before planning 
 
 问题必须先锁定用户结果和验收，再触及技术实现；若用户说“按推荐来”，立即按推荐锁定并进入下一阶段。
 
+## Collaborative Calibration
+
+Use this when the agent's interpretation, route, plan, ordering, or tradeoff may affect user-visible outcome, risk, validation, or next stage.
+
+```text
+协作校准:
+- 我的判断:
+- 为什么我建议这样:
+- 我排除的做法:
+- 对用户目标的影响:
+- 需要你校准:
+  A. 按推荐继续（推荐）...
+  B. 调整为 ...
+  C. 暂停或先解释 ...
+```
+
+必须先给 agent 自己的观点和理由，再让用户选择。不要空问“你怎么看”；不要把低风险 FAST_PATH 拖成冗长确认。
+
 ## Quick BRT
 
 ```text
@@ -273,4 +291,21 @@ Better:
 
 ```text
 我建议先按“当前项目可复用上下文 + 确认后写入”推进，这样行为可观察、风险可控。
+```
+
+Bad:
+
+```text
+是否进入下一步？
+```
+
+Why bad: 只有请示，没有 agent 自己的判断、排除项或对用户目标的影响；用户无法校准 agent 的意图。
+
+Better:
+
+```text
+协作校准: 我建议先进入方案制定；原因是当前目标会影响多个文件和验证策略，直接写代码容易偏离你的真实目标；我排除立刻 BDD/TDD，因为复杂度还没有在子任务级别判断。这样做对吗？
+A. 按推荐进入方案制定（推荐）
+B. 先继续需求对齐
+C. 低风险直接实现
 ```
