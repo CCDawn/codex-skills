@@ -16,6 +16,13 @@ Create a project-local memory system under `.docs/project-memory/` and keep it c
 - Stop Condition: missing project root, malformed memory files, overlapping active claim, renderer failure, or user explicitly skips memory.
 - Route Out: return to the current CCDawn stage, `ccdawn-completion-summary`, or BLOCKED with one required fix/input.
 
+## 统一输出标准
+
+- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
+- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
+- 若必须保留英文状态或枚举，先用中文解释其含义。
+- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+
 ## Load extra references when needed
 
 - Read `references/setup.md` on first initialization, or when the right project type, lane shape, or adoption approach is unclear.

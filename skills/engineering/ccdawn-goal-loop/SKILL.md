@@ -18,6 +18,13 @@ description: Use when the user gives a goal-oriented request that needs explicit
 - Stop Condition: 约束会被突破、没有有效下一步、缺少必须信息/权限、连续失败无法产生新证据、或用户要求暂停。
 - Route Out: 继续 goal loop、回到 `ccdawn-brt` 重新对齐目标、进入具体 owner skill、`ccdawn-completion-summary`，或 BLOCKED。
 
+## 统一输出标准
+
+- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
+- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
+- 若必须保留英文状态或枚举，先用中文解释其含义。
+- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+
 ## Goal contract
 
 先把下面 6 个字段补齐：

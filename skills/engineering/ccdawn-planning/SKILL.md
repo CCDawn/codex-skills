@@ -22,11 +22,18 @@ description: Use when aligned requirements need an implementation plan before co
 ## BRT interface
 
 - Context Boundary: 已确认意图、需求账本、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
-- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策、Plan Review Loop、方案修正和 Route Out。
+- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策、方案审查循环和路由出口。
 - Allowed Action: 只读分析、制定方案和修订方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
-- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险；Plan Review Loop 没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
-- Stop Condition: 需求不稳、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、Plan Review Loop 存在未解决缺口，或用户目标变成直接写代码。
+- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险；方案审查循环没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
+- Stop Condition: 需求不稳、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、方案审查循环存在未解决缺口，或用户目标变成直接写代码。
 - Route Out: `ccdawn-task-splitting`、`FAST_PATH` 直接执行、`ccdawn-feature-reuse-research`、`ccdawn-brt` 或 BLOCKED。
+
+## 统一输出标准
+
+- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
+- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
+- 若必须保留英文状态或枚举，先用中文解释其含义。
+- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
 
 ## 进入条件
 
@@ -48,11 +55,11 @@ description: Use when aligned requirements need an implementation plan before co
 3. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
 4. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
 5. 写方案草案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
-6. Plan Review Loop：从 3-5 个和本方案最相关的视角挑战草案。
+6. 方案审查循环：从 3-5 个和本方案最相关的视角挑战草案。
 7. 修订方案：任何视角为 `NEEDS_CHANGE` 时，先修订方案并写明修正；任何视角为 `NEEDS_CLARIFICATION` 时，回 `ccdawn-brt` 或 BLOCKED，不进入拆分/开发。
 8. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
 
-## Plan Review Loop
+## 方案审查循环
 
 规划阶段必须先自审再路由。自审不是附带评价，而是方案质量门禁：发现真实缺口就改方案，改完再给最终路由。
 
@@ -68,10 +75,10 @@ description: Use when aligned requirements need an implementation plan before co
 输出规则：
 
 - 正常方案只输出压缩矩阵；高风险或 `FULL_FLOW` 才展开完整证据。
-- 每个视角必须有 `Challenge / Evidence / Verdict`，证据来自用户意图、本地上下文、复用研究、可逆 probe、验证命令、日志或显式假设加风险。
+- 每个视角必须有 `挑战 / 证据 / 结论`，证据来自用户意图、本地上下文、复用研究、可逆 probe、验证命令、日志或显式假设加风险。
 - `NEEDS_CHANGE` 必须先体现在方案修正里，再输出最终方案；不能一边承认问题一边路由到下一阶段。
 - `NEEDS_CLARIFICATION` 必须回到 `ccdawn-brt` 或 BLOCKED，只问会改变目标、范围、风险或验证的关键问题。
-- 如果自审只剩措辞偏好或低价值优化，不阻塞路由，写入 `Deferred` 或忽略。
+- 如果自审只剩措辞偏好或低价值优化，不阻塞路由，写入 `延后项` 或忽略。
 
 ## 输出契约
 
@@ -81,7 +88,7 @@ description: Use when aligned requirements need an implementation plan before co
 实施方案:
 - 目标: ...
 - 范围: 本轮做...；不做...
-- Context Boundary: 本阶段读取/依赖的代码、文档、测试、日志或外部研究边界...
+- 上下文边界: 本阶段读取/依赖的代码、文档、测试、日志或外部研究边界...
 - 推荐路径: ...
 - 备选路径: A ... / B ...
 - 复用决策: REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped；证据...
@@ -91,30 +98,30 @@ description: Use when aligned requirements need an implementation plan before co
 - 保护边界: 不碰哪些相邻区域、用户改动或清理项
 - 风险决策: ...
 - 验证策略: ...
-- Success Evidence: 方案完成后下游可用什么证明目标、范围和验证路径已经明确...
-- Stop Condition: 需求不稳 / 复用研究缺失 / 影响面无法枚举 / 高风险动作未确认...
+- 成功证据: 方案完成后下游可用什么证明目标、范围和验证路径已经明确...
+- 停止条件: 需求不稳 / 复用研究缺失 / 影响面无法枚举 / 高风险动作未确认...
 - 需要保留的假设: ...
 
-Ledger Update:
-- Current Stage: PLANNING
-- Accepted Plan: ...
-- Verification Evidence: ...
-- Decisions: ...
-- Assumptions: ...
-- Unresolved Risks: ...
-- Recommended Next Stage: ccdawn-task-splitting（判定拆分/不拆分） / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED
-- Route Out: ccdawn-task-splitting / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED
+账本更新:
+- 当前阶段: PLANNING
+- 已接受方案: ...
+- 验证证据: ...
+- 决策: ...
+- 假设: ...
+- 未解决风险: ...
+- 推荐下一阶段: ccdawn-task-splitting（判定拆分/不拆分） / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED
+- 路由出口: ccdawn-task-splitting / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED
 
-Plan Review Loop:
-- 用户意图: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
-- 实施者: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
-- 测试验证: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
-- 维护者/风险/复用架构（按需选择）: PASS/ACCEPT_RISK/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
+方案审查循环:
+- 用户意图: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
+- 实施者: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
+- 测试验证: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
+- 维护者/风险/复用架构（按需选择）: PASS/ACCEPT_RISK/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
 
 方案修正:
-- Changed: 根据自审修正了什么；如果无修正，写 `无真实缺口`
-- Deferred: 不阻塞本轮的低价值优化或后续观察项
-- Gate: PASS / BLOCKED；只有 PASS 才能 Route Out 到拆分或执行
+- 已修正: 根据自审修正了什么；如果无修正，写 `无真实缺口`
+- 延后项: 不阻塞本轮的低价值优化或后续观察项
+- 闸门: PASS / BLOCKED；只有 PASS 才能路由到拆分或执行
 
 下一步:
 默认路由：<ccdawn-task-splitting / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED>，原因...
@@ -131,9 +138,9 @@ Plan Review Loop:
 - 不写“相关文件都可能调整”这类无限边界；无法枚举影响面时，必须说明需要先 probe 或进入任务拆分降低误改风险。
 - 复杂新增功能不能默认自研；必须引用复用研究结论，或说明为什么本次跳过 `ccdawn-feature-reuse-research`。
 - 不允许带着未处理的 `NEEDS_CHANGE` 进入任务拆分或开发；必须先修方案再路由。
-- 不允许把 `Plan Review Loop` 写成泛泛夸赞；每个视角都要挑战一个真实失败模式。
+- 不允许把 `方案审查循环` 写成泛泛夸赞；每个视角都要挑战一个真实失败模式。
 
-## Workflow Ledger
+## 工作流账本
 
 方案完成时必须给后续阶段留下可续接账本：
 
@@ -144,11 +151,11 @@ Plan Review Loop:
 - `Decisions` 只记录会影响实现、测试、风险或范围的决定。
 - `Unresolved Risks` 必须包含仍不清楚的影响面或保护边界。
 - `Recommended Next Stage` 默认是 `ccdawn-task-splitting` 做拆分判定；只有明确低风险直接执行时才写直接执行。
-- 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
+- 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `账本更新`。
 
 ## 高风险方案审查
 
-当方案涉及权限、安全、数据删除、迁移、发布、回滚、公共 API 或多模块重构时，必须读取 `plan-document-reviewer-prompt.md` 或等价组织一次高风险计划审查。审查只阻塞真实缺口，不阻塞措辞偏好；审查结论必须并入 `Plan Review Loop` 和 `方案修正`。
+当方案涉及权限、安全、数据删除、迁移、发布、回滚、公共 API 或多模块重构时，必须读取 `plan-document-reviewer-prompt.md` 或等价组织一次高风险计划审查。审查只阻塞真实缺口，不阻塞措辞偏好；审查结论必须并入 `方案审查循环` 和 `方案修正`。
 
 ## 阶段交接
 

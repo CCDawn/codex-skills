@@ -26,6 +26,13 @@ description: Use when CCDawn development has completed or a PR/diff is ready for
 - Stop Condition: 缺可审阅 diff、缺需求来源、验证证据不可得、审阅对象与用户目标不一致、或提交/推送/合并/发布需要明确权限。
 - Route Out: 对应开发模式、`ccdawn-task-splitting`、`ccdawn-completion-summary`、提交/推送/合并准备、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
+## 统一输出标准
+
+- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
+- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
+- 若必须保留英文状态或枚举，先用中文解释其含义。
+- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+
 ## 进入条件
 
 使用前确认至少有：

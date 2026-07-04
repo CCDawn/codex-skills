@@ -22,6 +22,13 @@ description: Use when coordinating a research competition lifecycle, Kaggle-styl
 - Stop Condition: 数据/metric 漂移、active baseline 不一致、证据链缺失、提交格式不确定、claim 无来源、leaderboard 与 validation 严重冲突且未解释。
 - Route Out: 当前阶段继续、`ccdawn-score-loop`、工程类 owner skill、paper/claim 审计、`ccdawn-completion-summary`，或 BLOCKED。
 
+## 统一输出标准
+
+- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
+- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
+- 若必须保留英文状态或枚举，先用中文解释其含义。
+- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+
 ## 核心原则
 
 - 不从聊天记忆推进项目。优先读取当前项目里的规则、数据说明、实验日志、run records、论文草稿和提交要求。
