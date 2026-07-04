@@ -49,6 +49,8 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 ## Failure Smells
 
 - Route says only "建议进入某 skill" but cannot name the next artifact.
+- Route starts planning or coding before locking user-visible outcome, owning surface, non-goals, constraints, and acceptance evidence.
+- Route asks library/framework/file-structure questions before behavior, scope, default, failure path, or acceptance questions.
 - Route recommends planning even though a low-risk edit can be finished and verified now.
 - Route starts implementing a complex/common feature without first checking local reuse, official examples, package ecosystem, GitHub, or similar projects.
 - Route creates worktrees or subagents for one-theme sequential work.

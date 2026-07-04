@@ -44,6 +44,27 @@ Read this file only when exact output templates, examples, or anti-patterns are 
   - Tradeoff:
 ```
 
+## Intent Lock
+
+Use this before development when the user intent must be locked before planning or implementation.
+
+```text
+意图锁定:
+- 我猜你真正想要的是:
+- 用户可观察结果:
+- 拥有面:
+- 非目标:
+- 关键约束:
+- 验收证据:
+- 推荐选择:
+
+需要你确认的关键项:
+1. [行为/结果问题]: A ... / B（推荐）... / C ...
+2. [范围/失败路径/默认值问题]: A ... / B（推荐）...
+```
+
+问题必须先锁定用户结果和验收，再触及技术实现；若用户说“按推荐来”，立即按推荐锁定并进入下一阶段。
+
 ## Quick BRT
 
 ```text
