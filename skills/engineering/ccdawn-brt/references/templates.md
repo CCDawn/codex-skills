@@ -55,6 +55,7 @@ Use this when the user should understand the agent's next move, but repeated cla
 ```text
 对齐握手: 我理解你要 ...；我准备 ...；我不会 ...；我会用 ... 证明；如果这里不对，最该纠偏的是 ...
 默认推进: 无自然闸门时，我将直接 ...
+下一步建议: ...
 ```
 
 只把真正会改变用户可见结果、风险或执行许可的点做成问题。可默认判断的范围、顺序、验证和路由写进默认推进，不连续追问；当前消息已含执行许可且无自然闸门时，说清握手后直接执行。
@@ -74,6 +75,7 @@ Use this before development when the user intent must be locked before planning 
 - 推荐选择:
 - 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
 - 默认推进:
+- 下一步建议:
 
 需要你确认的关键项:
 1. [行为/结果问题]: A ... / B（推荐）... / C ...
@@ -149,6 +151,8 @@ A. 进入方案制定（推荐）...
 B. 继续需求对齐...
 C. 低风险直接实现（仅当用户明确选择，且单点、可逆、可验证、无迁移/删除/权限/发布风险）...
 D. 暂停...
+
+下一步建议: 按推荐进入 ccdawn-planning；如果你要改范围，直接指出要纠偏的点。
 ```
 
 ## Development Reuse Gate
@@ -165,7 +169,18 @@ Use this before development when reuse or external reference may change the plan
 - 风险边界: 不复制外部代码 / 不安装依赖 / 许可证不明不 REUSE / 不扩大用户未确认范围
 - Next Output: 复用决策 / ccdawn-feature-reuse-research / ccdawn-planning / FAST_PATH 实现
 - Success Evidence: 本地复用点已查；若外部搜索，候选有链接和取舍；若跳过，原因明确
+下一步建议: ...
 ```
+
+## Next Action Footer
+
+Every user-visible response must end its main body with a lightweight next action recommendation.
+
+```text
+下一步建议: <一个具体动作；如果有自然闸门，给 2-3 个选项并标出推荐项>
+```
+
+Use one sentence by default. Do not turn this into a fixed menu. The recommendation must come from the current route, evidence, queue, blocker, or completion state.
 
 ## Test Constraint Review
 
@@ -183,6 +198,7 @@ A. 删除 Remove 类测试（推荐：已过时且不保护真实行为）...
 B. 放宽 Relax 类断言...
 C. 重写 Rewrite 类为行为测试...
 D. 暂停...
+下一步建议: 按推荐先处理 Remove 类测试；如果要保守推进，先只改最影响开发的 1-2 条。
 ```
 
 每条发现必须写出测试文件、具体过时假设或过度约束、开发影响和证据。不要因为测试难改或不方便就判定它无效。

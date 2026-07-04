@@ -17,6 +17,7 @@ BRT_INTERFACE_FIELDS = [
 BRT_CORE_MARKERS = [
     "One-Turn Alignment",
     "Route Contract",
+    "Next Action",
     "FAST_PATH",
     "COMPACT_FLOW",
     "FULL_FLOW",
