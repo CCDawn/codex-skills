@@ -100,6 +100,8 @@ Rules:
   plugin.json
 AGENTS.md
 CLAUDE.md
+install.ps1
+install.sh
 skills/
   competition/
     README.md
@@ -131,7 +133,26 @@ scripts/
 
 ## Quickstart
 
-Install the skills into the default local Codex surface as real folders:
+Clone the repository, then install the skills into the default local Codex surface as real folders:
+
+```bash
+git clone https://github.com/CCDawn/codex-skills.git
+cd codex-skills
+```
+
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+On macOS/Linux:
+
+```bash
+sh ./install.sh
+```
+
+You can also call the Python installer directly:
 
 ```bash
 python scripts/install_codex_library.py
@@ -150,6 +171,24 @@ The install script also enforces that:
 - installed live skills are validated when the local Codex `quick_validate.py` helper is available
 
 Installing the same skill into both `.codex/skills` and `.agents/skills` can create duplicate slash-command entries in Codex. Only use the `.agents` target when you explicitly need that extra catalog copy.
+
+Preview what will be installed without changing files:
+
+```bash
+python scripts/install_codex_library.py --dry-run
+```
+
+List available skills:
+
+```bash
+python scripts/install_codex_library.py --list
+```
+
+Verify the already installed live Codex copy without reinstalling:
+
+```bash
+python scripts/install_codex_library.py --verify-only
+```
 
 Install only selected skills:
 

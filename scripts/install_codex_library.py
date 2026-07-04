@@ -52,8 +52,12 @@ def destination_roots(home: Path, agent: str) -> list[Path]:
     return roots
 
 
+def codex_skills_root(home: Path) -> Path:
+    return home / ".codex" / "skills"
+
+
 def codex_validator_path(home: Path) -> Path:
-    return home / ".codex" / "skills" / ".system" / "skill-creator" / "scripts" / "quick_validate.py"
+    return codex_skills_root(home) / ".system" / "skill-creator" / "scripts" / "quick_validate.py"
 
 
 def validate_installed_codex_skills(home: Path, installed_skills: list[Path]) -> list[Path]:
@@ -68,8 +72,55 @@ def validate_installed_codex_skills(home: Path, installed_skills: list[Path]) ->
     return validated
 
 
+def print_available_skills(available_skills: list[Path]) -> None:
+    print("Available skills:")
+    for skill_path in available_skills:
+        print(f"  {skill_path.name}")
+
+
+def print_install_plan(home: Path, roots: list[Path], skill_names: list[str]) -> None:
+    print("Install plan:")
+    print(f"  Home: {home}")
+    print("  Targets:")
+    for root in roots:
+        print(f"    {root}")
+    print("  Skills:")
+    for name in skill_names:
+        print(f"    {name}")
+    validator = codex_validator_path(home)
+    print(f"  Codex validator: {validator if validator.exists() else 'not found'}")
+
+
+def warn_duplicate_agents_copy(home: Path, selected_skill_names: set[str], roots: list[Path]) -> None:
+    codex_root = codex_skills_root(home)
+    agents_root = home / ".agents" / "skills"
+    if codex_root not in roots or agents_root in roots or not agents_root.exists():
+        return
+
+    duplicates = sorted(name for name in selected_skill_names if (agents_root / name).exists())
+    if duplicates:
+        print("Warning: matching .agents skill copies already exist and may create duplicate slash-command entries:")
+        for name in duplicates:
+            print(f"  {agents_root / name}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Install this local skill library into local Codex, optional .agents, and Claude skill directories.")
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="List available skills and exit without installing.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show the install plan without copying files.",
+    )
+    parser.add_argument(
+        "--verify-only",
+        action="store_true",
+        help="Validate currently installed Codex skills without copying files.",
+    )
     parser.add_argument(
         "--home",
         default=str(Path.home()),
@@ -96,13 +147,43 @@ def main() -> int:
     home = Path(args.home).expanduser().resolve()
 
     available_skills = discover_skills(repo_root)
+    if args.list:
+        print_available_skills(available_skills)
+        return 0
+
     available_skill_names = {path.name for path in available_skills}
     selected_skill_names = set(args.skills or sorted(available_skill_names))
     unknown = sorted(selected_skill_names - available_skill_names)
     if unknown:
-        raise SystemExit(f"Unknown skill(s): {', '.join(unknown)}")
+        known = ", ".join(sorted(available_skill_names))
+        raise SystemExit(f"Unknown skill(s): {', '.join(unknown)}\nKnown skills: {known}")
+
+    selected_skill_names_list = sorted(selected_skill_names)
 
     roots = destination_roots(home, args.agent)
+    if args.dry_run:
+        print_install_plan(home, roots, selected_skill_names_list)
+        print("Dry run only; no files changed.")
+        return 0
+
+    if args.verify_only:
+        installed_codex_skills = [codex_skills_root(home) / name for name in selected_skill_names_list]
+        missing = [path for path in installed_codex_skills if not path.exists()]
+        if missing:
+            print("Missing installed Codex skill(s):")
+            for path in missing:
+                print(f"  {path}")
+            return 1
+        validator = codex_validator_path(home)
+        if not validator.exists():
+            print(f"Codex validator not found: {validator}")
+            return 1
+        validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
+        print("Validated live Codex skills:")
+        for path in validated_codex_skills:
+            print(f"  {path}")
+        return 0
+
     installed_skills = []
     installed_codex_skills = []
     for root in roots:
@@ -118,6 +199,8 @@ def main() -> int:
 
     validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
 
+    print(f"Repository: {repo_root}")
+    print(f"Home: {home}")
     print("Installed skills:")
     for path in installed_skills:
         print(f"  {path}")
@@ -127,6 +210,7 @@ def main() -> int:
             print(f"  {path}")
     elif installed_codex_skills:
         print("Codex validator not found; skipped live validation.")
+    warn_duplicate_agents_copy(home, selected_skill_names, roots)
     print("Restart the client so it reloads the updated local skills.")
     return 0
 

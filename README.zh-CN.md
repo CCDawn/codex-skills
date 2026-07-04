@@ -98,6 +98,8 @@ skills/<bucket>/<ccdawn-skill-name>/
   plugin.json
 AGENTS.md
 CLAUDE.md
+install.ps1
+install.sh
 skills/
   competition/
     README.md
@@ -129,7 +131,26 @@ scripts/
 
 ## 快速开始
 
-推荐默认把 skills 安装到 live Codex 目录：
+先克隆仓库，再默认把 skills 安装到 live Codex 目录：
+
+```bash
+git clone https://github.com/CCDawn/codex-skills.git
+cd codex-skills
+```
+
+Windows PowerShell 推荐用：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+macOS/Linux 推荐用：
+
+```bash
+sh ./install.sh
+```
+
+也可以直接调用 Python 安装器：
 
 ```bash
 python scripts/install_codex_library.py
@@ -148,6 +169,24 @@ python scripts/install_codex_library.py
 - 如果本机存在 Codex 自带的 `quick_validate.py`，会顺手校验 live skill
 
 如果同一个 skill 同时安装到 `.codex/skills` 和 `.agents/skills`，Codex 里可能会出现重复的斜杠条目。只有在你明确需要额外目录副本时，才使用 `.agents` 目标。
+
+只演练安装计划，不改文件：
+
+```bash
+python scripts/install_codex_library.py --dry-run
+```
+
+列出当前仓库可安装的 skills：
+
+```bash
+python scripts/install_codex_library.py --list
+```
+
+只验证已经安装到 Codex live 目录的副本，不重新安装：
+
+```bash
+python scripts/install_codex_library.py --verify-only
+```
 
 只安装部分 skill：
 

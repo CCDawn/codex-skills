@@ -39,15 +39,15 @@ Good additions include:
 2. Add `SKILL.md` with a precise trigger description and a narrow job statement.
 3. Add `REFERENCE.md`, `EXAMPLES.md`, `references/`, or `agents/` only when they materially help the skill.
 4. Update [README.md](README.md), [README.zh-CN.md](README.zh-CN.md), bucket-level listings, and `.claude-plugin/plugin.json` when the catalog changes.
-5. Run `python scripts/install_codex_library.py` to install the local Codex copy. Use `--agent codex-agents` only when you explicitly need both copies.
-6. Validate the installed live Codex skill with the local Codex validator when available, then restart Codex and confirm the slash-command entry reloads.
+5. Run `python scripts/install_codex_library.py --dry-run` to preview the install plan, then `python scripts/install_codex_library.py` to install the local Codex copy. Use `--agent codex-agents` only when you explicitly need both copies.
+6. Validate the installed live Codex skill with `python scripts/install_codex_library.py --verify-only` when the local Codex validator is available, then restart Codex and confirm the slash-command entry reloads.
 
 ## Suggested workflow
 
 1. Create or update the skill folder.
 2. Keep the description specific about when the skill should trigger.
 3. Add at least one realistic example.
-4. Test the live installed skill locally in Codex, not just the repo copy.
+4. Test the live installed skill locally in Codex, not just the repo copy. `--verify-only --skill <name>` is the fastest post-install check when you only changed one skill.
 5. If a slash-command entry is missing or duplicated, check the live `.codex` copy, then look for an extra `.agents` copy, then inspect the repo-local `.claude-plugin/plugin.json` if this repo is the active trusted workspace.
 6. Restart Codex before declaring a metadata change broken.
 7. Open a pull request with a short explanation of the use case.
