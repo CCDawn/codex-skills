@@ -2,7 +2,7 @@
 
 这是一个本地 skill 仓库，重点覆盖竞赛型研究流程、行为闸门式实现，以及持久化项目记忆。
 
-最重要入口是 `/brt`（安装名 `ccdawn-brt`，在 Codex 里也可能显示为 `$ccdawn-brt`）。日常使用优先从 `/brt` 开始，让它先做需求对齐、轻重判断和自动路由；其它 skill 通常作为它的下游能力被调用。
+最重要入口是 `ccdawn-brt`（在 Codex 里也可能显示为 `$ccdawn-brt` 或 `/brt`）。它的作用不是让用户每次都写“先对齐再路由”，而是安装/选择 BRT 后，用户正常表达需求，agent 自己完成需求对齐、轻重判断和下游 skill 路由。
 
 ## 懒人安装
 
@@ -25,7 +25,7 @@
 4. 先运行安装演练，再执行正式安装。
 5. 安装后验证 live skills 是否可用。
 6. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、验证是否通过、是否需要重启 Codex。
-7. 重点提醒我：最重要入口是 /brt（ccdawn-brt）；日常使用优先从 /brt 开始，其它 skill 通常由它自动路由。
+7. 重点提醒我：最重要入口是 ccdawn-brt；安装/选择它之后，用户正常说需求即可，BRT 会在 agent 内部自动完成意图对齐和下游 skill 路由。
 
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
@@ -265,21 +265,14 @@ skills/
 
 ## 使用方式
 
-在 Codex 聊天里可以直接这样触发：
+安装后建议把 `ccdawn-brt` 作为主入口。用户不需要反复写“先对齐意图、再自动路由”，正常说需求即可，例如：
 
-- `使用 /brt 帮我先对齐意图，再自动路由到合适流程`
-- `使用 ccdawn-brt 分析我这句话真正想做什么，并决定下一步 skill`
-- `使用 ccdawn-competition-research-lifecycle 帮我规划这个竞赛项目`
-- `用 ccdawn-goal-loop 把这个目标整理成可验证的执行合同`
-- `用 ccdawn-pr-review 在合并前审阅这个 PR`
-- `用 ccdawn-project-review 在重构前审查这个仓库`
-- `添加复杂编辑器模块前先用 ccdawn-feature-reuse-research 做复用调研`
-- `用 ccdawn-bug-review 包装 systematic-debugging 来审查这个回归`
-- `用 ccdawn-evaluation 在检查更具体 skill 后评估这个流程`
-- `用 ccdawn-score-loop 跑这个 benchmark 优化循环`
-- `用 ccdawn-huawei-nslb-score-loop 准备 NSLB epoch 并 gate child results`
-- `用 ccdawn-creative-toolbox 基于当前上下文生成新概念卡`
+- `修一下这个登录 bug`
+- `帮我审这个 PR`
+- `先审查一下这个项目结构`
+- `我要加一个复杂编辑器功能`
+- `这个 benchmark 分数退化了，帮我分析并继续优化`
+- `帮我把这个目标拆成可验证的执行计划`
 - `帮我给这个仓库初始化项目记忆`
-- `使用 ccdawn-dawn-agent-html-memory 把这个仓库按 frontend 项目初始化项目记忆`
 
 这个仓库按本地 skill library 维护。
