@@ -22,10 +22,10 @@ description: Use when aligned requirements need an implementation plan before co
 ## BRT interface
 
 - Context Boundary: 已确认意图、需求账本、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
-- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策和 Route Out。
-- Allowed Action: 只读分析和制定方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
-- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险。
-- Stop Condition: 需求不稳、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、或用户目标变成直接写代码。
+- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策、Plan Review Loop、方案修正和 Route Out。
+- Allowed Action: 只读分析、制定方案和修订方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
+- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险；Plan Review Loop 没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
+- Stop Condition: 需求不稳、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、Plan Review Loop 存在未解决缺口，或用户目标变成直接写代码。
 - Route Out: `ccdawn-task-splitting`、`FAST_PATH` 直接执行、`ccdawn-feature-reuse-research`、`ccdawn-brt` 或 BLOCKED。
 
 ## 进入条件
@@ -47,9 +47,31 @@ description: Use when aligned requirements need an implementation plan before co
 2. 检查复用决策：复杂新增功能必须说明 `REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped`。
 3. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
 4. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
-5. 写方案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
-6. 自审：从范围、可实施性、风险、验证四个角度检查方案。
-7. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
+5. 写方案草案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
+6. Plan Review Loop：从 3-5 个和本方案最相关的视角挑战草案。
+7. 修订方案：任何视角为 `NEEDS_CHANGE` 时，先修订方案并写明修正；任何视角为 `NEEDS_CLARIFICATION` 时，回 `ccdawn-brt` 或 BLOCKED，不进入拆分/开发。
+8. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
+
+## Plan Review Loop
+
+规划阶段必须先自审再路由。自审不是附带评价，而是方案质量门禁：发现真实缺口就改方案，改完再给最终路由。
+
+默认选择 3-5 个视角，按风险裁剪：
+
+- 用户意图视角：方案是否满足用户可观察结果、非目标和纠偏点。
+- 实施者视角：影响文件、接口、状态流、顺序和回滚边界是否具体。
+- 测试验证视角：验证策略是否能证明行为，不是假验证或只测实现细节。
+- 维护者视角：是否避免顺手重构、重复抽象、技术债扩大或长期维护负担。
+- 风险边界视角：数据、权限、安全、迁移、发布、删除、兼容和用户改动是否被保护。
+- 复用架构视角：复杂新增功能是否继承复用决策，或有明确自研理由。
+
+输出规则：
+
+- 正常方案只输出压缩矩阵；高风险或 `FULL_FLOW` 才展开完整证据。
+- 每个视角必须有 `Challenge / Evidence / Verdict`，证据来自用户意图、本地上下文、复用研究、可逆 probe、验证命令、日志或显式假设加风险。
+- `NEEDS_CHANGE` 必须先体现在方案修正里，再输出最终方案；不能一边承认问题一边路由到下一阶段。
+- `NEEDS_CLARIFICATION` 必须回到 `ccdawn-brt` 或 BLOCKED，只问会改变目标、范围、风险或验证的关键问题。
+- 如果自审只剩措辞偏好或低价值优化，不阻塞路由，写入 `Deferred` 或忽略。
 
 ## 输出契约
 
@@ -83,11 +105,16 @@ Ledger Update:
 - Recommended Next Stage: ccdawn-task-splitting（判定拆分/不拆分） / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED
 - Route Out: ccdawn-task-splitting / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED
 
-方案自审:
-- 范围: PASS/NEEDS_CHANGE，证据...
-- 可实施性: PASS/NEEDS_CHANGE，证据...
-- 风险: PASS/ACCEPT_RISK/NEEDS_CLARIFICATION，证据...
-- 验证: PASS/NEEDS_CHANGE，证据...
+Plan Review Loop:
+- 用户意图: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
+- 实施者: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
+- 测试验证: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
+- 维护者/风险/复用架构（按需选择）: PASS/ACCEPT_RISK/NEEDS_CHANGE/NEEDS_CLARIFICATION；Challenge...；Evidence...
+
+方案修正:
+- Changed: 根据自审修正了什么；如果无修正，写 `无真实缺口`
+- Deferred: 不阻塞本轮的低价值优化或后续观察项
+- Gate: PASS / BLOCKED；只有 PASS 才能 Route Out 到拆分或执行
 
 下一步:
 默认路由：<ccdawn-task-splitting / FAST_PATH 直接执行 / ccdawn-feature-reuse-research / ccdawn-brt / BLOCKED>，原因...
@@ -103,6 +130,8 @@ Ledger Update:
 - 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
 - 不写“相关文件都可能调整”这类无限边界；无法枚举影响面时，必须说明需要先 probe 或进入任务拆分降低误改风险。
 - 复杂新增功能不能默认自研；必须引用复用研究结论，或说明为什么本次跳过 `ccdawn-feature-reuse-research`。
+- 不允许带着未处理的 `NEEDS_CHANGE` 进入任务拆分或开发；必须先修方案再路由。
+- 不允许把 `Plan Review Loop` 写成泛泛夸赞；每个视角都要挑战一个真实失败模式。
 
 ## Workflow Ledger
 
@@ -119,7 +148,7 @@ Ledger Update:
 
 ## 高风险方案审查
 
-当方案涉及权限、安全、数据删除、迁移、发布、回滚、公共 API 或多模块重构时，可以读取 `plan-document-reviewer-prompt.md`，用它组织一次计划审查。审查只阻塞真实缺口，不阻塞措辞偏好。
+当方案涉及权限、安全、数据删除、迁移、发布、回滚、公共 API 或多模块重构时，必须读取 `plan-document-reviewer-prompt.md` 或等价组织一次高风险计划审查。审查只阻塞真实缺口，不阻塞措辞偏好；审查结论必须并入 `Plan Review Loop` 和 `方案修正`。
 
 ## 阶段交接
 

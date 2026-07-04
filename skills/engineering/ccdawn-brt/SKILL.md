@@ -201,6 +201,8 @@ ccdawn-brt -> ccdawn-planning -> [直接执行 | ccdawn-task-splitting]
 -> ccdawn-completion-summary -> ccdawn-pr-review
 ```
 
+进入 `ccdawn-planning` 后，方案必须完成 Plan Review Loop：多视角挑战草案、修正真实缺口、确认 Gate 通过后，才能进入任务拆分或开发。
+
 Development Reuse Gate：开发请求进入实现或方案前，先判断复用价值。
 
 - `LOCAL_REUSE`：简单小改、bug、样式、机械重构，只查当前项目已有实现、模式、组件、helper 或测试，不默认联网。
@@ -234,7 +236,7 @@ Owner Matrix：
 - 外部 review 反馈采纳：`receiving-code-review`。
 - 独立第二审：`requesting-code-review`。
 - 目标合同和迭代推进：`ccdawn-goal-loop`。
-- 方案制定：`ccdawn-planning`。
+- 方案制定和规划自审闭环：`ccdawn-planning`。
 - 完成前验证：`verification-before-completion` 或 `ccdawn-completion-summary`。
 
 进入 `ccdawn-evaluation` 后，只在用户目标或评价对象不明时回到 BRT；不要在 BRT 和 evaluation 之间来回循环。
