@@ -35,6 +35,7 @@ source SHA256: 28b33d6d67d547fbc4415ec363a1c80db7a1f8e2fe1f308fd96a8a528a0441cb
 
 - Context Boundary: Huawei NSLB project root, current baseline hash, score-loop ledger/search graph, selected command/lane, and isolated worker workspace when applicable.
 - Output Contract: status, epoch, worker, gate, package, online feedback, or recovery artifact with machine-readable evidence.
+- Allowed Action: only profile-approved commands and lane workspaces; workers never mutate the main baseline, ledger, package map, or promotion state unless the parent gate explicitly does it.
 - Success Evidence: command output, `child_result.json`, attempt card, ledger/search-graph update, compiled diff, gate decision, or registered short submission package.
 - Stop Condition: source drift, stale baseline hash, overlapping ledger/pool write, missing child result, invalid package, ambiguous online feedback, or user pause.
 - Route Out: `ccdawn-score-loop`, project-specific command, launch/recover workers, parent promotion gate, online feedback wait, project memory sync, or BLOCKED with one required input.

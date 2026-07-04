@@ -19,6 +19,7 @@ This is a generic template. A project-specific profile must define the metric, c
 
 - Context Boundary: project root, score metric, active baseline, allowed write surface, experiment ledger, validation commands, and selected lane.
 - Output Contract: status, experiment lane, worker contract, gate decision, package record, online feedback update, or recovery artifact.
+- Allowed Action: only the profile-approved write surface, one causal mechanism per lane, no baseline promotion/package/submission without a parsed gate decision.
 - Success Evidence: command output, score delta, diff, result JSON/report, ledger/search update, promotion decision, or registered package.
 - Stop Condition: source drift, stale baseline, missing metric definition, invalid validation command, overlapping writes, unsafe promotion, ambiguous online feedback, or user pause.
 - Route Out: continue score loop, launch/recover worker lane, promote/reject candidate, package/submit, update project memory, or BLOCKED with one required input.

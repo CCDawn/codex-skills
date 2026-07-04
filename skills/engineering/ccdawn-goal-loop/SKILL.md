@@ -13,6 +13,7 @@ description: Use when the user gives a goal-oriented request that needs explicit
 
 - Context Boundary: 当前目标、可用输入/工具/文件范围、明确约束、已获得证据和本轮迭代对象。
 - Output Contract: goal contract、当前行动、advance/iterate/stop 决策、证据和 Route Out。
+- Allowed Action: 只执行 goal contract 允许的最小下一步；写入、联网、安装、删除、迁移、发布或权限动作必须在 contract 中显式允许。
 - Success Evidence: 当前行动产出能满足或推进 `Evidence` 字段的可检查证据。
 - Stop Condition: 约束会被突破、没有有效下一步、缺少必须信息/权限、连续失败无法产生新证据、或用户要求暂停。
 - Route Out: 继续 goal loop、回到 `ccdawn-brt` 重新对齐目标、进入具体 owner skill、`ccdawn-completion-summary`，或 BLOCKED。
@@ -27,6 +28,14 @@ description: Use when the user gives a goal-oriented request that needs explicit
 - `Allowed scope`：允许使用的输入、工具、文件范围或操作边界
 - `Next-step rule`：每一轮迭代后如何判断下一步最优行动
 - `Blocker protocol`：遇到阻塞或无路可走时如何停止并汇报
+
+映射到 BRT 时：
+
+- `Goal` -> Desired Outcome；
+- `Evidence` -> Success Evidence；
+- `Constraints` + `Allowed scope` -> Allowed Actions / Out of Scope；
+- `Next-step rule` -> Route Out 和下一轮选择规则；
+- `Blocker protocol` -> Stop Condition 和 BLOCKED 输出。
 
 ## Operating rules
 
@@ -56,6 +65,7 @@ Constraints:
 Allowed scope:
 Next-step rule:
 Blocker protocol:
+Allowed action:
 Current action:
 Decision:
 Route Out:

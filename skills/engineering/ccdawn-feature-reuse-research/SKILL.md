@@ -11,6 +11,15 @@ description: Use when CCDawn workflow is about adding a complex feature, capabil
 
 本 skill 不写代码、不安装依赖、不把外部代码直接复制进项目。它输出一个可交给 `ccdawn-planning` 的复用决策。
 
+## BRT interface
+
+- Context Boundary: 用户目标、当前项目可复用点、网络/本地搜索范围、排除范围、许可证和依赖边界。
+- Output Contract: 搜索范围、候选评估、复用决策、Implementation Boundary、Verification Strategy 和 planning handoff。
+- Allowed Action: 只读搜索和只读本地代码/文档检查；不安装依赖、不运行外部代码、不复制外部代码、不扩大用户未确认范围。
+- Success Evidence: 当前项目复用点已查，候选有链接或本地证据，许可证/集成风险已判断，复用决策能作为 `ccdawn-planning` 输入。
+- Stop Condition: 无法搜索、许可证不明、需求不清、复用会改变用户未确认范围、需要安装/试跑/复制外部代码。
+- Route Out: `ccdawn-planning`、继续复用研究、`ccdawn-brt`、`ccdawn-evaluation` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认：
@@ -86,6 +95,7 @@ description: Use when CCDawn workflow is about adding a complex feature, capabil
 - 目标功能:
 - 搜索范围:
 - Context Boundary: 用户目标、当前项目可复用点、网络/本地搜索范围、排除范围...
+- Allowed Action: 只读搜索和本地检查；不安装、不运行、不复制外部代码
 - 当前项目已有复用点:
 - 结论: REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / BLOCKED
 - 推荐原因:
@@ -108,6 +118,7 @@ description: Use when CCDawn workflow is about adding a complex feature, capabil
 - Implementation Boundary:
 - Verification Strategy:
 - Rejected Alternatives:
+- Planning Handoff: 进入 ccdawn-planning 时必须携带的复用决策、依赖边界、验证策略和 rejected alternatives
 - Success Evidence: 当前项目复用点已查、候选有链接/本地证据、许可证/集成风险已判断
 - Stop Condition: 无法搜索 / 许可证不明 / 需求不清 / 复用会改变用户未确认范围
 
@@ -129,3 +140,4 @@ Route Out: ccdawn-planning / 继续复用研究 / ccdawn-brt / 暂停
 - 不安装、不运行、不复制外部代码；需要试用库时，先进入 `ccdawn-planning` 建立执行契约。
 - 如果搜索会花费大量时间，先做 QUICK 研究，再建议是否继续 DEEP 研究。
 - 进入 `ccdawn-planning` 前，必须把 `复用决策` 作为方案输入。
+- 如果复用决策会引入新依赖、改变架构边界或扩大用户可见结果，先用协作校准说明推荐、排除项和取舍，再进入 planning。

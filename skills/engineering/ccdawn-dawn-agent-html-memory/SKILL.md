@@ -11,6 +11,7 @@ Create a project-local memory system under `.docs/project-memory/` and keep it c
 
 - Context Boundary: target repository root, `.docs/project-memory/`, relevant lane files, project rules, and the current task result.
 - Output Contract: initialized or updated project memory files plus rendered dashboard/index evidence.
+- Allowed Action: edit only `.docs/project-memory/`, `PROJECT_MEMORY.html`, and the AGENTS memory block during initialization unless the user explicitly authorizes broader changes.
 - Success Evidence: changed lane/recent update is present in JSON, `overview.html`, `INDEX.md`, and root `PROJECT_MEMORY.html` when applicable.
 - Stop Condition: missing project root, malformed memory files, overlapping active claim, renderer failure, or user explicitly skips memory.
 - Route Out: return to the current CCDawn stage, `ccdawn-completion-summary`, or BLOCKED with one required fix/input.

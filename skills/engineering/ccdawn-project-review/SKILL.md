@@ -16,6 +16,15 @@ description: Use when CCDawn workflow needs a Chinese-first review of an entire 
 - 哪些风险会影响后续开发、迁移、发布或接手；
 - 下一步应该路由到哪个更具体的 CCDawn skill。
 
+## BRT interface
+
+- Context Boundary: 本次审查范围、实际读取的目录/入口/测试/配置/日志/git 信号/memory，以及明确排除范围。
+- Output Contract: 项目健康结论、证据化 findings、行动队列、可选 Ordered Fix Queue、下一步路由。
+- Allowed Action: 默认只读审查；不编辑文件、不移动分支、不改 index；用户要求边审边改时先回 `ccdawn-brt` 建立 Execution Contract。
+- Success Evidence: findings 均有位置/命令/文件证据，行动队列能路由到具体 skill 或阶段。
+- Stop Condition: 审查范围不明、需要写代码、发现 PR/diff 对象、发现具体 bug 需转调试、或用户目标变成实施。
+- Route Out: `ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-pr-review`、`ccdawn-completion-summary`、`ccdawn-evaluation`、`ccdawn-brt` 或 BLOCKED。
+
 ## 进入条件
 
 使用前确认：
@@ -115,6 +124,14 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 
 `WATCHLIST` 必须有退出条件：哪些指标、日志、测试、运行证据或时间窗口能证明关闭、降级或升级。Telemetry Gap 不要和确认型 P1 混在同一严重度里。
 
+当行动队列里存在多个可连续修复项，再生成 Ordered Fix Queue：
+
+- `Execution Order` 按依赖、改动范围、验证难度、误改风险和用户价值排序，不等同于 `Severity Rank`。
+- 每项标记 `SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED`。
+- `SAFE_DIRECT` 可在用户说“继续/开始修复/按顺序修”后直接执行并验证。
+- `PLAN_THEN_EXECUTE` 先进入 `ccdawn-planning` 或对应 owner；不要和低风险清理混做。
+- `DEFERRED` 只记录触发条件；不在当前队列里顺手修。
+
 ## 输出契约
 
 ```text
@@ -123,6 +140,7 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 - 深度: QUICK / STANDARD / DEEP
 - 结论: HEALTHY / WATCHLIST / NEEDS_ATTENTION / HIGH_RISK / BLOCKED
 - Context Boundary: 本次实际读取的目录、入口、测试、配置、日志、git 信号或 memory...
+- Allowed Action: 只读审查；需要写代码时回 BRT 建立 Execution Contract
 - 关键证据: ...
 
 项目地图:
@@ -149,6 +167,9 @@ Findings:
 - Primary Fix: 证据...；动作...；路由...
 - Telemetry Gap: 证据缺口...；补证方式...；退出 WATCHLIST 条件...
 - Deferred Refactor: 延后原因...；触发条件...
+
+修复队列（仅多个可连续修复项时）:
+- 1. ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]；为什么排在这里...；Success Evidence...
 
 下一步:
 A. 进入 ccdawn-planning 制定修复/重构方案（推荐，当存在 P0/P1/P2 需要落地）...

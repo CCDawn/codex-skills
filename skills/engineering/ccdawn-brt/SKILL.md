@@ -178,11 +178,14 @@ Owner Matrix：
 - 需求对齐、真实目标、执行深度、流程重量：`ccdawn-brt`。
 - 开发前复用门控、复杂功能新增前的外部项目/库/模块复用研究和复用价值评估：`ccdawn-feature-reuse-research`。
 - 分数、榜单、benchmark、online/offline feedback、baseline promotion、实验 lane 和提交包迭代：`ccdawn-score-loop`；Huawei NSLB 项目用 `ccdawn-huawei-nslb-score-loop` 作为项目适配层。
+- 竞赛科研全流程、数据/metric/实验/论文/提交证据链、public leaderboard 生命周期：`ccdawn-competition-research-lifecycle`；其中可度量分数优化再路由到 `ccdawn-score-loop`。
 - 项目、代码库、架构、技术债、测试覆盖、风险模块、接手摸底：`ccdawn-project-review`。
 - 测试代码质量、无效约束、过度 mock、重构后阻碍开发的测试：优先用 `Testing Anti-Patterns`；涉及整仓测试体系或覆盖风险时用 `ccdawn-project-review`。
 - CI、PR 评论、Sentry、浏览器验证、安全、性能、API、迁移、可观测性、git 历史风险等专项信号：只在对应外部 skill 已安装时作为 owner；未安装时使用 `references/github-skill-candidates.md` 的 local fallback，并把缺失 skill 记为 optional。
 - 流程、方案、skill、结果质量评价：最具体 owner 优先；没有更具体承接者时用 `ccdawn-evaluation`。
 - bug、失败测试、异常行为：`systematic-debugging`；深层来源隐藏时加 `root-cause-tracing`；CCDawn 阶段交接才加 `ccdawn-bug-review`。
+- 创意发散、新概念、命名、产品/研究/策略/故事方向探索：`ccdawn-creative-toolbox`；收敛到实施时再回 `ccdawn-brt` 或 `ccdawn-planning`。
+- 项目级持久记忆、`.docs/project-memory/`、HTML dashboard、跨会话进度/决策/claim guard：`ccdawn-dawn-agent-html-memory`。
 - PR、diff、分支、提交范围审阅：`ccdawn-pr-review`。
 - 外部 review 反馈采纳：`receiving-code-review`。
 - 独立第二审：`requesting-code-review`。
@@ -206,6 +209,19 @@ Owner Matrix：
 ```text
 路由判断: Owner = ...；Mode = ...；Next Output = ...；Success Evidence = ...
 ```
+
+CCDawn 被路由 skill 必须承接同一接口；缺字段时由 BRT 补齐或回到对齐：
+
+- `Context Boundary`：本阶段实际允许读取的对象和排除范围；
+- `Output Contract`：阶段结束时要产出的 artifact 或结论；
+- `Allowed Action`：只读、可写范围、禁止动作、是否允许网络/安装/删除/迁移；
+- `Success Evidence`：证明本阶段完成的证据；
+- `Stop Condition`：何时必须停下或回 BRT；
+- `Route Out`：下一阶段、当前阶段继续、回 BRT 或 BLOCKED。
+
+会写文件、改变方案、引入依赖、修改 baseline、更新记忆、提交/发布/迁移/删除的 skill，还必须在动手前承接 `Execution Contract` 或等价字段：`Target / Desired Outcome / Allowed Actions / Out of Scope / Success Evidence / Recovery Signal`。
+
+审查、评价、调试、项目体检、复用研究等 skill 产出多个后续动作时，不能只给一个孤立推荐；必须形成 Action Queue，若有多个可修复项，再转成 Ordered Fix Queue，并标记 `SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED`。
 
 审查、诊断、评价类任务进入 MICRO 或 COMPACT_FLOW 时，首轮最多输出一行审查契约和一行动作，不连续解释流程：
 

@@ -102,6 +102,7 @@ Use the full output contract in `references/full-toolbox.md` only for deep creat
 
 - Context Boundary: user brief, current conversation context, extracted concept materials, and any explicit domain constraints.
 - Output Contract: named concept cards, quality gate result, recommendation, and next route.
+- Allowed Action: generate and evaluate concepts only; implementation, external research, asset creation, or code changes require routing to the proper owner.
 - Success Evidence: each concept has source collision, mechanism, name, novelty reason, and testable next experiment.
 - Stop Condition: creative target unclear, insufficient context materials, user asks to converge into implementation, or safety/ownership constraints block the concept.
 - Route Out: `ccdawn-planning`, `ccdawn-feature-reuse-research`, `ccdawn-evaluation`, or back to `ccdawn-brt` for alignment.

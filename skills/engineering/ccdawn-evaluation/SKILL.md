@@ -30,6 +30,19 @@ Owner 边界：
 - `ccdawn-evaluation` 负责在评价对象和目标已知后给出证据化判断。
 - 进入本 skill 后，只在评价目标或对象不明时回到 BRT；不要因为“流程重量”这类主题本身就回 BRT。
 
+## BRT interface
+
+- Context Boundary: 被评价对象、用户评价标准、证据来源、已排除的更具体 owner、允许读取范围。
+- Output Contract: 总评、多维评价、必须调整、可选优化、行动队列和 Route Out。
+- Allowed Action: 默认只读评价；只有用户目标明确要求“调整/优化”，且改动低风险、范围清楚、可验证时，才路由到 `FAST_PATH` 或下游开发阶段。
+- Success Evidence: 结论绑定评价对象、证据和可执行下一步；没有空泛“更好/更完整”。
+- Stop Condition: 评价对象不明、存在更具体 owner、缺关键证据、用户目标变成实施、或评价结论会改变高风险路线且未校准。
+- Route Out: 更具体 skill、`ccdawn-brt`、`ccdawn-planning`、`ccdawn-task-splitting`、`FAST_PATH` 调整、`ccdawn-completion-summary` 或 BLOCKED。
+
+## 进入条件
+
+使用前确认评价对象和评价目的已知；未知时回到 `ccdawn-brt` 做需求对齐。若更具体 skill 已经能承接，不在本 skill 内重写对方流程。
+
 ## 评价方式
 
 1. 先写一句 `复用检查`：是否已有更具体 skill；有则路由，不继续评价。
@@ -38,7 +51,7 @@ Owner 边界：
 4. Evidence 必须来自文件、代码、测试、日志、用户要求、运行结果或明确假设。
 5. 给出总评、必须调整、可选优化和下一步路由。
 
-如果评价对象是审查报告、流程结果或多发现输出，必须先把后续动作归入 `Immediate Guardrail / Primary Fix / Telemetry Gap / Deferred Refactor`，再推荐下一步。不要把确认型问题、证据缺口、治理风险和维护性重构混成同一类建议。
+如果评价对象是审查报告、流程结果或多发现输出，必须先把后续动作归入 `Immediate Guardrail / Primary Fix / Telemetry Gap / Deferred Refactor`，再推荐下一步。若存在多个可修复项，转成 Ordered Fix Queue，并标记 `SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED`。不要把确认型问题、证据缺口、治理风险和维护性重构混成同一类建议。
 
 ## 默认维度
 
@@ -61,6 +74,7 @@ Owner 边界：
 - 复用检查: 已有更具体 skill / 无更具体 skill
 - 总评: GOOD / ACCEPTABLE_WITH_RISK / NEEDS_CHANGE / BLOCKED
 - Context Boundary: 被评价对象、用户标准、证据来源、已排除的专项 owner...
+- Allowed Action: 只读评价 / FAST_PATH 调整 / 路由到下游阶段 / BLOCKED
 - 推荐判断: ...
 - 关键证据: ...
 
@@ -77,6 +91,9 @@ Owner 边界：
 - Primary Fix: ...
 - Telemetry Gap: ...
 - Deferred Refactor: ...
+
+修复队列（仅多个可修复项时）:
+- 1. ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]；原因...；Success Evidence...
 
 下一步:
 A. 按推荐调整（推荐）...
