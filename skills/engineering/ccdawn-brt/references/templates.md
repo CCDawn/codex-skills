@@ -14,6 +14,8 @@ Read this file only when exact output templates, examples, or anti-patterns are 
   - C: [具体行为]；适合 [选择信号]；代价 [牺牲/风险]
 - 关键信号:
 - 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
+- 对齐握手: 我理解你要 ...；我准备 ...；我不会 ...；我会用 ... 证明；如果这里不对，最该纠偏的是 ...
+- 默认推进: 无自然闸门时，我将直接 ...
 
 请选关键项，或直接说“按推荐来”:
 1. [问题]: A [适合/代价] / B（推荐）[适合/代价] / C [适合/代价]
@@ -46,6 +48,17 @@ Read this file only when exact output templates, examples, or anti-patterns are 
 - 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
 ```
 
+## One-Turn Alignment
+
+Use this when the user should understand the agent's next move, but repeated clarification would waste turns.
+
+```text
+对齐握手: 我理解你要 ...；我准备 ...；我不会 ...；我会用 ... 证明；如果这里不对，最该纠偏的是 ...
+默认推进: 无自然闸门时，我将直接 ...
+```
+
+只把真正会改变用户可见结果、风险或执行许可的点做成问题。可默认判断的范围、顺序、验证和路由写进默认推进，不连续追问；当前消息已含执行许可且无自然闸门时，说清握手后直接执行。
+
 ## Intent Lock
 
 Use this before development when the user intent must be locked before planning or implementation.
@@ -60,6 +73,7 @@ Use this before development when the user intent must be locked before planning 
 - 验收证据:
 - 推荐选择:
 - 推荐理由: 信号=...；推断=...；推荐=...；错判代价=...
+- 默认推进:
 
 需要你确认的关键项:
 1. [行为/结果问题]: A ... / B（推荐）... / C ...
@@ -79,6 +93,7 @@ Use this when the agent's interpretation, route, plan, ordering, or tradeoff may
 - 意图理由: 信号=...；推断=...；推荐=...；错判代价=...
 - 我排除的做法:
 - 对用户目标的影响:
+- 默认推进:
 - 需要你校准:
   A. 按推荐继续（推荐）...
   B. 调整为 ...
@@ -200,6 +215,25 @@ Use this when a review finds multiple fixable items and the user may want contin
 ```
 
 ## Anti-Patterns
+
+Bad:
+
+```text
+你先回答这几个问题：
+1. 是否进入 planning？
+2. 是否要拆任务？
+3. 是否使用 BDD/TDD？
+4. 是否要我继续？
+```
+
+Why bad: 把 agent 可以默认判断的流程问题拆成多轮用户输入，降低交流效率。
+
+Better:
+
+```text
+对齐握手: 我理解你要减少流程噪声，同时保留复杂任务的保护；我准备用 COMPACT_FLOW，先不拆任务，只有子任务复杂时才路由 BDD/TDD；我不会每个小任务都开 worktree；我会用改动范围和验证证据证明没误改；如果这里不对，最该纠偏的是“是否必须严格全流程”。
+默认推进: 无自然闸门时，我将直接修改 BRT 的对齐规则并安装验证。
+```
 
 Bad:
 

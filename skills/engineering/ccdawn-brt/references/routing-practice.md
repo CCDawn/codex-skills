@@ -68,6 +68,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 - Route recommends an intent, skill, plan, or execution order but cannot name the user signal, inference, recommendation reason, and risk if wrong.
 - Route starts planning or coding before locking user-visible outcome, owning surface, non-goals, constraints, and acceptance evidence.
 - Route asks library/framework/file-structure questions before behavior, scope, default, failure path, or acceptance questions.
+- Route splits defaultable alignment into repeated user inputs instead of one alignment handshake with a default next action.
 - Route recommends planning even though a low-risk edit can be finished and verified now.
 - Route starts implementing a complex/common feature without first checking local reuse, official examples, package ecosystem, GitHub, or similar projects.
 - Route creates worktrees or subagents for one-theme sequential work.
@@ -94,6 +95,8 @@ Use one line for routine routing:
 ```text
 路由判断: Owner = ccdawn-project-review；Mode = COMPACT_FLOW；Next Output = action queue；Success Evidence = evidence-linked findings with selected next route.
 意图理由: 信号=用户要求“审项目”；推断=当前价值是风险排序而不是实现；推荐=ccdawn-project-review；错判代价=直接开发会绕过架构/测试风险。
+对齐握手: 我理解你要项目级风险判断；我准备只读审查并输出行动队列；我不会改代码；我会用文件证据和风险排序证明结论；如果这里不对，最该纠偏的是审查范围。
+默认推进: 无自然闸门时，我将直接开始只读审查。
 ```
 
 Use a reuse gate line before development:
