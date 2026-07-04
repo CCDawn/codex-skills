@@ -45,12 +45,16 @@ https://github.com/CCDawn/codex-skills.git
 3. 进入仓库根目录。
 4. 先运行安装演练：
    - Windows 优先用：powershell -ExecutionPolicy Bypass -File .\install.ps1 -DryRun
-   - 如果不适用，用：python scripts/install_codex_library.py --dry-run
+   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --dry-run
+   - macOS/Linux 用：python3 scripts/install_codex_library.py --dry-run
 5. 正式安装到 Codex：
    - Windows 优先用：powershell -ExecutionPolicy Bypass -File .\install.ps1
-   - 如果不适用，用：python scripts/install_codex_library.py --agent codex
+   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --agent codex
+   - macOS/Linux 用：python3 scripts/install_codex_library.py --agent codex
 6. 安装后验证：
-   - 优先用：python scripts/install_codex_library.py --verify-only
+   - Windows 优先用：powershell -ExecutionPolicy Bypass -File .\install.ps1 -VerifyOnly
+   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --verify-only
+   - macOS/Linux 用：python3 scripts/install_codex_library.py --verify-only
    - 如果验证器缺失，要明确说明验证器缺失，但仍检查 ~/.codex/skills 下是否存在已安装 skill。
 7. 最后中文汇报：
    - 仓库路径
@@ -77,7 +81,7 @@ git clone https://github.com/CCDawn/codex-skills.git
 cd codex-skills
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -DryRun
 powershell -ExecutionPolicy Bypass -File .\install.ps1
-python scripts/install_codex_library.py --verify-only
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -VerifyOnly
 ```
 
 安装后重启 Codex 或新开会话，让客户端重新加载本地 skills。建议把 `ccdawn-brt` 作为主入口；之后用户正常说需求即可，BRT 会自动判断是否需要路由到其它 skill。

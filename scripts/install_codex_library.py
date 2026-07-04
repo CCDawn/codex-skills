@@ -72,6 +72,12 @@ def validate_installed_codex_skills(home: Path, installed_skills: list[Path]) ->
     return validated
 
 
+def validate_ccdawn_package(repo_root: Path) -> None:
+    validator = repo_root / "scripts" / "validate_ccdawn_skills.py"
+    if validator.exists():
+        subprocess.run([sys.executable, str(validator), "--repo-root", str(repo_root)], check=True)
+
+
 def print_available_skills(available_skills: list[Path]) -> None:
     print("Available skills:")
     for skill_path in available_skills:
@@ -122,6 +128,11 @@ def parse_args() -> argparse.Namespace:
         help="Validate currently installed Codex skills without copying files.",
     )
     parser.add_argument(
+        "--skip-package-validate",
+        action="store_true",
+        help="Skip CCDawn package convention validation before install or dry run.",
+    )
+    parser.add_argument(
         "--home",
         default=str(Path.home()),
         help="Home directory containing .claude, .codex, and optional .agents (default: current user home).",
@@ -159,6 +170,9 @@ def main() -> int:
         raise SystemExit(f"Unknown skill(s): {', '.join(unknown)}\nKnown skills: {known}")
 
     selected_skill_names_list = sorted(selected_skill_names)
+
+    if not args.skip_package_validate:
+        validate_ccdawn_package(repo_root)
 
     roots = destination_roots(home, args.agent)
     if args.dry_run:

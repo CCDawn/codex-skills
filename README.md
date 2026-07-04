@@ -62,7 +62,7 @@ sh ./install.sh
 ### 工程流程
 
 - **`ccdawn-brt`**  
-  Behavior / Review / Test 流程入口 skill。它会主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和高信号选择题，让用户选择或确认后，再把模糊功能想法收束成行为契约、评审视角、测试锚点和下一阶段路由。
+  CCDawn 最重要入口 skill。用户正常说需求即可；BRT 会在 agent 内部判断真实意图、任务轻重、复用价值、误改风险和下游 owner。只有真实分叉、高风险取舍或阻塞时，才展示候选意图、推荐理由或少量高信号问题。
 
 - **`ccdawn-feature-reuse-research`**
   复杂功能新增前的复用调研 skill，用来比较现有项目、库、示例和项目内模块，判断复用价值和实现边界。
@@ -133,7 +133,7 @@ skills/<bucket>/<ccdawn-skill-name>/
 
 - `skill-name` 必须和 `SKILL.md` 里的 `name` 字段一致。
 - 每次 catalog 变化，都同步更新 `README.md`、`README.zh-CN.md`、对应 bucket 的 `README.md`，以及 `.claude-plugin/plugin.json`。
-- 正式安装到 `~/.codex/skills/<ccdawn-skill-name>` 时，运行 `python scripts/install_codex_library.py`，使用真实目录复制。
+- 正式安装到 `~/.codex/skills/<ccdawn-skill-name>` 时，优先运行 `install.ps1` / `install.sh`，或直接调用 Python 安装器，使用真实目录复制。
 - 除非你明确想要重复斜杠条目，否则不要把同一个 skill 同时安装到 `~/.codex/skills` 和 `~/.agents/skills`。
 
 ## 仓库结构
@@ -177,46 +177,46 @@ scripts/
 
 ## 安装细节
 
-也可以直接调用 Python 安装器：
+也可以直接调用 Python 安装器。Windows PowerShell 推荐用 `py -3`；macOS/Linux 推荐用 `python3`。
 
-```bash
-python scripts/install_codex_library.py
+```powershell
+py -3 scripts\install_codex_library.py
 ```
 
-安装器会把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。
+安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。
 
 只演练安装计划，不改文件：
 
-```bash
-python scripts/install_codex_library.py --dry-run
+```powershell
+py -3 scripts\install_codex_library.py --dry-run
 ```
 
 列出当前仓库可安装的 skills：
 
-```bash
-python scripts/install_codex_library.py --list
+```powershell
+py -3 scripts\install_codex_library.py --list
 ```
 
 只验证已经安装到 Codex live 目录的副本，不重新安装：
 
-```bash
-python scripts/install_codex_library.py --verify-only
+```powershell
+py -3 scripts\install_codex_library.py --verify-only
 ```
 
 只安装部分 skill：
 
-```bash
-python scripts/install_codex_library.py --skill ccdawn-brt --skill ccdawn-dawn-agent-html-memory
+```powershell
+py -3 scripts\install_codex_library.py --skill ccdawn-brt --skill ccdawn-dawn-agent-html-memory
 ```
 
 安装目标选项：
 
-```bash
-python scripts/install_codex_library.py --agent codex         # 默认 live Codex 目标
-python scripts/install_codex_library.py --agent agents        # 可选本地 catalog 副本
-python scripts/install_codex_library.py --agent claude        # 可选 Claude 全局副本
-python scripts/install_codex_library.py --agent codex-agents  # Codex 加 .agents
-python scripts/install_codex_library.py --agent all           # 所有支持目标
+```powershell
+py -3 scripts\install_codex_library.py --agent codex         # 默认 live Codex 目标
+py -3 scripts\install_codex_library.py --agent agents        # 可选本地 catalog 副本
+py -3 scripts\install_codex_library.py --agent claude        # 可选 Claude 全局副本
+py -3 scripts\install_codex_library.py --agent codex-agents  # Codex 加 .agents
+py -3 scripts\install_codex_library.py --agent all           # 所有支持目标
 ```
 
 只有在明确需要重复入口时，才把同一个 skill 同时安装到 `.codex/skills` 和 `.agents/skills`。
@@ -270,7 +270,7 @@ skills/
 
 ## 使用方式
 
-安装后建议把 `ccdawn-brt` 作为主入口。用户不需要反复写“先对齐意图、再自动路由”，正常说需求即可，例如：
+安装后建议把 `ccdawn-brt` 作为主入口。用户不需要记固定口令或主动声明流程，正常说需求即可，例如：
 
 - `修一下这个登录 bug`
 - `帮我审这个 PR`
