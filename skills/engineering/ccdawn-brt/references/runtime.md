@@ -14,6 +14,7 @@ ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn
 `ccdawn-score-loop` applies when the current need is benchmark, leaderboard, validation-score, online/offline feedback, baseline promotion, worker-lane, or submission-package iteration.
 `ccdawn-project-review` applies when the current need is whole-project, repository, architecture, technical debt, test gap, maintainability, onboarding, or risk-module review.
 External GitHub skill candidates are install-gated. Route to them only when they are installed or the user asks to install/use them; otherwise use the local fallback owner and preserve the candidate as an optional Route Out.
+Frontend design, UI engineering, browser control, development-standard/spec/source-doc, Kaggle/empirical-research, and creative-method candidates follow the same install gate. If they are missing, fill the Route Contract with the local CCDawn owner, current project patterns, browser/Playwright verification, or official-doc research instead of blocking.
 `systematic-debugging` is the primary bug/failure route; `root-cause-tracing` is added when the source is hidden deep in a call chain. `ccdawn-bug-review` is only a CCDawn adapter around those existing skills.
 `ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment and no more specific existing skill owns the task.
 
@@ -79,7 +80,9 @@ Self-assess process weight before routing:
 - If there are multiple intents, choose `COMPACT_FLOW` when they share a theme and can be ordered in one context; choose separate routing only when owner, risk, deliverable, or verification truly differs.
 - If the main value is adding a complex feature where external or internal reuse may change the plan, route to `ccdawn-feature-reuse-research` before `ccdawn-planning`.
 - If the main value is measurable score optimization, benchmark/leaderboard feedback, online/offline calibration, baseline promotion, worker lanes, or submission packages, route to `ccdawn-score-loop`.
-- If the main value is CI failure repair, GitHub PR comment handling, Sentry/production triage, browser runtime verification, security hardening, performance profiling, API contract design, migration/deprecation, or observability, route to the matching installed specialized skill; otherwise use the fallback in `github-skill-candidates.md`.
+- If the main value is frontend UI/design, browser control/runtime verification, development standards/spec/source-doc alignment, CI failure repair, GitHub PR comment handling, Sentry/production triage, security hardening, performance profiling, API contract design, migration/deprecation, or observability, route to the matching installed specialized skill; otherwise use the fallback in `github-skill-candidates.md`.
+- If the main value is Kaggle-specific competition workflow or empirical research, prefer installed Kaggle/AERS candidates only when present; otherwise route through `ccdawn-competition-research-lifecycle` and `ccdawn-score-loop`.
+- If the main value is creative ideation, pick an installed creative method router only when present; otherwise route to `ccdawn-creative-toolbox`.
 - If the main value is judgment, comparison, or audit, route to the most specific existing review skill; use `ccdawn-evaluation` only when none fits.
 - If the main value is project health, architecture, technical debt, test gaps, onboarding, or risk-module triage, route to `ccdawn-project-review`.
 - If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
