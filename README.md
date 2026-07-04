@@ -2,17 +2,39 @@
 
 A local skill library focused on competition-driven research workflows, behavior-gated implementation, and persistent project memory.
 
-The default operating model for this repo installs to one local live surface:
+[中文说明](README.zh-CN.md)
+
+## Install
+
+Fastest path: copy a ready prompt into Codex and let Codex install the package for you:
+
+- [Codex one-click install prompts](INSTALL_PROMPTS.md)
+
+Manual install:
+
+```bash
+git clone https://github.com/CCDawn/codex-skills.git
+cd codex-skills
+```
+
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+On macOS/Linux:
+
+```bash
+sh ./install.sh
+```
+
+The default install target is:
 
 - `~/.codex/skills/<ccdawn-skill-name>` for the live skill directory Codex can load at runtime
 
-An optional secondary surface is still available when you explicitly need it:
+The installer avoids `~/.agents/skills` by default to prevent duplicate slash-command entries. Use [Install Details](#install-details) for dry runs, verification, selected-skill installs, and advanced targets.
 
-- `~/.agents/skills/<ccdawn-skill-name>` for the local skill catalog surface used by some app setups
-
-Keep the folder name identical to the `name` field, using the `ccdawn-` namespace in `SKILL.md`, and validate the installed live Codex skill after updates.
-
-[中文说明](README.zh-CN.md)
 
 ## Included skills
 
@@ -100,6 +122,7 @@ Rules:
   plugin.json
 AGENTS.md
 CLAUDE.md
+INSTALL_PROMPTS.md
 install.ps1
 install.sh
 skills/
@@ -131,48 +154,17 @@ scripts/
   install_codex_library.py
 ```
 
-## Quickstart
+## Install Details
 
-Clone the repository, then install the skills into the default local Codex surface as real folders:
-
-```bash
-git clone https://github.com/CCDawn/codex-skills.git
-cd codex-skills
-```
-
-On Windows PowerShell:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
-```
-
-On macOS/Linux:
-
-```bash
-sh ./install.sh
-```
-
-You can also call the Python installer directly:
+You can call the Python installer directly:
 
 ```bash
 python scripts/install_codex_library.py
 ```
 
-That is the default, recommended workflow for this repo. It copies every published skill into:
+The installer copies published skills as real directories, checks that folder names match the `name` field in `SKILL.md`, and validates installed Codex skills when the local Codex `quick_validate.py` helper is available.
 
-```text
-~/.codex/skills/<ccdawn-skill-name>
-```
-
-The install script also enforces that:
-
-- the skill folder name matches the `name` field in `SKILL.md`
-- installed Codex skills are copied as real directories, not symlinks or junctions
-- installed live skills are validated when the local Codex `quick_validate.py` helper is available
-
-Installing the same skill into both `.codex/skills` and `.agents/skills` can create duplicate slash-command entries in Codex. Only use the `.agents` target when you explicitly need that extra catalog copy.
-
-Preview what will be installed without changing files:
+Preview without changing files:
 
 ```bash
 python scripts/install_codex_library.py --dry-run
@@ -196,35 +188,17 @@ Install only selected skills:
 python scripts/install_codex_library.py --skill ccdawn-brt --skill ccdawn-dawn-agent-html-memory
 ```
 
-Install only to the live Codex directory:
+Install target options:
 
 ```bash
-python scripts/install_codex_library.py --agent codex
+python scripts/install_codex_library.py --agent codex         # default live Codex target
+python scripts/install_codex_library.py --agent agents        # optional local catalog copy
+python scripts/install_codex_library.py --agent claude        # optional Claude global copy
+python scripts/install_codex_library.py --agent codex-agents  # Codex plus .agents
+python scripts/install_codex_library.py --agent all           # all supported targets
 ```
 
-Install only to the local slash-command catalog directory:
-
-```bash
-python scripts/install_codex_library.py --agent agents
-```
-
-Install to Claude's global skill folder only when you explicitly need it:
-
-```bash
-python scripts/install_codex_library.py --agent claude
-```
-
-Install to Codex, `.agents`, and Claude:
-
-```bash
-python scripts/install_codex_library.py --agent all
-```
-
-Install to both Codex and `.agents` only when you explicitly want both copies:
-
-```bash
-python scripts/install_codex_library.py --agent codex-agents
-```
+Only install the same skill into both `.codex/skills` and `.agents/skills` when duplicate slash-command surfaces are intentional.
 
 ## Slash-command troubleshooting
 
@@ -291,4 +265,4 @@ Invoke the skills in chat with prompts such as:
 - `Initialize project memory for this repo`
 - `Use ccdawn-dawn-agent-html-memory to initialize project memory for this repo as a frontend project`
 
-This repository is intentionally shaped like a local skill repo, not a marketplace-installed plugin.
+This repository is maintained as a local skill library.

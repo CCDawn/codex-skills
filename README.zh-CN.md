@@ -2,15 +2,36 @@
 
 这是一个本地 skill 仓库，重点覆盖竞赛型研究流程、行为闸门式实现，以及持久化项目记忆。
 
-这个仓库默认只安装到一层 live 本地目录：
+## 安装
+
+最快方式：把现成提示词复制给 Codex，让 Codex 自动安装：
+
+- [复制给 Codex 的一键安装提示词](INSTALL_PROMPTS.md)
+
+手动安装：
+
+```bash
+git clone https://github.com/CCDawn/codex-skills.git
+cd codex-skills
+```
+
+Windows PowerShell 推荐用：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+macOS/Linux 推荐用：
+
+```bash
+sh ./install.sh
+```
+
+默认安装目标是：
 
 - `~/.codex/skills/<ccdawn-skill-name>`：给 Codex 运行时直接加载的 live skill 目录
 
-如果你明确需要，也还保留可选的第二层目录：
-
-- `~/.agents/skills/<ccdawn-skill-name>`：给某些应用环境下的本地 skill 目录使用
-
-目录名必须和 `SKILL.md` 里的 `name` 一致，更新后要校验 live Codex skill。
+安装器默认不写入 `~/.agents/skills`，避免重复 slash-command。演练、验证、只安装部分 skill 和高级目标见 [安装细节](#安装细节)。
 
 ## 当前包含的 skill
 
@@ -98,6 +119,7 @@ skills/<bucket>/<ccdawn-skill-name>/
   plugin.json
 AGENTS.md
 CLAUDE.md
+INSTALL_PROMPTS.md
 install.ps1
 install.sh
 skills/
@@ -129,26 +151,7 @@ scripts/
   install_codex_library.py
 ```
 
-## 快速开始
-
-先克隆仓库，再默认把 skills 安装到 live Codex 目录：
-
-```bash
-git clone https://github.com/CCDawn/codex-skills.git
-cd codex-skills
-```
-
-Windows PowerShell 推荐用：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
-```
-
-macOS/Linux 推荐用：
-
-```bash
-sh ./install.sh
-```
+## 安装细节
 
 也可以直接调用 Python 安装器：
 
@@ -156,19 +159,7 @@ sh ./install.sh
 python scripts/install_codex_library.py
 ```
 
-这是这个仓库以后固定使用的正式安装方式。它会把每个已发布 skill 复制到：
-
-```text
-~/.codex/skills/<ccdawn-skill-name>
-```
-
-安装脚本还会强制保证：
-
-- skill 目录名和 `SKILL.md` 里的 `name` 一致
-- 安装到 Codex 的 skill 是真实目录，不是 symlink 或 junction
-- 如果本机存在 Codex 自带的 `quick_validate.py`，会顺手校验 live skill
-
-如果同一个 skill 同时安装到 `.codex/skills` 和 `.agents/skills`，Codex 里可能会出现重复的斜杠条目。只有在你明确需要额外目录副本时，才使用 `.agents` 目标。
+安装器会把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。
 
 只演练安装计划，不改文件：
 
@@ -194,35 +185,17 @@ python scripts/install_codex_library.py --verify-only
 python scripts/install_codex_library.py --skill ccdawn-brt --skill ccdawn-dawn-agent-html-memory
 ```
 
-只安装到 live Codex 目录：
+安装目标选项：
 
 ```bash
-python scripts/install_codex_library.py --agent codex
+python scripts/install_codex_library.py --agent codex         # 默认 live Codex 目标
+python scripts/install_codex_library.py --agent agents        # 可选本地 catalog 副本
+python scripts/install_codex_library.py --agent claude        # 可选 Claude 全局副本
+python scripts/install_codex_library.py --agent codex-agents  # Codex 加 .agents
+python scripts/install_codex_library.py --agent all           # 所有支持目标
 ```
 
-只安装到本地斜杠目录：
-
-```bash
-python scripts/install_codex_library.py --agent agents
-```
-
-只有在你明确需要时，才安装到 Claude：
-
-```bash
-python scripts/install_codex_library.py --agent claude
-```
-
-同时安装到 Codex、`.agents` 和 Claude：
-
-```bash
-python scripts/install_codex_library.py --agent all
-```
-
-如果你明确需要同时保留 Codex 和 `.agents` 两份副本：
-
-```bash
-python scripts/install_codex_library.py --agent codex-agents
-```
+只有在明确需要重复入口时，才把同一个 skill 同时安装到 `.codex/skills` 和 `.agents/skills`。
 
 ## 斜杠指令排查
 
@@ -283,4 +256,4 @@ skills/
 - `帮我给这个仓库初始化项目记忆`
 - `使用 ccdawn-dawn-agent-html-memory 把这个仓库按 frontend 项目初始化项目记忆`
 
-这个仓库现在刻意对齐“本地 skill 仓库”模式，而不是 marketplace plugin 模式。
+这个仓库按本地 skill library 维护。
