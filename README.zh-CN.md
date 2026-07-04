@@ -35,7 +35,7 @@ sh ./install.sh
 
 ## 当前包含的 skill
 
-### Engineering
+### 工程流程
 
 - **`ccdawn-brt`**  
   Behavior / Review / Test 流程入口 skill。它会主动揣测用户心里真正想要的结果，给出候选意图、推荐方案和高信号选择题，让用户选择或确认后，再把模糊功能想法收束成行为契约、评审视角、测试锚点和下一阶段路由。
@@ -73,14 +73,14 @@ sh ./install.sh
 - **`ccdawn-goal-loop`**  
   这是一个目标执行 skill，用来把一个目标整理成带有证据、限制条件、允许范围、下一步判断规则和阻塞停止报告的可执行合同。
 
-### Research
+### 研究流程
 
 - **`ccdawn-competition-research-lifecycle`**  
   这是一个面向研究竞赛和 benchmark 项目的端到端工作流 skill，覆盖任务定义、数据准备、文献和方案调研、baseline 搭建、训练与实验、分析与消融、论文写作和提交打包。
 
   它把 `ccdawn-brt` 视为流程治理层，用来定义每个阶段的目标、评审点和验收标准，同时附带参考指南、更紧的响应契约，以及可直接复用的阶段模板。
 
-### Competition
+### 竞赛与评分
 
 - **`ccdawn-score-loop`**
   通用 score loop 模板，用来处理 benchmark、榜单、validation、baseline promotion、worker lane、online/offline feedback 和提交包迭代。
@@ -88,7 +88,7 @@ sh ./install.sh
 - **`ccdawn-huawei-nslb-score-loop`**  
   Huawei Algorithm Challenge 37 NSLB 项目的 score loop 适配层，基于通用模板保留项目命令、ledger、mutation space、online feedback 和打包规则。
 
-### Creative
+### 创意工具
 
 - **`ccdawn-creative-toolbox`**  
   这是一个上下文创意生成 skill，用来做 concept collision、divergent thinking、Naming Forge、新概念生成、范式探索、产品想法、研究概念和非常规但有用的方向生成。
