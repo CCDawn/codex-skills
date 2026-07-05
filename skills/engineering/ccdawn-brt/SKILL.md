@@ -226,7 +226,7 @@ Owner Matrix：
 - 多文件小步实现、高风险自审、代码简化、架构腐化诊断：只在对应外部 skill 已安装时作为 owner；未安装时用 `ccdawn-planning`、`ccdawn-task-splitting`、`ccdawn-pr-review` 或 `ccdawn-evaluation`。
 - 前端设计、UI 实现、设计审查、React/Next 性能、浏览器控制和真实页面验证：只在对应外部 skill 或浏览器工具已安装时作为 owner；未安装时用当前项目 UI 模式、`ccdawn-feature-reuse-research`、浏览器/Playwright 验证作为 fallback。
 - 开发规范、需求规约、官方文档一致性、项目 agent 规则、代码质量门禁、ADR/决策记录：只在对应外部 skill 已安装时作为 owner；未安装时用 `ccdawn-brt` 意图锁定、`ccdawn-planning`、本地 `AGENTS.md`/标准文档扫描和 `ccdawn-pr-review`。
-- git/提交/分支、CI/CD、发布上线、回滚、部署流水线：只在对应外部 skill 已安装时作为 owner；未安装时用 git 工具、`ccdawn-completion-summary`、`ccdawn-pr-review` 和最小发布计划承接。
+- git/提交/分支、CI/CD、发布上线、回滚、部署流水线：只在对应外部 skill 已安装时作为 owner；未安装时用 git 工具、`ccdawn-completion-summary`、`ccdawn-pr-review` 和最小发布计划承接。若使用 `finishing-a-development-branch`，必须保留其测试、分支检测、确认和清理安全语义，但用户可见菜单按 BRT 中文展示层输出。
 - issue/backlog/Linear/Notion spec、GitHub issue 创建、MCP server/tool 集成、webapp 测试、Datadog 日志、LangSmith/LLM trace：只在对应外部 skill 已安装时作为 owner；未安装时用 `ccdawn-brt` 动态组合、`ccdawn-planning`、`ccdawn-feature-reuse-research`、`systematic-debugging` 或浏览器/测试 fallback。
 - OpenAI/Codex/API 文档、PDF/Word/PPT/Excel、图片生成或编辑等系统能力：优先路由到已安装系统 skill；未安装或能力不足时回到 BRT 说明缺口。
 - CI、PR 评论、Sentry、安全、性能、API、迁移、可观测性、git 历史风险等专项信号：只在对应外部 skill 已安装时作为 owner；未安装时使用 `references/github-skill-candidates.md` 的 local fallback，并把缺失 skill 记为 optional。
@@ -259,6 +259,47 @@ Owner Matrix：
 ```
 
 路由到其他 CCDawn skill 时，BRT 必须传递中文输出契约：用户可见报告、方案、审查结论、完成总结和下一步建议默认中文；只有技术原文、枚举值、文件路径、命令、代码符号和外部专名保留英文。
+
+## 外部 skill 输出归一化
+
+BRT 是最终用户可见展示层。路由到非 CCDawn 外部 skill 时，必须保留外部 skill 的安全语义、步骤顺序、选项数量和执行约束，但最终给用户看的标题、解释、菜单和下一步建议仍按 BRT 中文标准输出。
+
+规则：
+
+- 外部 skill 的英文模板不能原样泄露到用户可见回复；先翻译成中文，再输出。
+- 外部 skill 写有 `exactly these options`、固定菜单或固定阶段名时，`exactly` 约束的是选项数量、顺序和语义，不是英文措辞。
+- 保留英文的范围仍限于代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名。
+- 如果外部 skill 要求用户输入精确确认词，例如 `discard`，确认词本身可以保留英文，但说明必须中文。
+- 如果外部 skill 的菜单和 BRT 的 `下一步建议` 同时出现，合并为一个中文 `下一步建议` 区块，不要先中文标题再英文选项。
+
+`finishing-a-development-branch` 中文菜单映射：
+
+普通仓库或具名分支 worktree：
+
+ ```text
+下一步建议:
+1. 本地合并回 <base-branch>
+2. 推送并创建拉取请求
+3. 保留当前分支，稍后处理
+4. 丢弃本次工作
+请选择 1-4。
+```
+
+分离 HEAD 或外部管理工作区：
+
+```text
+下一步建议:
+1. 作为新分支推送并创建拉取请求
+2. 保留当前状态，稍后处理
+3. 丢弃本次工作
+请选择 1-3。
+```
+
+丢弃确认必须中文说明风险，例如：
+
+```text
+这会永久删除当前分支、相关提交和可清理的 worktree。确认要丢弃时，请输入 `discard`。
+```
 
 CCDawn 被路由 skill 必须承接同一接口；缺字段时由 BRT 补齐或回到对齐：
 
