@@ -21,11 +21,11 @@ description: Use when aligned requirements need an implementation plan before co
 
 ## BRT interface
 
-- Context Boundary: 已确认意图、需求账本、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
-- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策、方案审查循环和路由出口。
-- Allowed Action: 只读分析、制定方案和修订方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
-- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险；方案审查循环没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
-- Stop Condition: 需求不稳、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、方案审查循环存在未解决缺口，或用户目标变成直接写代码。
+- Context Boundary: 已确认意图、需求账本、规划前相关部分审查证据、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
+- Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策、方案审查循环、规划中补充审查结论和路由出口。
+- Allowed Action: 只读分析、继续审查会影响方案的相关部分、制定方案和修订方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
+- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险；前置相关审查和规划中补充审查的证据被纳入方案；方案审查循环没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
+- Stop Condition: 需求不稳、缺少会改变方案的前置相关审查证据、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、方案审查循环存在未解决缺口，或用户目标变成直接写代码。
 - Route Out: `ccdawn-task-splitting`、`FAST_PATH` 直接执行、`ccdawn-feature-reuse-research`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一输出标准
@@ -42,22 +42,26 @@ description: Use when aligned requirements need an implementation plan before co
 - 来自 `ccdawn-brt` 的已确认意图或行为契约；
 - BRT、上一阶段或用户已允许进入方案阶段；用户原始目标已包含执行许可时，可按自然闸门连续进入；
 - 已知范围边界、关键约束、验证锚点；
+- 已完成规划前相关部分审查：owning surface、相邻风险、现有模式、验证锚点和保护边界已有证据；若缺失，先回到 `ccdawn-brt` 补审查，不直接写方案。
 - 必要的本地上下文：代码、文档、测试、配置、日志或历史决策。
 - 若目标是复杂新增功能且外部/内部复用可能改变方案，已有 `ccdawn-feature-reuse-research` 的复用决策，或已明确跳过复用研究并记录原因。
 
 如果缺少会改变方案的需求信息，先回到 `ccdawn-brt` 继续需求对齐，不要硬写方案。
+如果缺少会改变方案的相关部分审查证据，先回到 `ccdawn-brt` 做规划前审查，或在本阶段只读补查到足够证据后再写方案。
 如果缺少会改变方案的复用研究，先进入 `ccdawn-feature-reuse-research`，不要默认自研。
 
 ## 工作方式
 
-1. 读取上下文：检查相关文件、测试、文档、配置和已有模式。
-2. 检查复用决策：复杂新增功能必须说明 `REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped`。
-3. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
-4. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
-5. 写方案草案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
-6. 方案审查循环：从 3-5 个和本方案最相关的视角挑战草案。
-7. 修订方案：任何视角为 `NEEDS_CHANGE` 时，先修订方案并写明修正；任何视角为 `NEEDS_CLARIFICATION` 时，回 `ccdawn-brt` 或 BLOCKED，不进入拆分/开发。
-8. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
+1. 接收前置证据：确认 `ccdawn-brt` 已完成意图锁定和规划前相关部分审查。
+2. 读取上下文：检查相关文件、测试、文档、配置、日志、历史决策和已有模式。
+3. 继续审查相关部分：规划过程中发现新影响面、隐藏依赖、保护边界不清或验证锚点不足时，先只读补查，再修订方案。
+4. 检查复用决策：复杂新增功能必须说明 `REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped`。
+5. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
+6. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
+7. 写方案草案：用具体文件、接口、数据流、状态流和验证方式描述实现路径。
+8. 方案审查循环：从 3-5 个和本方案最相关的视角挑战草案。
+9. 修订方案：任何视角为 `NEEDS_CHANGE` 时，先补充审查或修订方案并写明修正；任何视角为 `NEEDS_CLARIFICATION` 时，回 `ccdawn-brt` 或 BLOCKED，不进入拆分/开发。
+10. 更新 Workflow Ledger，并按 BRT 自然闸门规则路由到 `ccdawn-task-splitting` 做“拆分/不拆分”判定，或在明确低风险时直接执行。
 
 ## 方案审查循环
 
@@ -66,6 +70,7 @@ description: Use when aligned requirements need an implementation plan before co
 默认选择 3-5 个视角，按风险裁剪：
 
 - 用户意图视角：方案是否满足用户可观察结果、非目标和纠偏点。
+- 前置审查视角：方案是否继承规划前相关部分审查证据，是否遗漏 owning surface、相邻风险、现有模式、验证锚点或保护边界。
 - 实施者视角：影响文件、接口、状态流、顺序和回滚边界是否具体。
 - 测试验证视角：验证策略是否能证明行为，不是假验证或只测实现细节。
 - 维护者视角：是否避免顺手重构、重复抽象、技术债扩大或长期维护负担。
@@ -76,6 +81,7 @@ description: Use when aligned requirements need an implementation plan before co
 
 - 正常方案只输出压缩矩阵；高风险或 `FULL_FLOW` 才展开完整证据。
 - 每个视角必须有 `挑战 / 证据 / 结论`，证据来自用户意图、本地上下文、复用研究、可逆 probe、验证命令、日志或显式假设加风险。
+- 规划中允许继续审查相关部分；新证据必须更新 `上下文边界`、`影响面`、`保护边界`、`验证策略` 或 `方案修正`，不能只作为旁注。
 - `NEEDS_CHANGE` 必须先体现在方案修正里，再输出最终方案；不能一边承认问题一边路由到下一阶段。
 - `NEEDS_CLARIFICATION` 必须回到 `ccdawn-brt` 或 BLOCKED，只问会改变目标、范围、风险或验证的关键问题。
 - 如果自审只剩措辞偏好或低价值优化，不阻塞路由，写入 `延后项` 或忽略。
@@ -89,6 +95,8 @@ description: Use when aligned requirements need an implementation plan before co
 - 目标: ...
 - 范围: 本轮做...；不做...
 - 上下文边界: 本阶段读取/依赖的代码、文档、测试、日志或外部研究边界...
+- 前置审查证据: owning surface / 相邻风险 / 现有模式 / 验证锚点 / 保护边界...
+- 规划中补充审查: 新发现的影响面、依赖、约束或验证证据；若无，写 `无新增影响面`
 - 推荐路径: ...
 - 备选路径: A ... / B ...
 - 复用决策: REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped；证据...
@@ -114,6 +122,7 @@ description: Use when aligned requirements need an implementation plan before co
 
 方案审查循环:
 - 用户意图: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
+- 前置审查: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
 - 实施者: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
 - 测试验证: PASS/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
 - 维护者/风险/复用架构（按需选择）: PASS/ACCEPT_RISK/NEEDS_CHANGE/NEEDS_CLARIFICATION；挑战...；证据...
@@ -132,6 +141,8 @@ description: Use when aligned requirements need an implementation plan before co
 
 - 不写占位词：`TBD`、`TODO`、`后续补充`、`适当处理` 都不合格。
 - 不只写方向：每个关键点都要落到文件、模块、接口、状态、测试或可观察行为。
+- 不跳过前置审查：没有相关部分审查证据时，不能直接写规划；必须先补查或回 `ccdawn-brt`。
+- 不把规划中补查当成范围膨胀：只允许继续审查会改变当前方案的相关部分，不能扩成无目标全仓体检。
 - 不过早拆任务：是否拆分和子任务模式留给 `ccdawn-task-splitting`；本阶段只提供可执行方案。
 - 不实现：本阶段不编辑业务代码，除非用户明确改变阶段目标。
 - 不扩大范围：不能把用户没确认的增强项塞进推荐路径。
@@ -145,6 +156,8 @@ description: Use when aligned requirements need an implementation plan before co
 方案完成时必须给后续阶段留下可续接账本：
 
 - `Confirmed Intent` 来自 `ccdawn-brt`，不能重新发明。
+- `Pre-Plan Review Evidence` 必须记录来自 `ccdawn-brt` 的相关部分审查证据。
+- `Planning Review Additions` 记录规划中继续审查得到的新证据、方案修正和剩余风险。
 - `Accepted Plan` 写成一句可执行方案摘要。
 - `Reuse Decision` 若存在，必须写入 `Decisions` 或 `Assumptions`，供拆分和开发阶段继承。
 - `Task Graph` 在本阶段标为未判定，留给 `ccdawn-task-splitting` 决定拆分或不拆分。
