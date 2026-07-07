@@ -176,9 +176,11 @@ C. 暂停或先解释 ...
 - `Execution Order` 按依赖、改动范围、验证难度、误改风险和用户价值排序，不等同于 `Severity Rank`。
 - 每项标记 `SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED`，并写清为什么排在这里。
 - `SAFE_DIRECT` 可以在用户说“继续”“开始修复”“按顺序修”后直接做并验证。
-- `PLAN_THEN_EXECUTE` 先进入 `ccdawn-planning` 或输出最小方案，再执行；不要和低风险清理混做。
+- `PLAN_THEN_EXECUTE` 必须路由 `ccdawn-planning`；BRT 只传递当前项的交接上下文，不替 planning 写完整方案，也不要和低风险清理混做。
 - `DEFERRED` 只记录触发条件，不在当前队列里顺手修。
 - 每完成一项就验证、更新队列并继续下一项；只有遇到自然闸门才停下来问用户。
+
+修复队列形成后必须选出 `当前推进项`：默认取执行顺序里第一个非 `DEFERRED` 且非 `BLOCKED` 的项目，除非用户点名某项。队列项路由固定为 `SAFE_DIRECT -> FAST_PATH`、`PLAN_THEN_EXECUTE -> ccdawn-planning`、`DEFERRED -> 记录触发条件`、`BLOCKED -> 问 1 个阻塞问题`。交接上下文只含意图锁定、相关审查证据、影响面、保护边界、成功证据和停止条件；`下一步建议` 必须落到当前推进项和 owner skill，不能泛写“按队列继续”。
 
 需要输出时用压缩形态：
 
@@ -187,6 +189,8 @@ C. 暂停或先解释 ...
 执行顺序: 先 ...，再 ...；并行/延后原因 ...
 行动队列: Guardrail = ...；Primary Fix = ...；Telemetry Gap = ...；Deferred = ...
 修复队列: 1. ... [SAFE_DIRECT]；2. ... [PLAN_THEN_EXECUTE]；3. ... [DEFERRED]
+当前推进项: ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]
+队列项路由: owner = ...；交接上下文 = 意图/证据/影响面/保护边界/成功证据/停止条件
 ```
 
 ## 路由核心

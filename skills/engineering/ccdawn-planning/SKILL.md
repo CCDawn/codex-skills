@@ -21,10 +21,10 @@ description: Use when aligned requirements need an implementation plan before co
 
 ## BRT interface
 
-- Context Boundary: 已确认意图、需求账本、规划前相关部分审查证据、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
+- Context Boundary: 已确认意图、需求账本、规划前相关部分审查证据、可选的修复队列当前推进项、相关代码/文档/测试/配置/日志、复用决策、明确排除范围和保护边界。
 - Output Contract: 实施方案，包括目标、范围、推荐路径、备选取舍、影响面、保护边界、验证策略、风险决策、方案审查循环、规划中补充审查结论和路由出口。
 - Allowed Action: 只读分析、继续审查会影响方案的相关部分、制定方案和修订方案；不写业务代码、不改测试、不安装依赖、不执行迁移/删除/发布；复杂新增功能缺复用依据时先路由到 `ccdawn-feature-reuse-research`。
-- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、影响文件/模块、验证方式和剩余风险；前置相关审查和规划中补充审查的证据被纳入方案；方案审查循环没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
+- Success Evidence: 下游可以据此判定拆分/不拆分；方案能点名用户可观察结果、owned surface、非目标、当前推进项范围、影响文件/模块、验证方式和剩余风险；前置相关审查和规划中补充审查的证据被纳入方案；方案审查循环没有未处理的 `NEEDS_CHANGE` 或 `NEEDS_CLARIFICATION`。
 - Stop Condition: 需求不稳、缺少会改变方案的前置相关审查证据、复用研究缺失、影响面无法枚举、保护边界不清、高风险动作未确认、方案审查循环存在未解决缺口，或用户目标变成直接写代码。
 - Route Out: `ccdawn-task-splitting`、`FAST_PATH` 直接执行、`ccdawn-feature-reuse-research`、`ccdawn-brt` 或 BLOCKED。
 
@@ -40,6 +40,7 @@ description: Use when aligned requirements need an implementation plan before co
 使用前确认已有：
 
 - 来自 `ccdawn-brt` 的已确认意图或行为契约；
+- 若来自修复队列，已有单个 `当前推进项`、队列标记 `PLAN_THEN_EXECUTE`、排序原因、交接证据、影响面、保护边界、成功证据和停止条件；本阶段只规划该推进项，不重新规划整条队列。
 - BRT、上一阶段或用户已允许进入方案阶段；用户原始目标已包含执行许可时，可按自然闸门连续进入；
 - 已知范围边界、关键约束、验证锚点；
 - 已完成规划前相关部分审查：owning surface、相邻风险、现有模式、验证锚点和保护边界已有证据；若缺失，先回到 `ccdawn-brt` 补审查，不直接写方案。
@@ -52,9 +53,9 @@ description: Use when aligned requirements need an implementation plan before co
 
 ## 工作方式
 
-1. 接收前置证据：确认 `ccdawn-brt` 已完成意图锁定和规划前相关部分审查。
+1. 接收前置证据：确认 `ccdawn-brt` 已完成意图锁定和规划前相关部分审查；若从修复队列进入，先锁定单个当前推进项。
 2. 读取上下文：检查相关文件、测试、文档、配置、日志、历史决策和已有模式。
-3. 继续审查相关部分：规划过程中发现新影响面、隐藏依赖、保护边界不清或验证锚点不足时，先只读补查，再修订方案。
+3. 继续审查相关部分：规划过程中发现新影响面、隐藏依赖、保护边界不清或验证锚点不足时，先只读补查，再修订方案；补查只服务当前推进项，不能扩成整条队列的全量方案。
 4. 检查复用决策：复杂新增功能必须说明 `REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped`。
 5. 识别方案分叉：只有当选择会影响风险、成本、行为或可维护性时，才给 2-3 个方案选项。
 6. 推荐路径：给出推荐方案，并说明为什么优于其他路径。
@@ -93,7 +94,8 @@ description: Use when aligned requirements need an implementation plan before co
 ```text
 实施方案:
 - 目标: ...
-- 范围: 本轮做...；不做...
+- 范围: 本轮做...；不做...；若来自修复队列，明确只覆盖当前推进项...
+- 当前推进项: 名称...；队列标记 PLAN_THEN_EXECUTE；排序原因...；不纳入本轮的队列项...
 - 上下文边界: 本阶段读取/依赖的代码、文档、测试、日志或外部研究边界...
 - 前置审查证据: owning surface / 相邻风险 / 现有模式 / 验证锚点 / 保护边界...
 - 规划中补充审查: 新发现的影响面、依赖、约束或验证证据；若无，写 `无新增影响面`

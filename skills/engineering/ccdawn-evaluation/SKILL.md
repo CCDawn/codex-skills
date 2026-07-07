@@ -60,6 +60,8 @@ Owner 边界：
 
 如果评价对象是审查报告、流程结果或多发现输出，必须先把后续动作归入 `Immediate Guardrail / Primary Fix / Telemetry Gap / Deferred Refactor`，再推荐下一步。若存在多个可修复项，转成 Ordered Fix Queue，并标记 `SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED`。不要把确认型问题、证据缺口、治理风险和维护性重构混成同一类建议。
 
+队列不能悬空：如果用户目标包含“继续 / 优化 / 调整 / 修复 / 规划”，评价完成后必须选出 `当前推进项` 并给出 Route Out。默认选择执行顺序里第一个非 `DEFERRED` 且非 `BLOCKED` 的项目；`SAFE_DIRECT` 路由 `FAST_PATH` 调整，`PLAN_THEN_EXECUTE` 路由 `ccdawn-planning`，`DEFERRED` 只记录触发条件，`BLOCKED` 只问一个阻塞问题。`ccdawn-evaluation` 不替 `ccdawn-planning` 写实施方案，只传递当前项的证据、影响、保护边界、成功证据和停止条件。
+
 ## 默认维度
 
 按对象选择，不要全量输出：
@@ -101,6 +103,12 @@ Owner 边界：
 
 修复队列（仅多个可修复项时）:
 - 1. ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]；原因...；Success Evidence...
+
+当前推进项（仅有修复队列且用户要求继续/优化/规划/修复时）:
+- 项目: ...
+- 队列标记: SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED
+- Route Out: FAST_PATH 调整 / ccdawn-planning / ccdawn-brt / BLOCKED
+- 交接上下文: 证据...；影响...；保护边界...；Success Evidence...；Stop Condition...
 
 下一步:
 默认路由：<更具体 skill / FAST_PATH 调整 / ccdawn-planning / ccdawn-task-splitting / ccdawn-completion-summary / ccdawn-brt / BLOCKED>，原因...
