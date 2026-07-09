@@ -27,6 +27,14 @@ description: Use when CCDawn workflow is about adding a complex feature, capabil
 - 若必须保留英文状态或枚举，先用中文解释其含义。
 - 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
 
+## Owner 接入规则
+
+进入本 skill 前先做轻量 owner 自检：
+
+- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
+- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
+- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+
 ## 进入条件
 
 使用前确认：

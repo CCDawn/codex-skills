@@ -34,6 +34,14 @@ description: Use when CCDawn workflow needs a Chinese-first handoff around an ex
 - 若必须保留英文状态或枚举，先用中文解释其含义。
 - 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
 
+## Owner 接入规则
+
+进入本 skill 前先做轻量 owner 自检：
+
+- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
+- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
+- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+
 ## 进入条件
 
 使用前确认 bug 对象不是 PR/diff 审阅、不是泛项目体检，也不是纯测试约束审查。若用户实际想要“先审查 bug 再决定是否修”，本 skill 输出根因状态和修复路由；若用户已经要求直接修复，只有在根因明确、范围局部且可验证时走 `FAST_PATH`。

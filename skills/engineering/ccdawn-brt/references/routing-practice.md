@@ -18,6 +18,28 @@ Route Contract:
 
 If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe or ask one high-signal question before acting.
 
+## Owner Arbitration Gate
+
+Before choosing planning, task splitting, development, or summary, run this compact owner check:
+
+```text
+Owner Arbitration:
+- Candidate Owners: [1-3 signal-matched owners only]
+- Selected Owner:
+- Excluded Owners:
+- Reason:
+- Next Artifact:
+- Success Evidence:
+```
+
+Rules:
+
+- Pick the most specific owner that can produce the next artifact and success evidence.
+- `ccdawn-planning` is only the implementation-plan owner; it must not absorb PR review, bug diagnosis, UI/design, score loop, project review, reuse research, completion summary, or evaluation.
+- Development is an execution mode, not an intent owner. Enter it only after the selected owner has provided intent, boundaries, allowed actions, and success evidence.
+- For composite requests, route Primary first and carry Secondary only when it shares the same contract; otherwise defer or split by owner/risk.
+- If a downstream skill discovers a more specific owner, it must route back to BRT or hand off instead of continuing under the wrong owner.
+
 ## Scenario Matrix
 
 | User signal | Primary route | Mode | Next output | Success evidence | Stop condition |
@@ -65,6 +87,7 @@ If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe o
 ## Failure Smells
 
 - Route says only "建议进入某 skill" but cannot name the next artifact.
+- Route chooses planning or development without first checking signal-matched candidate owners.
 - Route recommends an intent, skill, plan, or execution order but cannot name the user signal, inference, recommendation reason, and risk if wrong.
 - Route starts planning or coding before locking user-visible outcome, owning surface, non-goals, constraints, and acceptance evidence.
 - Route asks library/framework/file-structure questions before behavior, scope, default, failure path, or acceptance questions.

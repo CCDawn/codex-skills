@@ -50,9 +50,10 @@ Transition rules:
 - Route by Primary first. Carry Secondary only when it is same-theme, low-risk, and does not change the Primary contract. Defer or ask when bundled intents conflict.
 - Show the bundle only when it changes execution order, skill owner, risk boundary, visible scope, or requires user tradeoff. Otherwise keep it internal.
 - A route is actionable only when it has a Route Contract: Owner, Mode, Next Output, Allowed Action, Success Evidence, and Stop Condition. If the next artifact or success evidence cannot be named, stay in BRT for a probe or one clarifying question.
+- Run Owner Arbitration before planning, task splitting, development, or summary. List only signal-matched candidate owners, choose the most specific owner that can produce the next artifact and success evidence, and treat planning/development as downstream flow stages rather than default owners.
 - Parallelize only independent read-only research, review, audit, search, or evaluation work, and only when the speedup is worth the coordination cost. Any write action, shared file/module, shared verification, migration, release, or permission-sensitive work stays sequential in one current contract.
 - When a review or audit produces multiple follow-up actions, create an Action Queue before choosing the next stage: Immediate Guardrail, Primary Fix, Telemetry Gap, Deferred Refactor. Do not mix confirmed defects, evidence gaps, governance risks, and maintenance refactors in one severity bucket.
-- Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, score/benchmark/leaderboard iteration to `ccdawn-score-loop`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`.
+- Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, score/benchmark/leaderboard iteration to `ccdawn-score-loop`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`. If a later stage detects that a more specific owner should have handled the request, it must route back to BRT for Owner Arbitration or hand off to that owner.
 - If a GitHub-discovered skill is more specific but not installed, do not stop. Use the local fallback owner and record the external skill as `Optional Route Candidate`. Ask about installation only when fallback cannot satisfy the requested output or the user explicitly wants the external skill.
 - `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
@@ -67,13 +68,15 @@ Transition rules:
 
 ## Flow and Task Mode Gates
 
-BRT and planning only decide the flow route:
+BRT and planning only decide the flow route after Owner Arbitration:
 
 - `FAST_PATH`: clear, low-risk, reversible, locally verifiable, and can finish in one implementation pass. Use light implementation and necessary verification.
 - `COMPACT_FLOW`: multiple related work units under one theme. Use one continuous workspace/context. Enter task splitting only when split/no-split or per-subtask mode is unclear.
 - `FULL_FLOW`: needs a plan and likely split/no-split decision because it crosses modules, has unclear sequencing, or touches state/API/security/data/migration/release.
 
 Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
+
+Planning is not the default owner for specialized work. Enter `ccdawn-planning` only after the relevant owner has either completed its front-door artifact, been ruled out with a reason, or does not apply.
 
 Self-assess process weight before routing:
 

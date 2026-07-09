@@ -29,6 +29,14 @@ description: Use when coordinating a research competition lifecycle, Kaggle-styl
 - 若必须保留英文状态或枚举，先用中文解释其含义。
 - 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
 
+## Owner 接入规则
+
+进入本 skill 前先做轻量 owner 自检：
+
+- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
+- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
+- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+
 ## 核心原则
 
 - 不从聊天记忆推进项目。优先读取当前项目里的规则、数据说明、实验日志、run records、论文草稿和提交要求。
