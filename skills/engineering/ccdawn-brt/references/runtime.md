@@ -6,7 +6,7 @@ This runtime is not an implementation engine inside `ccdawn-brt`. It is the shar
 
 ```text
 ccdawn-brt -> [existing skill reuse | external skill candidate with local fallback | ccdawn-feature-reuse-research | ccdawn-score-loop | ccdawn-project-review | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
-ccdawn-planning -> ccdawn-task-splitting -> ccdawn-bdd-tdd-development -> ccdawn-completion-summary -> ccdawn-pr-review
+ccdawn-planning -> [direct execution | ccdawn-task-splitting] -> [light verification | ccdawn-bdd-tdd-development] -> [ccdawn-completion-summary when cross-stage/handoff] -> [ccdawn-pr-review when integration review is needed]
 ```
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
@@ -29,7 +29,7 @@ State is a routing signal, not decoration.
 - FEATURE_REUSE_RESEARCHING: `ccdawn-feature-reuse-research` is searching and evaluating reusable projects, libraries, examples, or modules before implementation planning.
 - SCORE_LOOPING: `ccdawn-score-loop` is running score/benchmark lanes, promotion gates, online/offline calibration, or package feedback.
 - EXTERNAL_SKILL_CANDIDATE: BRT found a better GitHub/community skill candidate but must verify installation or use a local fallback.
-- PLANNING_READY: requirements are stable enough to ask whether to enter `ccdawn-planning`.
+- PLANNING_READY: requirements are stable and planning has enough value to enter `ccdawn-planning`; do not pause only to ask whether to proceed when permission already exists.
 - PROJECT_REVIEWING: `ccdawn-project-review` is reviewing a repository, subsystem, architecture, technical debt, test gaps, or project health.
 - EVALUATING: `ccdawn-evaluation` is judging a plan, workflow, skill, implementation, result, or current state.
 - BUG_REVIEWING: `ccdawn-bug-review` is inspecting a bug, regression, failing test, or abnormal behavior before choosing a fix path.
@@ -63,8 +63,8 @@ Transition rules:
 - A user may authorize continuous Critical Path execution after task splitting. This authorizes repeated task handoff only; each task still runs through its selected development mode, verification, ledger update, and stop-on-blocker checks.
 - Continuous Critical Path execution must stop on blocker, failed verification that cannot be safely recovered inside the current Execution Contract, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
 - A failed verification is first a recovery signal, not automatically a handoff stop. If the cause is inside the current Execution Contract and safe to fix, route back to the owning development/debug stage, fix, and re-verify. Stop only when it becomes a natural gate.
-- Do not enter `COMPLETED` before `ccdawn-completion-summary` verifies evidence.
-- Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means implementation evidence passed; `MERGE_READY` means integration review passed.
+- FAST_PATH and bounded COMPACT_FLOW may complete from fresh verification in the current owner. Use `ccdawn-completion-summary` for FULL_FLOW, cross-stage synthesis, resumed work, or formal handoff.
+- Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means the current route's success evidence passed; `MERGE_READY` means integration review passed.
 
 ## Flow and Task Mode Gates
 
@@ -150,7 +150,7 @@ Keep a subtask `SIMPLE` when it is localized, has clear expected output, has no 
 
 ## Workflow Ledger
 
-Maintain a compact ledger whenever work spans more than one reply, one file, or one stage. The ledger can live in the reply unless the project has persistent memory.
+Maintain a compact ledger only when work is long-running, resumed, blocked, handed across agents/stages, or has deferred items that would otherwise be lost. File count and reply count alone do not trigger a ledger.
 
 Minimum fields:
 
@@ -235,11 +235,11 @@ Ask one blocking question only. If several questions are useful but not required
 
 ## Completion Gate
 
-Only `ccdawn-completion-summary` can mark implementation `COMPLETED`. Only `ccdawn-pr-review` can mark a PR or diff `MERGE_READY`.
+The current owner may mark a FAST_PATH or bounded COMPACT_FLOW implementation `COMPLETED` when fresh success evidence passes. `ccdawn-completion-summary` owns FULL_FLOW, resumed, cross-stage, or formal handoff completion synthesis. Only `ccdawn-pr-review` can mark a PR or diff `MERGE_READY`.
 
 Runtime owns the state transition; the stage skills own the detailed criteria.
 
-- Do not mark `COMPLETED` without `ccdawn-completion-summary` evidence.
+- Do not mark `COMPLETED` without fresh evidence from the current route; require `ccdawn-completion-summary` only for FULL_FLOW, resumed, cross-stage, or formal handoff work.
 - Do not mark `MERGE_READY` without `ccdawn-pr-review` evidence.
 - If evidence is missing, stale, or contradicted by the diff, route to the owning stage instead of claiming readiness.
 - If the gap is fixable inside the current Execution Contract, recommend the recovery route; if it requires new scope, permission, or intent change, stop at the natural gate.

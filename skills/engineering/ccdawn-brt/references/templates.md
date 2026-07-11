@@ -129,7 +129,7 @@ Use this when the agent's interpretation, route, plan, ordering, or tradeoff may
 - 关键边界:
 ```
 
-## Planning Gate
+## Planning Handoff
 
 ```text
 BRT 检查点:
@@ -146,29 +146,24 @@ BRT 检查点:
   - Unresolved Risks:
   - Recommended Next Stage: ccdawn-planning
 
-是否进入 ccdawn-planning 制定实施方案？
-A. 进入方案制定（推荐）...
-B. 继续需求对齐...
-C. 低风险直接实现（仅当用户明确选择，且单点、可逆、可验证、无迁移/删除/权限/发布风险）...
-D. 暂停...
-
-下一步建议: 按推荐进入 ccdawn-planning；如果你要改范围，直接指出要纠偏的点。
+默认推进: 用户已授权且没有自然闸门时，直接进入 `ccdawn-planning`；只有需求仍不稳定、存在高风险取舍或用户要求选择时才询问。
+下一步建议: 进入 `ccdawn-planning` 产出实施方案。
 ```
 
-## Development Reuse Gate
+## Minimal Sufficient Solution Gate
 
-Use this before development when reuse or external reference may change the plan.
+Use this before development to decide what still needs to be built.
 
 ```text
-复用门控:
+最小充分方案:
 - 目标功能:
-- Decision: LOCAL_REUSE / QUICK_RESEARCH / FULL_REUSE_RESEARCH / SKIP_WITH_REASON
+- 已满足层级: NO_BUILD / PROJECT_REUSE / STANDARD_NATIVE / INSTALLED_DEPENDENCY / MINIMAL_BUILD
 - 判断原因:
 - 当前项目复用点:
-- 外部搜索范围: 官方文档 / 包生态 / GitHub / 相似项目 / 不搜索
-- 风险边界: 不复制外部代码 / 不安装依赖 / 许可证不明不 REUSE / 不扩大用户未确认范围
-- Next Output: 复用决策 / ccdawn-feature-reuse-research / ccdawn-planning / FAST_PATH 实现
-- Success Evidence: 本地复用点已查；若外部搜索，候选有链接和取舍；若跳过，原因明确
+- 剩余实现单元:
+- 外部研究: NONE / QUICK_RESEARCH / FULL_REUSE_RESEARCH / SKIP_WITH_REASON
+- Next Output: 直接验证 / FAST_PATH 实现 / 复用研究 / ccdawn-planning
+- Success Evidence: 最小方案足以满足意图锁定；外部研究只在会改变方案时触发
 下一步建议: ...
 ```
 
