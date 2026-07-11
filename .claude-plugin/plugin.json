@@ -12,6 +12,8 @@
                    "./skills/engineering/ccdawn-completion-summary",
                    "./skills/engineering/ccdawn-pr-review",
                    "./skills/engineering/ccdawn-project-review",
+                   "./skills/engineering/ccdawn-simplification-review",
+                   "./skills/engineering/ccdawn-simplification-audit",
                    "./skills/engineering/ccdawn-bug-review",
                    "./skills/engineering/ccdawn-evaluation",
                    "./skills/engineering/ccdawn-goal-loop",

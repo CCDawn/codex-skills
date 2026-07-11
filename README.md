@@ -85,6 +85,12 @@ sh ./install.sh
 - **`ccdawn-project-review`**
   项目审查 skill，用来审查整个仓库、架构、技术债、测试缺口、可维护性、接手状态和项目健康。
 
+- **`ccdawn-simplification-review`**
+  当前 diff 的精简审查 skill，用来寻找可删除代码、原生/标准库替代、无效抽象和不必要依赖；不替代正确性审查。
+
+- **`ccdawn-simplification-audit`**
+  整仓或子系统精简审计 skill，用来形成证据化复杂度 findings 和按风险排序的精简队列。
+
 - **`ccdawn-bug-review`**
   CCDawn bug 审查适配器，优先复用 `systematic-debugging` 和 `root-cause-tracing`，再总结证据、根因状态、影响范围和修复路由。
 
@@ -165,6 +171,8 @@ skills/
     ccdawn-completion-summary/
     ccdawn-pr-review/
     ccdawn-project-review/
+    ccdawn-simplification-review/
+    ccdawn-simplification-audit/
     ccdawn-bug-review/
     ccdawn-evaluation/
     ccdawn-goal-loop/

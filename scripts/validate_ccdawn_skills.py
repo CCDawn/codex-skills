@@ -21,6 +21,9 @@ BRT_CORE_MARKERS = [
     "FAST_PATH",
     "COMPACT_FLOW",
     "FULL_FLOW",
+    "ccdawn-simplification-review",
+    "ccdawn-simplification-audit",
+    "默认 `AUTO`",
 ]
 
 

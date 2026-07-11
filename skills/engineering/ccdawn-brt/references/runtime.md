@@ -5,7 +5,7 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> [existing skill reuse | external skill candidate with local fallback | ccdawn-feature-reuse-research | ccdawn-score-loop | ccdawn-project-review | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
+ccdawn-brt -> [existing skill reuse | external skill candidate with local fallback | ccdawn-feature-reuse-research | ccdawn-score-loop | ccdawn-project-review | ccdawn-simplification-review | ccdawn-simplification-audit | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
 ccdawn-planning -> [direct execution | ccdawn-task-splitting] -> [light verification | ccdawn-bdd-tdd-development] -> [ccdawn-completion-summary when cross-stage/handoff] -> [ccdawn-pr-review when integration review is needed]
 ```
 
@@ -13,6 +13,8 @@ ccdawn-planning -> [direct execution | ccdawn-task-splitting] -> [light verifica
 `ccdawn-feature-reuse-research` applies before planning a complex new feature when external projects, libraries, examples, or current-project modules may change the implementation path.
 `ccdawn-score-loop` applies when the current need is benchmark, leaderboard, validation-score, online/offline feedback, baseline promotion, worker-lane, or submission-package iteration.
 `ccdawn-project-review` applies when the current need is whole-project, repository, architecture, technical debt, test gap, maintainability, onboarding, or risk-module review.
+`ccdawn-simplification-review` applies when the primary question is what unnecessary complexity can be removed from a current diff without changing required behavior.
+`ccdawn-simplification-audit` applies when the primary question is what dependency, abstraction, wrapper, legacy path, or duplicate structure can be removed from a repository or subsystem.
 External GitHub skill candidates are install-gated. Route to them only when they are installed or the user asks to install/use them; otherwise use the local fallback owner and preserve the candidate as an optional Route Out.
 Frontend design, UI engineering, browser control, development-standard/spec/source-doc, Kaggle/empirical-research, and creative-method candidates follow the same install gate. If they are missing, fill the Route Contract with the local CCDawn owner, current project patterns, browser/Playwright verification, or official-doc research instead of blocking.
 Intent interview/refinement, incremental implementation, doubt/self-review, code simplification, git/versioning, CI/CD, shipping, issue/backlog/spec intake, MCP/tool integration, webapp testing, logs, and LLM traces also follow the install gate. External workspace writes, remote git actions, releases, deployments, and destructive browser actions require an explicit permission gate.
@@ -31,6 +33,8 @@ State is a routing signal, not decoration.
 - EXTERNAL_SKILL_CANDIDATE: BRT found a better GitHub/community skill candidate but must verify installation or use a local fallback.
 - PLANNING_READY: requirements are stable and planning has enough value to enter `ccdawn-planning`; do not pause only to ask whether to proceed when permission already exists.
 - PROJECT_REVIEWING: `ccdawn-project-review` is reviewing a repository, subsystem, architecture, technical debt, test gaps, or project health.
+- SIMPLIFICATION_REVIEWING: `ccdawn-simplification-review` is reviewing a current diff for evidence-backed cuts while leaving correctness and merge readiness to PR review.
+- SIMPLIFICATION_AUDITING: `ccdawn-simplification-audit` is ranking removable repository complexity while leaving architecture and project health to project review.
 - EVALUATING: `ccdawn-evaluation` is judging a plan, workflow, skill, implementation, result, or current state.
 - BUG_REVIEWING: `ccdawn-bug-review` is inspecting a bug, regression, failing test, or abnormal behavior before choosing a fix path.
 - PLANNING: `ccdawn-planning` is producing an implementation plan.
