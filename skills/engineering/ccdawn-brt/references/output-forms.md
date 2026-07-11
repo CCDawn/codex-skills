@@ -92,6 +92,34 @@ Ask only questions that change observable outcome, scope, risk, verification, ro
 
 Do not ask local-context questions that tools can answer, equivalent naming/order questions, or implementation details that do not change user-visible results.
 
+## Intent Lock
+
+Use before planning or implementation when the behavior contract must be explicit.
+
+```text
+意图锁定: 用户可观察结果 = ...；拥有面 = ...；非目标 = ...；关键约束 = ...；验收证据 = ...；默认推进 = ...
+```
+
+Only add choices when a real behavior, scope, risk, or permission branch remains. If the user says "按推荐来", lock the recommended choice and continue.
+
+## Planning Handoff
+
+```text
+方案交接: 已确认意图 = ...；范围 = ...；关键风险 = ...；验证锚点 = ...；未决项 = ...
+默认推进: 用户已授权且没有自然闸门时，直接进入 `ccdawn-planning`。
+下一步建议: 进入 `ccdawn-planning` 产出实施方案。
+```
+
+Do not ask whether to enter planning merely because alignment is complete. Ask only when requirements remain unstable, a high-impact tradeoff is unresolved, or the user requested a choice.
+
+## Minimal Sufficient Solution
+
+```text
+最小充分方案: 层级 = NO_BUILD / PROJECT_REUSE / STANDARD_NATIVE / INSTALLED_DEPENDENCY / MINIMAL_BUILD；依据 = ...；剩余实现单元 = ...；外部研究 = NONE / QUICK_RESEARCH / FULL_REUSE_RESEARCH / SKIP_WITH_REASON；成功证据 = ...
+```
+
+External research is valid only when it can materially change the implementation plan. File count alone does not increase process weight.
+
 ## Bundle and Queue Forms
 
 Use compressed forms unless the user asks for the full ledger.
