@@ -68,11 +68,11 @@ Transition rules:
 
 ## Flow and Task Mode Gates
 
-BRT and planning only decide the flow route after Owner Arbitration:
+BRT and planning decide the flow route only after Owner Arbitration and the Minimal Sufficient Solution Gate. Complexity means the work still required after checking no-build, local reuse, standard/native capabilities, and installed dependencies; file count alone is not complexity.
 
-- `FAST_PATH`: clear, low-risk, reversible, locally verifiable, and can finish in one implementation pass. Use light implementation and necessary verification.
-- `COMPACT_FLOW`: multiple related work units under one theme. Use one continuous workspace/context. Enter task splitting only when split/no-split or per-subtask mode is unclear.
-- `FULL_FLOW`: needs a plan and likely split/no-split decision because it crosses modules, has unclear sequencing, or touches state/API/security/data/migration/release.
+- `FAST_PATH`: one remaining low-risk implementation unit, reversible, locally verifiable, and finishable in one pass. A few files with the same mechanical replacement still count as one unit. Use light implementation and necessary verification.
+- `COMPACT_FLOW`: two to five related work units remain under one theme. Use one continuous workspace/context. Enter task splitting only when it changes dependencies, ownership, risk, or verification.
+- `FULL_FLOW`: real design choices, cross-boundary state/contracts, unclear sequencing, or state/API/security/data/migration/release risk remain after simplification.
 
 Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
 
@@ -85,7 +85,7 @@ Self-assess process weight before routing:
 - If the main value is adding a complex feature where external or internal reuse may change the plan, route to `ccdawn-feature-reuse-research` before `ccdawn-planning`.
 - If the main value is measurable score optimization, benchmark/leaderboard feedback, online/offline calibration, baseline promotion, worker lanes, or submission packages, route to `ccdawn-score-loop`.
 - If the main value is extracting unclear intent or refining a rough idea, keep `ccdawn-brt` as the owner unless an installed interview/refine skill can produce a better intent contract.
-- If the main value is multi-file but bounded implementation, prefer incremental slices or `ccdawn-task-splitting` SIMPLE tasks before escalating to BDD/TDD.
+- If the main value is a bounded implementation, first collapse repeated mechanical edits into one FAST_PATH unit. Use incremental slices or `ccdawn-task-splitting` SIMPLE tasks only when independent work units remain before escalating a complex subtask to BDD/TDD.
 - If the main value is high-risk confidence checking, code simplification, git/release/deploy, issue/spec intake, MCP/tool integration, webapp testing, logs, or LLM traces, route to the matching installed specialized skill; otherwise use the fallback in `github-skill-candidates.md`.
 - If the main value is frontend UI/design, browser control/runtime verification, development standards/spec/source-doc alignment, CI failure repair, GitHub PR comment handling, Sentry/production triage, security hardening, performance profiling, API contract design, migration/deprecation, or observability, route to the matching installed specialized skill; otherwise use the fallback in `github-skill-candidates.md`.
 - If the main value is Kaggle-specific competition workflow or empirical research, prefer installed Kaggle/AERS candidates only when present; otherwise route through `ccdawn-competition-research-lifecycle` and `ccdawn-score-loop`.
