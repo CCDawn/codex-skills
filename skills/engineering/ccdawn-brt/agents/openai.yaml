@@ -1,6 +1,6 @@
 interface:
   display_name: "CCDawn BRT"
-  short_description: "每句话前的中文意图适配层：揣测真实目标，选择响应深度，复用合适 skill，并压缩无价值流程。"
-  default_prompt: "使用 $ccdawn-brt：把用户这句话接到 agent 的合适行动上。先内部判断意图、响应深度、流程重量和可复用 skill；简单任务 SILENT/MICRO 处理，模糊或高风险任务再输出候选意图、高信号问题、行为契约和下一步路由。"
+  short_description: "高能力模型的中文意图与流程适配层：少管过程，以边界和证据防错。"
+  default_prompt: "使用 $ccdawn-brt：默认相信高能力模型能内部完成推断、规划和自审；简单任务直接执行。只有具体误改风险、真实行为分叉、不可逆动作或证据缺口才增加 skill、artifact、问题和流程。"
 
 

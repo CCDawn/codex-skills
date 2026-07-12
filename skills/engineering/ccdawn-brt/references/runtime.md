@@ -5,8 +5,8 @@ Read this file only when the work is long-running, multi-step, blocked, resumed,
 This runtime is not an implementation engine inside `ccdawn-brt`. It is the shared control layer for:
 
 ```text
-ccdawn-brt -> [existing skill reuse | external skill candidate with local fallback | ccdawn-feature-reuse-research | ccdawn-score-loop | ccdawn-project-review | ccdawn-simplification-review | ccdawn-simplification-audit | ccdawn-evaluation | ccdawn-bug-review | ccdawn-planning | ccdawn-pr-review]
-ccdawn-planning -> [direct execution | ccdawn-task-splitting] -> [light verification | ccdawn-bdd-tdd-development] -> [ccdawn-completion-summary when cross-stage/handoff] -> [ccdawn-pr-review when integration review is needed]
+ccdawn-brt -> most specific owner
+owner -> [direct execution | persistent planning when reusable] -> [optional splitting | compact TDD when risky] -> proportional verification -> [optional summary/review when another boundary needs it]
 ```
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
@@ -19,6 +19,7 @@ External GitHub skill candidates are install-gated. Route to them only when they
 Frontend design, UI engineering, browser control, development-standard/spec/source-doc, Kaggle/empirical-research, and creative-method candidates follow the same install gate. If they are missing, fill the Route Contract with the local CCDawn owner, current project patterns, browser/Playwright verification, or official-doc research instead of blocking.
 Intent interview/refinement, incremental implementation, doubt/self-review, code simplification, git/versioning, CI/CD, shipping, issue/backlog/spec intake, MCP/tool integration, webapp testing, logs, and LLM traces also follow the install gate. External workspace writes, remote git actions, releases, deployments, and destructive browser actions require an explicit permission gate.
 Superpowers process skills are scoped methods, not the workflow owner. BRT mode and the current Route Contract decide whether brainstorming, planning, worktree isolation, strict TDD, subagents, review loops, or branch finishing are justified; broad `always/every/any` trigger language does not upgrade the flow by itself. Verification evidence remains mandatory but proportional to the claim and risk.
+Assume a high-capability reasoning model can keep a bounded plan, dependency order, and self-review internal. Require a visible artifact or separate stage only when another person/session needs it, the user wants to review it, or a named high-risk failure needs the checkpoint.
 When a subtask needs TDD, use the compact `ccdawn-bdd-tdd-development` owner instead of dual-loading Superpowers `test-driven-development`. Reuse a real failing test or stable reproduction as RED, run the narrow test to GREEN, and defer broad suites to integration risk or closeout.
 Default to no subagent. If independent write lanes justify dispatch, use one implementer per lane with a compact contract, let the parent verify diff and command evidence, and add at most one final independent reviewer only for a high-risk boundary or explicit user request. Do not create implementer-plus-two-reviewer chains per task or allow child agents to dispatch grandchildren.
 `systematic-debugging` is the primary bug/failure route; `root-cause-tracing` is added when the source is hidden deep in a call chain. `ccdawn-bug-review` is only a CCDawn adapter around those existing skills.
@@ -64,15 +65,15 @@ Transition rules:
 - When a review or audit produces multiple follow-up actions, create an Action Queue before choosing the next stage: Immediate Guardrail, Primary Fix, Telemetry Gap, Deferred Refactor. Do not mix confirmed defects, evidence gaps, governance risks, and maintenance refactors in one severity bucket.
 - Prefer existing specialized skills before CCDawn wrapper skills. Route complex feature reuse research to `ccdawn-feature-reuse-research`, score/benchmark/leaderboard iteration to `ccdawn-score-loop`, whole-project/codebase/architecture/technical-debt review to `ccdawn-project-review`, bug/failure work to `systematic-debugging`, deep source tracing to `root-cause-tracing`, PR/diff work to `ccdawn-pr-review`, external review feedback to `receiving-code-review`, and independent reviewer requests to `requesting-code-review`. If a later stage detects that a more specific owner should have handled the request, it must route back to BRT for Owner Arbitration or hand off to that owner.
 - If a GitHub-discovered skill is more specific but not installed, do not stop. Use the local fallback owner and record the external skill as `Optional Route Candidate`. Ask about installation only when fallback cannot satisfy the requested output or the user explicitly wants the external skill.
-- `ccdawn-brt` routes to `ccdawn-planning`, not directly to development, unless the user message already gives clear execution permission and the path is single-scope, reversible, locally verifiable, and has no migration/deletion/permission/release risk. Explicit execution verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
+- Direct execution is the default after internal alignment when the owner can name the intended outcome, protected boundary, success evidence, and recovery signal. Enter `ccdawn-planning` only when its artifact will be reviewed/reused, coordinates distinct owners or phases, preserves a long-task decision, or gates irreversible/high-risk sequencing. Explicit verbs such as fix/add/update/remove/adjust count as permission when the target is clear.
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
 - If a selected task is unclear, return to `ccdawn-task-splitting`.
-- A user may authorize continuous Critical Path execution after task splitting. This authorizes repeated task handoff only; each task still runs through its selected development mode, verification, ledger update, and stop-on-blocker checks.
+- A user may authorize continuous Critical Path execution after task splitting. Related tasks may remain one internal sequence; update a ledger only when handoff, resumption, blocker, deferred work, or high-risk evidence would otherwise be lost.
 - Continuous Critical Path execution must stop on blocker, failed verification that cannot be safely recovered inside the current Execution Contract, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
 - A failed verification is first a recovery signal, not automatically a handoff stop. If the cause is inside the current Execution Contract and safe to fix, route back to the owning development/debug stage, fix, and re-verify. Stop only when it becomes a natural gate.
-- FAST_PATH and bounded COMPACT_FLOW may complete from fresh verification in the current owner. Use `ccdawn-completion-summary` for FULL_FLOW, cross-stage synthesis, resumed work, or formal handoff.
+- Any flow may complete from fresh verification in the current owner when no handoff, deferred item, or unresolved risk remains. Use `ccdawn-completion-summary` only for cross-stage synthesis, resumed work, formal handoff, or evidence that must persist.
 - Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means the current route's success evidence passed; `MERGE_READY` means integration review passed.
 
 ## Flow and Task Mode Gates
@@ -80,12 +81,12 @@ Transition rules:
 BRT and planning decide the flow route only after Owner Arbitration and the Minimal Sufficient Solution Gate. Complexity means the work still required after checking no-build, local reuse, standard/native capabilities, and installed dependencies; file count alone is not complexity.
 
 - `FAST_PATH`: one remaining low-risk implementation unit, reversible, locally verifiable, and finishable in one pass. A few files with the same mechanical replacement still count as one unit. Use light implementation and necessary verification.
-- `COMPACT_FLOW`: two to five related work units remain under one theme. Use one continuous workspace/context. Enter task splitting only when it changes dependencies, ownership, risk, or verification.
-- `FULL_FLOW`: real design choices, cross-boundary state/contracts, unclear sequencing, or state/API/security/data/migration/release risk remain after simplification.
+- `COMPACT_FLOW`: multiple related work units remain under one theme and fit one reasoning context. Enter task splitting only when it changes dependencies, ownership, risk, or verification.
+- `FULL_FLOW`: real design choices, cross-boundary contracts, unclear sequencing, or state/API/security/data/migration/release risk remain after simplification. FULL controls risk; it does not require every workflow stage.
 
 Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
 
-Planning is not the default owner for specialized work. Enter `ccdawn-planning` only after the relevant owner has either completed its front-door artifact, been ruled out with a reason, or does not apply.
+Planning is not the default owner or a mandatory bridge to implementation. Enter it only when a persistent/reviewable plan has value beyond the model's internal execution outline.
 
 Self-assess process weight before routing:
 
@@ -104,6 +105,7 @@ Self-assess process weight before routing:
 - If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
 - If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
 - If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.
+- Prefer outcome gates over method gates: require scope, safety, evidence, and recovery; let the current model choose the shortest sound method.
 - Reuse the current worktree for one theme. Create a new worktree only for parallel work, conflict isolation, high-risk isolation, or explicit user request.
 
 ## Execution Contract and Edit Guard

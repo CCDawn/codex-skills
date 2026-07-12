@@ -24,8 +24,10 @@ BRT_CORE_MARKERS = [
     "ccdawn-simplification-review",
     "ccdawn-simplification-audit",
     "默认 `AUTO`",
-    "Superpowers 兼容降权",
-    "FAST_PATH`：禁止自动进入",
+    "能力感知与阶段折叠",
+    "`FAST_PATH` 直接执行并最小验证",
+    "Skill Budget",
+    "约束用于防错",
 ]
 
 
