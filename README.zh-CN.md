@@ -74,7 +74,7 @@ sh ./install.sh
   任务拆分阶段 skill，用来把已确认方案拆成可审阅、可独立验证的任务单元。
 
 - **`ccdawn-bdd-tdd-development`**
-  开发阶段 skill，用来围绕行为预期执行 BDD/TDD 风格开发。
+  仅对复杂、高回归风险子任务使用紧凑 TDD；复用已有 RED、运行窄验证，默认不派发逐任务子代理和 reviewer 链。
 
 - **`ccdawn-completion-summary`**
   完成总结阶段 skill，用来做新鲜验证、需求对照和简洁交接总结。

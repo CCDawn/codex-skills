@@ -25,7 +25,7 @@ description: Use when an accepted CCDawn implementation plan needs split/no-spli
 - Output Contract: `NO_SPLIT` 直接执行单元，或 `SPLIT` 任务图；每个任务含 output、files/boundary、reuse、dependency、development mode、verification 和 Route Out。
 - Allowed Action: 只做拆分/不拆分判定；不写代码、不改测试、不运行迁移/删除/发布动作；发现方案不可执行时回 `ccdawn-planning`。
 - Success Evidence: `NO_SPLIT` 有明确理由和直接验证；`SPLIT` 的 critical tasks 都有 owner surface、protected boundary、Development Mode 和 verification condition。
-- Stop Condition: 方案未接受、文件边界不清、critical task 缺验证、BDD_TDD 缺 Anchor、高风险动作未确认或方案不可执行。
+- Stop Condition: 方案未接受、文件边界不清、critical task 缺验证、BDD_TDD 缺紧凑 Test Anchor、高风险动作未确认或方案不可执行。
 - Route Out: `FAST_PATH` 轻量执行、`ccdawn-bdd-tdd-development`、`ccdawn-completion-summary`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一输出标准
@@ -142,7 +142,7 @@ Task N: 名称
 - Dependencies: 无 / Task X
 - Criticality: critical / optional
 - Development Mode: SIMPLE / BDD_TDD
-- BDD/TDD Anchor: SIMPLE 写“无需，原因...”；BDD_TDD 写 Given / When / Then 和先失败测试
+- Test Anchor: SIMPLE 写“轻量验证”；BDD_TDD 写一行目标行为、可复用 RED 或最小失败测试、最窄测试命令
 - Verification: 要运行的命令或结构性检查
 - Review Gate: 任务完成后审什么
 - Risk: 本任务最可能出偏差的点
@@ -215,7 +215,7 @@ Ledger Update:
 - Unresolved Risks: ...
 - Recommended Next Stage: 轻量执行 Task 1 / ccdawn-bdd-tdd-development（仅 BDD_TDD 任务）/ 授权后连续 Critical Path
 - Route Out: FAST_PATH 轻量执行 / ccdawn-bdd-tdd-development / ccdawn-completion-summary / ccdawn-planning
-- Stop Condition: critical task 缺验证 / Boundary 不清 / BDD_TDD 缺 Anchor / 方案不可执行
+- Stop Condition: critical task 缺验证 / Boundary 不清 / BDD_TDD 缺紧凑 Test Anchor / 方案不可执行
 
 拆分自审:
 - 覆盖方案: PASS/NEEDS_CHANGE，证据...
@@ -232,7 +232,7 @@ Ledger Update:
 
 ## 质量门槛
 
-- `BDD_TDD` 任务没有 BDD/TDD Anchor 不合格。
+- `BDD_TDD` 任务没有紧凑 Test Anchor 不合格；不要求长 Given/When/Then、`.feature` 文件或测试矩阵。
 - `SIMPLE` 任务不要补形式化 BDD/TDD；只要说明为什么轻量验证足够。
 - 任务不能只写“实现功能”“添加测试”“更新文档”。
 - 有误改风险的任务缺少 Boundary 不合格。

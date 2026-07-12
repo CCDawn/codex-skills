@@ -112,6 +112,11 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: BRT missing core marker '{marker}'")
 
+    if name == "ccdawn-bdd-tdd-development":
+        for marker in ["## 紧凑 TDD", "现有失败测试或稳定复现可直接作为 RED", "默认不派发子代理"]:
+            if marker not in text:
+                errors.append(f"{label}: compact TDD profile missing marker '{marker}'")
+
     words = word_count(text)
     if name == "ccdawn-brt" and words > 1500:
         warnings.append(f"{label}: {words} words; BRT is a hot entrypoint, consider moving details to references")

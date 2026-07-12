@@ -5,7 +5,7 @@
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research before complex feature planning, comparing existing projects, libraries, examples, and in-project modules.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
 - **[ccdawn-task-splitting](./ccdawn-task-splitting/SKILL.md)** - Task decomposition from an accepted implementation plan.
-- **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Behavior-anchored development using TDD.
+- **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Compact TDD for selected high-risk behavior, reusing RED evidence and avoiding per-task agent/reviewer chains.
 - **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Evidence-backed completion checks and stage summaries.
 - **[ccdawn-pr-review](./ccdawn-pr-review/SKILL.md)** - PR, branch, commit-range, or diff review against requirements, evidence, regression risk, and merge readiness.
 - **[ccdawn-project-review](./ccdawn-project-review/SKILL.md)** - Repository, architecture, technical debt, test gap, and project health review.

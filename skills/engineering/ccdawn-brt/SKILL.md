@@ -149,6 +149,10 @@ BRT 先决定 owner、流程重量和子任务复杂度，再选择 Superpowers 
 - `verification-before-completion` 的证据原则始终保留，但验证范围按风险选择；不为简单修改强制全量测试、回滚演练或人为制造无价值失败。
 - `finishing-a-development-branch` 只在确实存在分支集成、PR、保留或丢弃决策时进入；普通本地完成不展示固定菜单。
 - Superpowers 的“一次问一个问题”让位于 BRT 的单轮对齐：能在一个高信号消息中给推荐和必要问题时，不拆成多轮仪式。
+- 复杂子任务由 `ccdawn-bdd-tdd-development` 提供紧凑 TDD；不要同时加载 Superpowers `test-driven-development` 重复注入相同纪律。已有失败测试/稳定复现可作为 RED，只运行窄测试到 GREEN，最终按风险补相关验证。
+- 子代理默认 0 个。同一上下文可完成、文件重叠、顺序依赖或共享验证时由当前 agent 执行；真正独立且协调收益为正时才按 lane 派发一个实现 agent。
+- 不做逐任务双重审查。主 agent 验证子代理 diff 和命令证据；仅高风险最终边界或用户明确要求时增加一个独立 reviewer。子代理不再派发子代理。
+- 给子代理的上下文只含目标行为、owned files、保护边界、验证命令和完成条件，不发送完整对话、完整计划或无关项目材料。
 
 选中某个 Superpowers 方法后，保留它与当前 Route Contract 相容的安全边界和步骤顺序。冲突时优先满足用户明确要求、项目规则、Intent Lock、Route Contract 和更高风险防线，不用“严格执行流程”扩大范围。
 
