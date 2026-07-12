@@ -24,6 +24,16 @@ This is a generic template. A project-specific profile must define the metric, c
 - Stop Condition: source drift, stale baseline, missing metric definition, invalid validation command, overlapping writes, unsafe promotion, ambiguous online feedback, or user pause.
 - Route Out: continue score loop, launch/recover worker lane, promote/reject candidate, package/submit, update project memory, or BLOCKED with one required input.
 
+## 实验 owner 独占
+
+只要当前工作的主要未知量是“候选是否改善 metric/score”，该修改就属于 score-loop experiment lane，即使它改代码、跨模块或结果变差，也不进入通用 `SIMPLE/BDD_TDD` 分类。
+
+- score regression、候选分数下降、假设被拒、online neutral/worse 都是实验 gate 结果，不是 TDD RED，也不代表代码 bug。
+- 实验使用 `BASELINE / CANDIDATE / DELTA / PROMOTE / REJECT / HOLD`，不要用 RED/GREEN 描述方向。
+- 只有发现预期行为明确的工程缺陷，例如 metric 计算、解析、数据 schema、seed、shape、NaN、打包或评测脚本错误，才临时路由到 `ccdawn-bdd-tdd-development`。
+- 临时工程修复必须写清确定性行为，修复并验证后返回原 baseline/lane；TDD GREEN 只能证明工具行为正确，不能证明实验候选应晋升。
+- 文件数量、跨模块、运行失败或分数回退本身都不能把整个实验升级成 BDD/TDD。
+
 ## 统一输出标准
 
 - 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
@@ -101,7 +111,7 @@ Every executable lane must fit this shape:
   "hypothesis": "one causal mechanism only",
   "intendedMetric": "primary or component metric",
   "nonScoreSignal": "secondary signal, legality, runtime, or diagnostic proof",
-  "smallestDecisiveTest": "single case, narrow suite, trace, or bounded run",
+  "smallestDecisiveEvaluation": "single case, narrow suite, trace, or bounded run",
   "killCondition": "flat, regression, timeout, illegal output, or missing target",
   "expectedDiffSurface": ["path/to/file"],
   "negativeControls": ["known failed family or baseline comparison"],
@@ -118,7 +128,7 @@ Workers are diff-first executors:
 1. Work only in the assigned isolated workspace.
 2. Confirm baseline/source identity before editing.
 3. Implement exactly one mechanism or produce one diagnostic artifact.
-4. Run the smallest decisive test before broad suites.
+4. Run the smallest decisive evaluation before broad suites.
 5. Preserve diff, report, logs, and parsed metrics.
 6. Write a result artifact before finishing.
 
@@ -126,11 +136,13 @@ Minimum result fields:
 
 ```text
 laneId, attemptId, baselineId, hypothesis, mutationType, changedFiles,
-commandsRun, checksRun, smallestDecisiveTestResult, metricsBeforeAfter,
+commandsRun, checksRun, smallestDecisiveEvaluationResult, metricsBeforeAfter,
 promotionCandidate, result, summary, avoidNextTime, artifactPaths, diffSummary
 ```
 
-## Validation and promotion
+Existing profiles may continue reading legacy `smallestDecisiveTest` / `smallestDecisiveTestResult` fields, but new instructions and artifacts use `evaluation` to avoid confusing experiment evidence with TDD.
+
+## Evaluation and promotion
 
 Use `smoke -> screen -> parent gate`:
 

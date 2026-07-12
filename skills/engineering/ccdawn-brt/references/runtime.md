@@ -11,7 +11,7 @@ owner -> [direct execution | persistent planning when reusable] -> [optional spl
 
 `ccdawn-pr-review` applies when the next action is submit, push, PR, merge, release, or handoff review. A task can stop after `ccdawn-completion-summary` when no PR/diff review is needed.
 `ccdawn-feature-reuse-research` applies before planning a complex new feature when external projects, libraries, examples, or current-project modules may change the implementation path.
-`ccdawn-score-loop` applies when the current need is benchmark, leaderboard, validation-score, online/offline feedback, baseline promotion, worker-lane, or submission-package iteration.
+`ccdawn-score-loop` exclusively owns benchmark, leaderboard, validation-score, online/offline feedback, baseline promotion, worker-lane, experiment mutation, and submission-package iteration while the main unknown is metric impact. Experiment lanes bypass general SIMPLE/BDD_TDD classification.
 `ccdawn-project-review` applies when the current need is whole-project, repository, architecture, technical debt, test gap, maintainability, onboarding, or risk-module review.
 `ccdawn-simplification-review` applies when the primary question is what unnecessary complexity can be removed from a current diff without changing required behavior.
 `ccdawn-simplification-audit` applies when the primary question is what dependency, abstraction, wrapper, legacy path, or duplicate structure can be removed from a repository or subsystem.
@@ -21,6 +21,7 @@ Intent interview/refinement, incremental implementation, doubt/self-review, code
 Superpowers process skills are scoped methods, not the workflow owner. BRT mode and the current Route Contract decide whether brainstorming, planning, worktree isolation, strict TDD, subagents, review loops, or branch finishing are justified; broad `always/every/any` trigger language does not upgrade the flow by itself. Verification evidence remains mandatory but proportional to the claim and risk.
 Assume a high-capability reasoning model can keep a bounded plan, dependency order, and self-review internal. Require a visible artifact or separate stage only when another person/session needs it, the user wants to review it, or a named high-risk failure needs the checkpoint.
 When a subtask needs TDD, use the compact `ccdawn-bdd-tdd-development` owner instead of dual-loading Superpowers `test-driven-development`. Reuse a real failing test or stable reproduction as RED, run the narrow test to GREEN, and defer broad suites to integration risk or closeout.
+Score regression, metric underperformance, rejected hypotheses, and neutral/worse online feedback are experiment evidence, not TDD RED. Route only a separated deterministic harness/parser/schema/metric/seed/shape/packaging bug to compact TDD, then return to the original score lane without treating GREEN as promotion evidence.
 Default to no subagent. If independent write lanes justify dispatch, use one implementer per lane with a compact contract, let the parent verify diff and command evidence, and add at most one final independent reviewer only for a high-risk boundary or explicit user request. Do not create implementer-plus-two-reviewer chains per task or allow child agents to dispatch grandchildren.
 `systematic-debugging` is the primary bug/failure route; `root-cause-tracing` is added when the source is hidden deep in a call chain. `ccdawn-bug-review` is only a CCDawn adapter around those existing skills.
 `ccdawn-evaluation` applies when the current need is judgment, comparison, audit, or process quality assessment and no more specific existing skill owns the task.
@@ -85,6 +86,7 @@ BRT and planning decide the flow route only after Owner Arbitration and the Mini
 - `FULL_FLOW`: real design choices, cross-boundary contracts, unclear sequencing, or state/API/security/data/migration/release risk remain after simplification. FULL controls risk; it does not require every workflow stage.
 
 Do not assign `SIMPLE` or `BDD_TDD` to the whole user request.
+Do not assign either mode to an experiment lane whose expected metric result is unknown.
 
 Planning is not the default owner or a mandatory bridge to implementation. Enter it only when a persistent/reviewable plan has value beyond the model's internal execution outline.
 
@@ -94,6 +96,7 @@ Self-assess process weight before routing:
 - If there are multiple intents, choose `COMPACT_FLOW` when they share a theme and can be ordered in one context; choose separate routing only when owner, risk, deliverable, or verification truly differs.
 - If the main value is adding a complex feature where external or internal reuse may change the plan, route to `ccdawn-feature-reuse-research` before `ccdawn-planning`.
 - If the main value is measurable score optimization, benchmark/leaderboard feedback, online/offline calibration, baseline promotion, worker lanes, or submission packages, route to `ccdawn-score-loop`.
+- Do not send an experiment lane through `ccdawn-task-splitting` merely because its code spans modules, its run failed, or its score regressed. Split only a detached deterministic engineering defect; keep candidate evaluation with score-loop.
 - If the main value is extracting unclear intent or refining a rough idea, keep `ccdawn-brt` as the owner unless an installed interview/refine skill can produce a better intent contract.
 - If the main value is a bounded implementation, first collapse repeated mechanical edits into one FAST_PATH unit. Use incremental slices or `ccdawn-task-splitting` SIMPLE tasks only when independent work units remain before escalating a complex subtask to BDD/TDD.
 - If the main value is high-risk confidence checking, code simplification, git/release/deploy, issue/spec intake, MCP/tool integration, webapp testing, logs, or LLM traces, route to the matching installed specialized skill; otherwise use the fallback in `github-skill-candidates.md`.
@@ -147,13 +150,14 @@ Owner boundaries:
 
 - `NO_SPLIT`: one low-risk execution unit, clear verification, no staged dependencies, no BDD/TDD need.
 - `SPLIT`: create subtasks and classify each subtask as `SIMPLE` or `BDD_TDD`.
+- Experiment lane: bypass this engineering classification and stay with `ccdawn-score-loop`; only a separated deterministic defect may return as a SIMPLE/BDD_TDD subtask.
 
 Inside `SPLIT`, upgrade a subtask to `BDD_TDD` only when at least one signal is present:
 
 - behavior is new or ambiguous enough that a one-pass implementation is likely to drift;
 - failure path, state transition, persistence, permission, migration, API, or integration contract matters;
-- change spans multiple modules or depends on staged refactoring;
-- existing bug is not localized or has already regressed;
+- deterministic engineering change spans multiple modules or depends on staged refactoring;
+- existing deterministic software bug is not localized or has already regressed;
 - verification requires a new behavior test to be trustworthy;
 - user explicitly asks for strict BDD/TDD.
 

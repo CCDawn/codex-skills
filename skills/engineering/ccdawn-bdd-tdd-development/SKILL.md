@@ -16,7 +16,7 @@ description: Use when a selected CCDawn subtask has meaningful behavior, regress
 - Allowed Action: 只改当前行为所需的生产代码和测试；不扩大范围、不覆盖无关改动。
 - Success Evidence: RED 确认目标缺失或回归，GREEN 确认最小实现通过，相关回归检查通过。
 - Stop Condition: 行为预期不清、测试不能证明目标、边界冲突、修复需要扩大范围或高风险授权。
-- Route Out: 当前 owner、下一个已授权任务、`ccdawn-completion-summary`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 当前 owner、`ccdawn-score-loop`、下一个已授权任务、`ccdawn-completion-summary`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 模式闸门
 
@@ -24,9 +24,11 @@ description: Use when a selected CCDawn subtask has meaningful behavior, regress
 
 直接降级为轻量实现，当任务是机械替换、样式/文案、配置、生成代码、小范围适配，或现有验证已经足够证明行为。
 
+分数下降、metric 未提升、候选被 reject、假设失败、online neutral/worse 是实验结果，不是 TDD RED。此类任务返回 `ccdawn-score-loop`；只有预期输入输出明确的 metric/harness/parser/schema/seed/shape/NaN/打包 bug 留在本 skill。
+
 使用紧凑 TDD，当存在任一强信号：
 
-- 已知回归或失败测试；
+- 已知的确定性软件行为回归或失败测试；
 - 状态、数据、权限、安全、迁移、公共 API 或持久化风险；
 - 失败路径/边界容易遗漏；
 - 跨模块行为只有自动化测试才能可信证明；

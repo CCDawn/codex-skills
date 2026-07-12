@@ -113,7 +113,7 @@ sh ./install.sh
 ### 竞赛与评分
 
 - **`ccdawn-score-loop`**
-  通用 score loop 模板，用来处理 benchmark、榜单、validation、baseline promotion、worker lane、online/offline feedback 和提交包迭代。
+  通用 score loop 模板。实验使用 `BASELINE/CANDIDATE/DELTA/GATE`，分数回退或假设失败不进入 TDD；只有分离出的确定性工程 bug 才临时使用 RED/GREEN。
 
 - **`ccdawn-huawei-nslb-score-loop`**  
   Huawei Algorithm Challenge 37 NSLB 项目的 score loop 适配层，基于通用模板保留项目命令、ledger、mutation space、online feedback 和打包规则。

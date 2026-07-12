@@ -1,6 +1,6 @@
 ---
 name: ccdawn-task-splitting
-description: Use when an accepted CCDawn implementation plan needs split/no-split routing before development, NO_SPLIT may be valid, or subtasks need SIMPLE vs BDD_TDD decisions, verification anchors, dependencies, boundaries, and handoff decisions.
+description: Use when an accepted CCDawn engineering implementation plan needs split/no-split routing before development, NO_SPLIT may be valid, or deterministic subtasks need SIMPLE vs BDD_TDD decisions, verification anchors, dependencies, boundaries, and handoff decisions.
 ---
 
 # CCDawn Task Splitting
@@ -26,7 +26,7 @@ description: Use when an accepted CCDawn implementation plan needs split/no-spli
 - Allowed Action: 只做拆分/不拆分判定；不写代码、不改测试、不运行迁移/删除/发布动作；发现方案不可执行时回 `ccdawn-planning`。
 - Success Evidence: `NO_SPLIT` 有明确理由和直接验证；`SPLIT` 的 critical tasks 都有 owner surface、protected boundary、Development Mode 和 verification condition。
 - Stop Condition: 方案未接受、文件边界不清、critical task 缺验证、BDD_TDD 缺紧凑 Test Anchor、高风险动作未确认或方案不可执行。
-- Route Out: `FAST_PATH` 轻量执行、`ccdawn-bdd-tdd-development`、`ccdawn-completion-summary`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `FAST_PATH` 轻量执行、`ccdawn-bdd-tdd-development`、`ccdawn-score-loop`、`ccdawn-completion-summary`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一输出标准
 
@@ -92,6 +92,8 @@ description: Use when an accepted CCDawn implementation plan needs split/no-spli
 
 只在 `SPLIT` 后对子任务判定模式。
 
+实验 lane 不进入 `SIMPLE/BDD_TDD` 判定：当主要未知量是候选对 metric/score 的影响时，整条 lane 归 `ccdawn-score-loop`。分数下降、假设失败、online neutral/worse、跨模块实验或训练运行失败都不是 TDD RED。只有从实验中分离出的确定性工程 bug 才建立独立工程子任务。
+
 标记 `SIMPLE`，当子任务：
 
 - 范围局部，输出明确；
@@ -103,7 +105,7 @@ description: Use when an accepted CCDawn implementation plan needs split/no-spli
 
 - 行为、失败路径、状态流转或数据契约不清；
 - 跨模块协作，容易一次实现偏离；
-- 之前类似问题回归过；
+- 之前相同的确定性软件行为回归过；
 - 需要新增行为测试才可信；
 - 涉及权限、安全、迁移、持久化、公共 API、发布或回滚；
 - 用户要求谨慎 BDD/TDD。
@@ -257,6 +259,8 @@ Ledger Update:
 完成拆分判定后遵守 `ccdawn-brt/references/runtime.md` 的自然闸门规则：用户目标已包含执行许可时，按推荐任务继续；只有阻塞、高风险动作、验证失败、范围变化、目标变化、发布/合并/迁移/删除/权限动作前，才停下等用户选择。
 
 进入开发时，按任务的 `Development Mode` 执行：`SIMPLE` 任务轻量实现和验证；`BDD_TDD` 任务使用 `ccdawn-bdd-tdd-development`。只有用户明确选择“连续执行全部 Critical Path”或原始目标已经是完成整个 critical path 时，才连续执行全部任务；否则执行推荐的下一个任务。
+
+如果任务实际是 score/benchmark/validation/leaderboard 实验，不进入上述开发模式，直接回 `ccdawn-score-loop` 继续 baseline/candidate/gate 循环。
 
 如果用户选择连续执行全部 Critical Path：
 

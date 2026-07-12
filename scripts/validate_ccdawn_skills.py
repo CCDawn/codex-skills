@@ -115,9 +115,17 @@ def validate_skill(
                 errors.append(f"{label}: BRT missing core marker '{marker}'")
 
     if name == "ccdawn-bdd-tdd-development":
-        for marker in ["## 紧凑 TDD", "现有失败测试或稳定复现可直接作为 RED", "默认不派发子代理"]:
+        for marker in ["## 紧凑 TDD", "现有失败测试或稳定复现可直接作为 RED", "默认不派发子代理", "分数下降"]:
             if marker not in text:
                 errors.append(f"{label}: compact TDD profile missing marker '{marker}'")
+
+    if name == "ccdawn-score-loop":
+        for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation"]:
+            if marker not in text:
+                errors.append(f"{label}: experiment/TDD boundary missing marker '{marker}'")
+
+    if name == "ccdawn-task-splitting" and "实验 lane 不进入" not in text:
+        errors.append(f"{label}: missing experiment-lane bypass for SIMPLE/BDD_TDD classification")
 
     words = word_count(text)
     if name == "ccdawn-brt" and words > 1500:
