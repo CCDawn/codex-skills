@@ -17,6 +17,8 @@
                    "./skills/engineering/ccdawn-bug-review",
                    "./skills/engineering/ccdawn-evaluation",
                    "./skills/engineering/ccdawn-goal-loop",
+                   "./skills/research/ccdawn-ai-research-loop",
+                   "./skills/research/ccdawn-research-rigor-review",
                    "./skills/research/ccdawn-competition-research-lifecycle"
                ],
     "name":  "dawn-codex-skills"

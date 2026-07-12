@@ -183,6 +183,28 @@ When progress stalls:
 - preserve rejected compiled diffs as search material;
 - stop if no safe new causal variable can be named.
 
+## 研究回传契约
+
+当本 lane 由 `ccdawn-ai-research-loop` 发起时，gate 决策后把实验信息交回研究 owner，而不是自行决定整个研究方向：
+
+```text
+Candidate:
+Hypothesis outcome: supported / rejected / unresolved
+Metric evidence:
+Mechanism evidence:
+Confidence and caveat:
+Reusable lesson:
+Next-hypothesis signal:
+Pivot signal:
+Artifact paths:
+```
+
+- metric 没有提升但排除了关键机制时，仍可标记为高信息价值；不得伪装成 promotion。
+- 单次分数提升但缺少机制证据时，只能晋升候选 baseline，不能直接扩写成研究 claim。
+- 连续 lane 出现相同失败、结果冲突、强 seed/split 敏感或信息增益降低时，设置 `Pivot signal`，交回外层综合。
+- QUICK 模式可把这些字段压缩进短汇报；只有跨会话、高成本或需要交接时才写独立 artifact。
+- score-loop 不负责生成新的研究总规划；下一假设由研究 owner 结合多轮证据选择。
+
 ## Compact outputs
 
 Status:
@@ -207,6 +229,18 @@ Gate Decision:
 - Verdict: promote / reject / hold / blocked
 - Reason:
 - Next action:
+```
+
+Research return:
+
+```text
+研究回传:
+- 假设结果:
+- 指标证据:
+- 机制证据:
+- 可复用教训:
+- 下一假设/转向信号:
+- Artifact:
 ```
 
 Online feedback:

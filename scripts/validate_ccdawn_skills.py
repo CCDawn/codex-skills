@@ -23,6 +23,8 @@ BRT_CORE_MARKERS = [
     "FULL_FLOW",
     "ccdawn-simplification-review",
     "ccdawn-simplification-audit",
+    "ccdawn-ai-research-loop",
+    "ccdawn-research-rigor-review",
     "默认 `AUTO`",
     "能力感知与阶段折叠",
     "`FAST_PATH` 直接执行并最小验证",
@@ -120,9 +122,19 @@ def validate_skill(
                 errors.append(f"{label}: compact TDD profile missing marker '{marker}'")
 
     if name == "ccdawn-score-loop":
-        for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation"]:
+        for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "## 研究回传契约"]:
             if marker not in text:
                 errors.append(f"{label}: experiment/TDD boundary missing marker '{marker}'")
+
+    if name == "ccdawn-ai-research-loop":
+        for marker in ["## Baseline Gate", "## 内层实验循环", "## 外层综合与转向", "ccdawn-score-loop"]:
+            if marker not in text:
+                errors.append(f"{label}: AI research loop missing marker '{marker}'")
+
+    if name == "ccdawn-research-rigor-review":
+        for marker in ["## 触发闸门", "## 审查方法", "ACCEPT", "QUALIFY", "REJECT", "BLOCKED"]:
+            if marker not in text:
+                errors.append(f"{label}: research rigor gate missing marker '{marker}'")
 
     if name == "ccdawn-task-splitting" and "实验 lane 不进入" not in text:
         errors.append(f"{label}: missing experiment-lane bypass for SIMPLE/BDD_TDD classification")

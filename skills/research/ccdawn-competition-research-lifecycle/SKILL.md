@@ -9,9 +9,9 @@ description: Use when coordinating a research competition lifecycle, Kaggle-styl
 
 `ccdawn-brt` 是治理层。它不替代任何阶段，而是用来定义行为目标、审查风险，并在阶段推进前设定验收检查。
 
-`literature-evidence-synthesis` 是研究密集型阶段默认的证据标准化层。
+`ccdawn-ai-research-loop` 是 baseline 复现、假设实验和多轮证据综合的研究工程层。
 
-`paper-claim-traceability` 是论文写作和提交打包阶段默认的证据审计层。
+`ccdawn-research-rigor-review` 是重要 baseline、论文结论和提交证据的严谨性审查层。
 
 ## BRT interface
 
@@ -20,7 +20,7 @@ description: Use when coordinating a research competition lifecycle, Kaggle-styl
 - Allowed Action: 只在当前阶段 artifact 和已确认 lane 范围内行动；晋升 baseline/evidence、提交打包、论文 claim 固化或多 lane 合并前必须有 gate 证据。
 - Success Evidence: 阶段 artifact、run log、metric 表、claim map、submission checklist、leaderboard/外部反馈记录或复现实验证据。
 - Stop Condition: 数据/metric 漂移、active baseline 不一致、证据链缺失、提交格式不确定、claim 无来源、leaderboard 与 validation 严重冲突且未解释。
-- Route Out: 当前阶段继续、`ccdawn-score-loop`、工程类 owner skill、paper/claim 审计、`ccdawn-completion-summary`，或 BLOCKED。
+- Route Out: 当前阶段继续、`ccdawn-ai-research-loop`、`ccdawn-score-loop`、`ccdawn-research-rigor-review`、工程类 owner skill、`ccdawn-completion-summary`，或 BLOCKED。
 
 ## 统一输出标准
 
@@ -125,12 +125,11 @@ description: Use when coordinating a research competition lifecycle, Kaggle-styl
 ## 路由规则
 
 - 进入新阶段、修改范围、或准备把结果推进到下一阶段时，使用 `ccdawn-brt`。
-- 在第 3 阶段使用 `literature-evidence-synthesis`，把论文、repo、笔记和公开发现整理成 literature matrix、comparison table、claim map 或 experiment hypothesis pack。
-- 在第 7 阶段，如果 related work、方法定位或证据组织仍然松散，再次使用 `literature-evidence-synthesis`。
-- 在第 7 阶段后段和第 8 阶段之前，使用 `paper-claim-traceability` 审查 abstract、contribution bullets、tables 和最终 claims 的证据支撑。
-- 使用 `aminer-data-search` 获取论文、作者、venue、citation、institution，以及贴近专利语境的技术先验。
-- 使用 `autoglm-deepresearch` 获取 competition 背景、public leaderboard、开源 baseline、博客、policy 和非论文类资料。
-- 只有在证据、实验和 claims 已经整理清楚后，才使用 `research-paper-writer`。
+- 在第 3、5、6 阶段使用 `ccdawn-ai-research-loop` 统筹 baseline 复现、假设组合、实验 lane 和 findings 综合；具体 metric lane 下沉到 `ccdawn-score-loop`。
+- 在第 7 阶段，如果 related work、方法定位或证据组织仍然松散，先由研究循环收敛证据与适用范围。
+- 在第 7 阶段后段和第 8 阶段之前，使用 `ccdawn-research-rigor-review` 审查 abstract、contribution bullets、tables 和最终 claims 的证据支撑。
+- 论文、项目、榜单和非论文资料检索使用当前已安装的浏览/研究工具；不把未安装的外部 skill 名写成强制 owner。
+- 只有证据、实验和 claims 已整理清楚后，才路由到当前可用的论文写作 owner。
 - 数据脚本、训练管线、调试和复现性问题，交给工程类 skills。
 - 需要拆里程碑、issues 或 checklist 时，交给项目管理类 skills。
 

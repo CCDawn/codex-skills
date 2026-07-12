@@ -171,7 +171,7 @@ Checklist：
 
 Routing：
 - 用 `ccdawn-brt` 锁定范围和阶段退出标准
-- 如果领域背景、历史 baselines 或 policy context 还不清楚，用 `autoglm-deepresearch`
+- 如果领域背景、历史 baselines 或 policy context 还不清楚，使用当前可用的浏览/研究工具收集来源，再交给 `ccdawn-ai-research-loop` 收敛
 
 BRT gate：
 - Behavior: 团队可以准确说出目标 metric、允许使用的数据，以及最终 deliverables。
@@ -250,9 +250,8 @@ Recovery signals：
 - related work 和公开 baselines 还是散的
 
 Routing：
-- `aminer-data-search`：学术论文和 citation 路径
-- `autoglm-deepresearch`：leaderboard、repo、公开方案、领域背景和非论文资料
-- `literature-evidence-synthesis`：把来源标准化为可比较的 artifacts
+- 当前可用的浏览/研究工具：学术论文、citation、leaderboard、repo、公开方案和领域背景
+- `ccdawn-ai-research-loop`：把来源、baseline 和假设标准化为可验证的研究 lane
 
 Checklist：
 - 来源已经按方法、数据集、metric 或 claim 分组
@@ -426,9 +425,9 @@ Recovery signals：
 - 团队可以清楚说出 contribution，而不是靠猜
 
 Routing：
-- `research-paper-writer`：当 claims、tables、figures 和 references 已组织好时使用
-- `literature-evidence-synthesis`：当 related work 或方法定位仍然松散时使用
-- `paper-claim-traceability`：当 draft 或结构化 outline 已存在时使用
+- 当前可用的论文写作 owner：当 claims、tables、figures 和 references 已组织好时使用
+- `ccdawn-ai-research-loop`：当 related work、方法定位或实验方向仍然松散时使用
+- `ccdawn-research-rigor-review`：当 draft、结构化 outline 或重要 baseline claim 已存在时使用
 
 BRT gate：
 - Behavior: 论文中的每个重要 claim 都能追溯到实验、table、定性案例或 citation。

@@ -105,6 +105,12 @@ sh ./install.sh
 
 ### 研究流程
 
+- **`ccdawn-ai-research-loop`**
+  AI 研究工程主流程，负责 baseline 复现、可证伪假设、最小实验、多轮 findings 综合，以及继续、分支、转向或停止决策。
+
+- **`ccdawn-research-rigor-review`**
+  重要 baseline、反直觉结果和论文级结论晋升前的轻量严谨性审查；普通实验 lane 不强制触发。
+
 - **`ccdawn-competition-research-lifecycle`**  
   这是一个面向研究竞赛和 benchmark 项目的端到端工作流 skill，覆盖任务定义、数据准备、文献和方案调研、baseline 搭建、训练与实验、分析与消融、论文写作和提交打包。
 
@@ -178,6 +184,8 @@ skills/
     ccdawn-goal-loop/
   research/
     README.md
+    ccdawn-ai-research-loop/
+    ccdawn-research-rigor-review/
     ccdawn-competition-research-lifecycle/
 scripts/
   install_codex_library.py
