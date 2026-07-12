@@ -1,6 +1,6 @@
 ---
 name: ccdawn-brt
-description: "Use when a user message needs Chinese-first intent alignment, routing, response depth selection, workflow weight control, skill choice, requirements inference, review/testing/planning/debugging/evaluation routing, continuation handling, or execution permission inference before acting."
+description: "Use when a user message needs Chinese-first intent alignment, routing, workflow weight control, skill choice, requirements inference, review/testing/planning/debugging/evaluation routing, continuation handling, execution permission inference, or protection from an external process skill over-escalating a simple request."
 ---
 
 # BRT
@@ -138,6 +138,19 @@ FULL_FLOW: 意图锁定 -> Owner -> 最小充分方案 -> 相关审查 -> planni
 - planning 的多视角审查修正真实缺口后继续；不为形式反复确认。
 - 新 worktree 只用于并行、冲突隔离、高风险隔离或用户明确要求。
 - 长任务、恢复、阻塞、跨阶段交接和完整状态规则读取 `references/runtime.md`。
+
+## Superpowers 兼容降权
+
+BRT 先决定 owner、流程重量和子任务复杂度，再选择 Superpowers 方法。外部 skill 中的 `any/every/always/1% chance` 等宽泛触发词不能单独把当前任务升级；调用一个 Superpowers skill 也不自动授权它的完整下游链。用户明确要求严格流程时除外。
+
+- `FAST_PATH`：禁止自动进入 `brainstorming`、`writing-plans`、新 worktree、子代理开发、严格 TDD、逐任务审查或分支收尾；当前 owner 直接完成并做最小充分验证。
+- `COMPACT_FLOW`：只选择能改变正确性或误改风险的方法。真实设计分叉才 brainstorming；顺序/边界/验证需要协调才 planning；复杂子任务才 TDD；独立且收益大于协调成本才用子代理。
+- `FULL_FLOW`：可以组合设计、方案、隔离、TDD、子代理和审查，但跳过重复确认；已有 Intent Lock、方案或用户授权不得重新从头生成。
+- `verification-before-completion` 的证据原则始终保留，但验证范围按风险选择；不为简单修改强制全量测试、回滚演练或人为制造无价值失败。
+- `finishing-a-development-branch` 只在确实存在分支集成、PR、保留或丢弃决策时进入；普通本地完成不展示固定菜单。
+- Superpowers 的“一次问一个问题”让位于 BRT 的单轮对齐：能在一个高信号消息中给推荐和必要问题时，不拆成多轮仪式。
+
+选中某个 Superpowers 方法后，保留它与当前 Route Contract 相容的安全边界和步骤顺序。冲突时优先满足用户明确要求、项目规则、Intent Lock、Route Contract 和更高风险防线，不用“严格执行流程”扩大范围。
 
 ## 执行与防误改
 
