@@ -24,7 +24,7 @@ description: Use when completed work needs formal cross-stage or cross-session s
 - Allowed Action: 只验证、读取证据和总结；不补写新功能、不削弱测试、不提交/推送/发布；可恢复缺口必须路由到最具体开发/debug/验证阶段。
 - Success Evidence: 每个完成 claim 都有新鲜命令、检查、日志、截图或结构性证据支撑，并对照 critical tasks 和已确认意图。
 - Stop Condition: 关键任务未完成、新鲜证据缺失、NEEDS_CHANGE 未解决、保护边界越界、需要用户决策或高风险交付动作。
-- Route Out: `ccdawn-pr-review`、提交/PR 准备、对应开发模式、`systematic-debugging`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `ccdawn-pr-review`、提交/PR 准备、对应开发模式、`ccdawn-bug-review`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一输出标准
 
@@ -87,7 +87,7 @@ description: Use when completed work needs formal cross-stage or cross-session s
 
 如果验证失败或证据不足：
 
-- 若缺口可在当前 Execution Contract 内修复，结论写 `PARTIAL`，`Recommended Next Stage` 指向具体恢复动作：轻量开发、`ccdawn-bdd-tdd-development`、`systematic-debugging` 或补验证。
+- 若缺口可在当前 Execution Contract 内修复，结论写 `PARTIAL`，`Recommended Next Stage` 指向具体恢复动作：轻量开发、`ccdawn-bdd-tdd-development`、`ccdawn-bug-review` 或补验证。
 - 若缺口需要新范围、权限、迁移、删除、发布或需求变更，结论写 `BLOCKED`，只问一个阻塞问题。
 - 不把“已发现问题”当作完成；不让用户自己猜下一步该回哪里修。
 
@@ -119,11 +119,11 @@ Ledger Update:
 - Completed Tasks: ...
 - Verification Evidence: ...
 - Unresolved Risks: ...
-- Recommended Next Stage: ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / systematic-debugging / ccdawn-planning / ccdawn-brt / BLOCKED
-- Route Out: ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式 / systematic-debugging / ccdawn-planning / ccdawn-brt / BLOCKED
+- Recommended Next Stage: ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
+- Route Out: ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
 
 下一步:
-默认路由：<收口 / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / systematic-debugging / ccdawn-planning / ccdawn-brt / BLOCKED>，原因...
+默认路由：<收口 / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED>，原因...
 执行规则：COMPLETE 且没有提交、推送、PR、合并、发布或补任务需求时直接收口；PARTIAL 时路由到最具体恢复阶段；BLOCKED 时只问一个阻塞问题；远程写入、发布、合并、删除或迁移动作前必须停下等用户授权。
 ```
 

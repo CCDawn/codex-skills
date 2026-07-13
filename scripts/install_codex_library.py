@@ -5,13 +5,20 @@ import sys
 from pathlib import Path
 
 
-PROCESS_SKILL_CONFLICTS = (
+SUPERPOWERS_ENTRYPOINTS = (
     "using-superpowers",
     "brainstorming",
     "test-driven-development",
     "using-git-worktrees",
     "writing-plans",
     "subagent-driven-development",
+    "dispatching-parallel-agents",
+    "executing-plans",
+    "finishing-a-development-branch",
+    "receiving-code-review",
+    "requesting-code-review",
+    "systematic-debugging",
+    "verification-before-completion",
 )
 DISABLED_SKILL_FILENAME = "SKILL.md.ccdawn-disabled"
 
@@ -74,7 +81,7 @@ def targets_codex(home: Path, roots: list[Path]) -> bool:
 def process_skill_conflict_state(home: Path) -> list[tuple[str, str]]:
     root = codex_skills_root(home)
     states = []
-    for name in PROCESS_SKILL_CONFLICTS:
+    for name in SUPERPOWERS_ENTRYPOINTS:
         skill_dir = root / name
         active = (skill_dir / "SKILL.md").exists()
         disabled = (skill_dir / DISABLED_SKILL_FILENAME).exists()
@@ -123,7 +130,7 @@ def manage_process_skill_conflicts(home: Path, action: str, dry_run: bool = Fals
                 disabled_path.rename(active_path)
 
     if action == "warn" and changed:
-        print("Warning: broad process skills can override CCDawn BRT routing and increase planning/TDD/worktree/subagent cost:")
+        print("Warning: Superpowers entrypoints can bypass CCDawn BRT routing and add unnecessary workflow context:")
         for name, _ in changed:
             print(f"  {root / name / 'SKILL.md'}")
         print("To disable only their auto-discovery entrypoints, rerun with --process-skill-conflicts disable.")
@@ -237,7 +244,7 @@ def parse_args() -> argparse.Namespace:
         choices=["warn", "disable", "restore", "ignore"],
         default="warn",
         help=(
-            "Manage broad local process skill entrypoints that can override BRT routing. "
+            "Manage local Superpowers entrypoints that can bypass BRT routing. "
             "disable/restore renames only SKILL.md, preserving the original directory and content (default: warn)."
         ),
     )

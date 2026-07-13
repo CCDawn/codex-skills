@@ -30,6 +30,7 @@ BRT_CORE_MARKERS = [
     "`FAST_PATH` 直接执行并最小验证",
     "Skill Budget",
     "约束用于防错",
+    "Superpowers 默认不参与自动路由",
 ]
 
 
@@ -125,6 +126,11 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: compact TDD profile missing marker '{marker}'")
 
+    if name == "ccdawn-bug-review":
+        for marker in ["不要求展示固定阶段", "根因状态", "只有 `CONFIRMED`", "当前 owner 直接修复并验证"]:
+            if marker not in text:
+                errors.append(f"{label}: compact debugging owner missing marker '{marker}'")
+
     if name == "ccdawn-score-loop":
         for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "## 研究回传契约"]:
             if marker not in text:
@@ -171,6 +177,7 @@ def validate_skill(
         "ccdawn-planning": 1800,
         "ccdawn-task-splitting": 1600,
         "ccdawn-completion-summary": 3000,
+        "ccdawn-bug-review": 1800,
     }
     estimated_tokens = estimated_instruction_tokens(text)
     budget = token_budgets.get(name)

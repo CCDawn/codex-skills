@@ -24,7 +24,7 @@
 3. 不要安装到 ~/.agents/skills，避免重复 slash-command。
 4. 先运行安装演练，再执行正式安装。
 5. 安装后验证 live skills 是否可用。
-6. 使用安装脚本默认可逆停用 using-superpowers、brainstorming、test-driven-development、using-git-worktrees、writing-plans、subagent-driven-development 的自动发现入口，保留原目录和内容，不要删除。
+6. 使用安装脚本默认可逆停用安装器识别的完整 Superpowers 自动发现入口集，保留原目录和内容，不要删除。
 7. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、冲突入口处理、验证是否通过、是否需要重启 Codex。
 8. 重点提醒我：最重要入口是 ccdawn-brt；安装/选择它之后，用户正常说需求即可，BRT 会在 agent 内部自动完成意图对齐和下游 skill 路由。
 
@@ -56,7 +56,7 @@ sh ./install.sh
 
 - `~/.codex/skills/<ccdawn-skill-name>`：给 Codex 运行时直接加载的 live skill 目录
 
-安装器默认不写入 `~/.agents/skills`，并可逆停用会强制 brainstorming、planning、TDD、worktree 或子代理流程的广触发入口，避免它们抢占 BRT 的轻重判断。演练、恢复、验证和高级目标见 [安装细节](#安装细节)。
+安装器默认不写入 `~/.agents/skills`，并可逆停用完整 Superpowers 自动发现入口集，避免外部流程约束抢占 BRT 的轻重判断。演练、恢复、验证和高级目标见 [安装细节](#安装细节)。
 
 ## 当前包含的 skill
 
@@ -93,7 +93,7 @@ sh ./install.sh
   整仓或子系统精简审计 skill，用来形成证据化复杂度 findings 和按风险排序的精简队列。
 
 - **`ccdawn-bug-review`**
-  CCDawn bug 审查适配器，优先复用 `systematic-debugging` 和 `root-cause-tracing`，再总结证据、根因状态、影响范围和修复路由。
+  紧凑 bug owner，直接完成证据收集、根因定位、契约内最小修复和验证；只有深层来源才加载 `root-cause-tracing`。
 
 - **`ccdawn-evaluation`**
   CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。
@@ -200,7 +200,7 @@ scripts/
 py -3 scripts\install_codex_library.py
 ```
 
-安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`：只把六个广触发流程 skill 的 `SKILL.md` 改名为 `SKILL.md.ccdawn-disabled`，不删除目录或内容。
+安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`：只把已识别 Superpowers skill 的 `SKILL.md` 改名为 `SKILL.md.ccdawn-disabled`，不删除目录或内容。
 
 恢复这些入口：
 
@@ -208,7 +208,7 @@ py -3 scripts\install_codex_library.py
 py -3 scripts\install_codex_library.py --agent codex --process-skill-conflicts restore
 ```
 
-直接调用 Python 安装器时，默认只警告；要使用 BRT 的低噪声路由，显式加 `--process-skill-conflicts disable`。
+直接调用 Python 安装器时，默认只警告；要使用 BRT 的低噪声路由，显式加 `--process-skill-conflicts disable`。需要单独使用某个 Superpowers skill 时，可先恢复全部入口，再手动保留所需入口；恢复不会改变 CCDawn skills。
 
 只演练安装计划，不改文件：
 

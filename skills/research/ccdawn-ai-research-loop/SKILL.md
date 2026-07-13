@@ -23,13 +23,13 @@ description: "Use when AI/ML research engineering needs baseline reproduction, h
 - Allowed Action: 在已锁定的可编辑面和预算内复现、修改、运行、评估和记录；不静默改变数据划分、metric、baseline 或研究目标。
 - Success Evidence: 可复现命令、baseline 指纹、metric 与方差、diff/config、实验 artifact、对照/消融结果以及有来源的研究结论。
 - Stop Condition: baseline 不可信、评价协议漂移、数据泄漏、预算或权限不足、结果不可复现、关键假设无法区分，或继续实验已无新的信息价值。
-- Route Out: `ccdawn-score-loop`、`ccdawn-feature-reuse-research`、`systematic-debugging`、`ccdawn-research-rigor-review`、`ccdawn-competition-research-lifecycle`、完成交接或 BLOCKED。
+- Route Out: `ccdawn-score-loop`、`ccdawn-feature-reuse-research`、`ccdawn-bug-review`、`ccdawn-research-rigor-review`、`ccdawn-competition-research-lifecycle`、完成交接或 BLOCKED。
 
 ## 所有权判断
 
 - 用户要推进一个 AI/ML 研究问题、复现论文、做消融或从多轮实验中决定方向：本 skill 主责。
 - 用户已经给出明确 baseline、metric 和单个候选，只需跑一次比较：直接路由 `ccdawn-score-loop`。
-- 主要问题是训练脚本、metric、数据 schema、seed、shape、NaN 或环境的确定性故障：临时路由 `systematic-debugging`，修复后返回研究循环。
+- 主要问题是训练脚本、metric、数据 schema、seed、shape、NaN 或环境的确定性故障：临时路由 `ccdawn-bug-review`，修复后返回研究循环。
 - 主要问题是 Kaggle、竞赛规则、提交包或 public leaderboard：由竞赛生命周期主责，本 skill 只承接其研究阶段。
 - 需要搜索论文、仓库、模型或可复用实现且结果会改变方案：使用 `ccdawn-feature-reuse-research`；研究 owner 保留方向决策权。
 

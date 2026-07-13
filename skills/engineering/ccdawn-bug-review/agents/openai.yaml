@@ -1,5 +1,4 @@
 interface:
   display_name: "CCDawn Bug Review"
-  short_description: "CCDawn handoff wrapper that reuses systematic-debugging and root-cause-tracing."
-  default_prompt: "Use ccdawn-bug-review only as a CCDawn wrapper: first reuse systematic-debugging or root-cause-tracing, then summarize evidence, root-cause state, impact, and the next CCDawn route."
-
+  short_description: "紧凑完成 bug 根因定位、最小修复和证据验证。"
+  default_prompt: "使用 $ccdawn-bug-review：先复现或建立最窄证据链，确认根因后在授权边界内最小修复并验证；只有深层来源才加 root-cause-tracing，不展开固定调试仪式。"

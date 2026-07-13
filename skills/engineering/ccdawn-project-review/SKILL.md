@@ -49,7 +49,7 @@ description: Use when CCDawn workflow needs a Chinese-first review of an entire 
 - 审查范围已知：整个 repo、某个 package、某个模块、某条业务链路，未知时先用 `ccdawn-brt` 对齐；
 - 默认只读，不编辑代码、不移动分支、不改 index。
 
-如果用户要审的是 PR/diff/分支，使用 `ccdawn-pr-review`。如果用户报告具体 bug、失败测试或异常行为，使用 `systematic-debugging` 或 `ccdawn-bug-review`。
+如果用户要审的是 PR/diff/分支，使用 `ccdawn-pr-review`。如果用户报告具体 bug、失败测试或异常行为，使用 `ccdawn-bug-review`。
 
 ## 审查深度
 
@@ -99,14 +99,14 @@ PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确
 
 发现明确专项问题时路由：
 
-- 具体 bug 或失败测试 -> `systematic-debugging` / `ccdawn-bug-review`
+- 具体 bug 或失败测试 -> `ccdawn-bug-review`
 - PR/diff 合并前 -> `ccdawn-pr-review`
 - 复杂新增功能、模块替换、开源库/项目复用价值评估 -> `ccdawn-feature-reuse-research`
 - 需要方案 -> `ccdawn-planning`
 - 需要任务拆分 -> `ccdawn-task-splitting`
 - 完成状态/证据 -> `ccdawn-completion-summary`
 - 安全专项 -> 已安装 `security-and-hardening` 时使用；否则用 `Defense-in-Depth Validation` 或保留在本 skill 做证据化风险审查
-- 发布、CI 或合并前专项 -> 已安装 `gh-fix-ci` 时处理 CI；否则按对象路由到 `systematic-debugging`、`ccdawn-pr-review` 或 `ccdawn-completion-summary`
+- 发布、CI 或合并前专项 -> 已安装 `gh-fix-ci` 时处理 CI；否则按对象路由到 `ccdawn-bug-review`、`ccdawn-pr-review` 或 `ccdawn-completion-summary`
 - 性能专项 -> 已安装 `performance-optimization` / `react-component-performance` 时使用；否则保留在本 skill 并要求运行时或浏览器测量证据
 
 ## Findings 规则

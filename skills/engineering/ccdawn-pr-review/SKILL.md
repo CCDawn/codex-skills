@@ -165,13 +165,13 @@ Ledger Update:
 
 ## 路由规则
 
-- 代码问题：回到对应开发模式；如果原任务缺少拆分或模式不清，先回到 `ccdawn-task-splitting` 判定子任务 `SIMPLE / BDD_TDD`。
-- 任务拆分错误：回到 `ccdawn-task-splitting`。
+- 代码问题：回到对应 owner 直接修复；只有已经确认存在独立依赖、风险或验证边界时才进入 `ccdawn-task-splitting`。
+- 任务边界错误：普通情况由当前 owner 收敛；真实拆分错误才回到 `ccdawn-task-splitting`。
 - 方案错误：回到 `ccdawn-planning`。
 - 需求方向错误：回到 `ccdawn-brt`。
-- 证据不足但实现可能正确：回到 `ccdawn-completion-summary` 补验证总结。
-- 外部 review 反馈需要处理时，使用 `receiving-code-review` 的“先验证再执行”原则。
-- 用户明确要独立第二审时，可使用 `requesting-code-review` 派发只读 reviewer。
+- 证据不足但实现可能正确：当前 owner 补最窄有效验证；只有正式交接才进入 `ccdawn-completion-summary`。
+- 外部 review 反馈先与代码和需求核对，再决定接受、拒绝或澄清，不因 reviewer 身份盲改。
+- 用户明确要独立第二审且风险足以抵消上下文成本时，可派一个只读 reviewer；主 agent 仍负责最终证据判断。
 
 ## 常见失败
 

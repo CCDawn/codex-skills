@@ -41,7 +41,7 @@ Rules:
 - Exact confirmation tokens such as `discard` may remain English; explain risk in Chinese.
 - If both the external skill and BRT require `下一步建议`, merge them into one Chinese section.
 
-`finishing-a-development-branch` menu mapping:
+Only for a real branch integration decision:
 
 ```text
 下一步建议:

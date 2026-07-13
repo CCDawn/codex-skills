@@ -1,81 +1,53 @@
 ---
 name: ccdawn-bug-review
-description: Use when CCDawn workflow needs a Chinese-first handoff around an existing debugging skill for a bug, regression, failing test, abnormal behavior, or suspected root cause.
+description: "Use when a bug, regression, failing test, build failure, abnormal behavior, performance symptom, or suspected root cause needs Chinese-first diagnosis, bounded repair, and evidence-based verification without loading a heavyweight debugging workflow."
 ---
 
 # CCDawn Bug Review
 
 ## 目标
 
-这是 CCDawn 的 bug 审查适配器，不是新的调试流程。
-
-优先复用现有 skill：
-
-- `systematic-debugging`：默认 bug、失败测试、异常行为、构建失败、性能异常、集成问题。
-- `root-cause-tracing`：错误出现在深层调用链、坏值来源不清、需要倒追触发源。
-- `verification-before-completion`：修复后声明完成前验证。
-- `ccdawn-pr-review`：对象是 PR、diff、分支或提交范围。
-
-只有当需要中文优先的 CCDawn 阶段交接、Workflow Ledger、修复路由或用户想先“审查 bug 再决定是否修”时，才使用本 skill 包装上述流程。
+直接承接 bug 诊断与契约内修复：先用证据定位根因，再做最小修复和风险相称的验证。相信模型能自行选择调试手段，不要求展示固定阶段、长检查表或完整思维过程。
 
 ## BRT interface
 
-- Context Boundary: 症状、失败命令、日志、相关代码/测试、用户指定范围、已排除的 PR/diff 或环境范围。
-- Output Contract: 复用 skill 选择、根因状态、影响范围、下一步路由和是否允许修复。
-- Allowed Action: 默认只读审查；根因 CONFIRMED 且局部低风险时可路由到 `FAST_PATH` 轻量修复；跨模块、高风险或需求不清时必须进入 planning/拆分。
-- Success Evidence: 根因状态有证据支撑，下一步能路由到调试、轻量修复、规划或 PR 审阅。
-- Stop Condition: 无法复现、缺失败证据、根因未确认且修复会写代码、范围扩大、高风险动作或用户要求暂停。
-- Route Out: `systematic-debugging`、`root-cause-tracing`、`FAST_PATH` 轻量修复、`ccdawn-planning`、`ccdawn-task-splitting`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Context Boundary: 预期行为、实际症状、失败命令/日志、相关代码与测试、允许修改面和非目标。
+- Output Contract: 根因状态、证据链、最小修复或下一 probe、影响范围、验证结果和剩余风险。
+- Allowed Action: 用户要求修复且边界清楚时可直接读取、复现、修改和验证；只要求审查时保持只读。
+- Success Evidence: 失败可复现或有等价证据，根因与修复存在因果联系，目标验证通过且未越界。
+- Stop Condition: 缺少必要对象/权限、根因仍不稳定且写入会扩大误改、需要破坏性动作、需求冲突或风险越过当前授权。
+- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-bdd-tdd-development`、`ccdawn-planning`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
-## 统一输出标准
+用户可见输出默认中文，代码、命令、路径和错误原文保留原样；末尾给一个具体的 `下一步建议`。
 
-- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
-- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
-- 若必须保留英文状态或枚举，先用中文解释其含义。
-- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+## 调试契约
 
-## Owner 接入规则
+1. 写清 `Expected / Actual / Scope`，先读本地可得的代码、日志、失败测试和近期 diff。
+2. 优先复用现有失败测试或稳定复现；无法直接运行时，用调用链、状态变化或日志建立最窄证据链。
+3. 定位 owning surface，沿数据流或控制流追到最早错误来源。来源藏在深层链路时才加载 `root-cause-tracing`。
+4. 标记根因：`CONFIRMED / HYPOTHESIS / ENVIRONMENT / TEST_ISSUE / REQUIREMENT_MISMATCH`。只有 `CONFIRMED` 才进入行为修复；其他状态继续低风险 probe 或路由正确 owner。
+5. 用户已授权修复且根因、边界、回滚和验证清楚时，直接做最小修复；不为流程形式停下确认。
+6. 运行能证明因果关系的窄验证，再按影响面决定是否扩展。区分实现失败、测试意图过期、环境失败和需求不一致。
 
-进入本 skill 前先做轻量 owner 自检：
+## 流程重量
 
-- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
-- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
-- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+- 简单、局部、可逆问题：当前 owner 直接修复并验证，不 planning、不拆分、不创建 worktree。
+- 确定性行为存在明显回归、状态/数据/权限/迁移或公共契约风险：使用 `ccdawn-bdd-tdd-development` 的紧凑测试锚点。
+- 真实设计分叉、跨系统迁移或修复边界无法在当前上下文稳定表达：进入 `ccdawn-planning`。
+- 多文件或复杂调用链本身不触发额外流程；能由一个根因修复统一解决就保持一个实现单元。
 
-## 进入条件
+## 输出
 
-使用前确认 bug 对象不是 PR/diff 审阅、不是泛项目体检，也不是纯测试约束审查。若用户实际想要“先审查 bug 再决定是否修”，本 skill 输出根因状态和修复路由；若用户已经要求直接修复，只有在根因明确、范围局部且可验证时走 `FAST_PATH`。
-
-## 使用方式
-
-1. 判定问题类型：bug、回归、失败测试、环境问题、测试问题、需求误解或 PR 审阅。
-2. 加载并遵守最具体的现有 skill；不要复制或弱化它的硬规则。
-3. 用 CCDawn 格式输出证据、根因状态、影响范围和下一步路由。
-4. 需要修复时，按风险路由到轻量修复、`ccdawn-planning`、`ccdawn-task-splitting` 或 `ccdawn-bdd-tdd-development`。
-
-## 输出契约
+普通修复只需汇报：`根因 / 修改 / 验证 / 剩余风险 / 下一步建议`。只读审查或阻塞时再补：
 
 ```text
-Bug 审查路由:
-- 复用 skill: systematic-debugging / root-cause-tracing / ccdawn-pr-review / ...
-- 理由: ...
-- Context Boundary: 症状、失败命令、日志、相关代码/测试、用户指定范围...
-- Allowed Action: 只读审查 / FAST_PATH 轻量修复 / 进入方案或拆分 / 暂停
-- 症状: ...
-- 当前证据: ...
-- 根因状态: UNKNOWN / HYPOTHESIS / CONFIRMED / ENVIRONMENT / TEST_ISSUE
-- 影响范围: ...
-- Success Evidence: 根因状态有证据支撑，下一步能路由到调试、轻量修复、规划或 PR 审阅
-- Stop Condition: 无法复现 / 缺失败证据 / 根因未确认且修复会写代码 / 范围扩大或高风险
-- 下一步:
-  默认路由：<systematic-debugging / root-cause-tracing / FAST_PATH 轻量修复 / ccdawn-planning / ccdawn-task-splitting / ccdawn-pr-review / ccdawn-brt / BLOCKED>，原因...
-  执行规则：根因 CONFIRMED 且局部低风险时可直接进入 FAST_PATH；根因未确认则继续证据收集；跨模块、高风险或方案分叉进入 planning/拆分；只有缺失败证据、范围不明或修复会越界时才问一个阻塞问题。
-- Route Out: systematic-debugging / root-cause-tracing / FAST_PATH 轻量修复 / ccdawn-planning / ccdawn-task-splitting / ccdawn-pr-review / ccdawn-brt / BLOCKED
+Bug 判断:
+- 根因状态:
+- 关键证据:
+- 影响范围:
+- 建议动作:
+- 停止条件:
+下一步建议: <一个具体动作>
 ```
 
-## 质量门槛
-
-- 根因未确认时，不得提出修复方案。
-- 不把 `ccdawn-bug-review` 当作 `systematic-debugging` 的替代品。
-- 不为已有调试规则再写一套弱化版流程。
-- 如果只是简单失败诊断，直接使用 `systematic-debugging` 并给短摘要。
+不得为了让测试通过而削弱正确行为，也不得在根因仍是猜测时堆叠补丁。

@@ -14,10 +14,9 @@ description: Use when CCDawn workflow needs a Chinese-first evaluation adapter a
 - PR、diff、分支、提交范围：`ccdawn-pr-review`。
 - 复杂功能新增前的项目/库/模块搜索、技术选型、复用价值评估：`ccdawn-feature-reuse-research`。
 - 项目、代码库、架构、技术债、测试缺口、风险模块、接手摸底：`ccdawn-project-review`。
-- 独立代码审阅：`requesting-code-review`。
-- 外部 review 反馈是否采纳：`receiving-code-review`。
-- bug、失败测试、异常行为：`systematic-debugging`，必要时叠加 `root-cause-tracing`。
-- 完成状态和证据：`ccdawn-completion-summary` 或 `verification-before-completion`。
+- PR、独立代码审阅和外部 review 反馈：`ccdawn-pr-review`。
+- bug、失败测试、异常行为：`ccdawn-bug-review`，只有深层来源才叠加 `root-cause-tracing`。
+- 普通完成状态由当前 owner 用新鲜证据收口；正式跨阶段证据包才用 `ccdawn-completion-summary`。
 - 需求/真实目标/执行深度/流程重量：由 `ccdawn-brt` 判定；如果这些不清楚，先回 BRT。
 - 方案制定前后的可实施性：`ccdawn-planning`。
 - 目标是否可执行：`ccdawn-goal-loop`。
