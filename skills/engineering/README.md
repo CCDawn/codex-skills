@@ -3,6 +3,7 @@
 - **[ccdawn-brt](./ccdawn-brt/SKILL.md)** - Capability-aware entrypoint that trusts model reasoning and adds only the constraints, artifacts, and routes that prevent concrete errors.
 - **[ccdawn-ui-design](./ccdawn-ui-design/SKILL.md)** - UI/UX design, interaction-state, responsive, accessibility, and browser-based visual QA owner.
 - **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Opt-in cross-session project memory and HTML dashboard for durable decisions, blockers, and handoffs.
+- **[ccdawn-thread-coordination](./ccdawn-thread-coordination/SKILL.md)** - Lightweight same-project Codex thread conflict, cooperative pause, reliable resume, and handoff coordination.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research only when external or in-project candidates can materially change a complex feature plan.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
 - **[ccdawn-task-splitting](./ccdawn-task-splitting/SKILL.md)** - Task decomposition from an accepted implementation plan.

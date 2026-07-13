@@ -25,6 +25,7 @@ BRT_CORE_MARKERS = [
     "ccdawn-simplification-audit",
     "ccdawn-ai-research-loop",
     "ccdawn-research-rigor-review",
+    "ccdawn-thread-coordination",
     "默认 `AUTO`",
     "能力感知与阶段折叠",
     "`FAST_PATH` 直接执行并最小验证",
@@ -182,6 +183,17 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: research rigor gate missing marker '{marker}'")
 
+    if name == "ccdawn-thread-coordination":
+        for marker in [
+            "CONFLICT_PAUSE_REQUEST",
+            "`PAUSE_REQUEST` 不等于 `PAUSED`",
+            "主动发送 `CONFLICT_RESOLVED`",
+            "send_message_to_thread",
+            "read_thread",
+        ]:
+            if marker not in text:
+                errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
+
     if name == "ccdawn-task-splitting" and "实验 lane 不进入" not in text:
         errors.append(f"{label}: missing experiment-lane bypass for SIMPLE/BDD_TDD classification")
 
@@ -216,6 +228,7 @@ def validate_skill(
         "ccdawn-bug-review": 1800,
         "ccdawn-ui-design": 2200,
         "ccdawn-dawn-agent-html-memory": 2200,
+        "ccdawn-thread-coordination": 1800,
     }
     estimated_tokens = estimated_instruction_tokens(text)
     budget = token_budgets.get(name)

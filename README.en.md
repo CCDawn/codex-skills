@@ -3,13 +3,13 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-21-2f81f7)](#skill-catalog)
+[![Skills](https://img.shields.io/badge/skills-22-2f81f7)](#skill-catalog)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 21 Agent Skills for intent alignment, dynamic routing, lightweight development, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 22 Agent Skills for intent alignment, dynamic routing, multi-thread coordination, lightweight development, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
@@ -62,11 +62,13 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 | Many skills exist but routing is manual | BRT selects the most specific owner and can combine multiple intents |
 | Small changes trigger heavyweight process | Scale workflow weight per subtask and prefer direct implementation plus verification |
 | Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
+| Multiple Codex threads conflict in one project | Arbitrate ownership, pause safely, and actively notify the paused thread when work can resume |
 | Research experiments get treated like software tests | Separate research, score loops, rigor review, and deterministic software TDD |
 
 ## Featured Skills
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md): intent inference, collaborative alignment, routing, and workflow-weight control.
+- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md): same-project Codex thread conflict, pause, resume, and handoff coordination.
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md): evidence-driven diagnosis, bounded repair, and verification.
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md): risk-ranked PR and diff review with merge-readiness evidence.
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md): UI/UX direction, responsive behavior, accessibility, and browser visual QA.
@@ -78,6 +80,7 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 ### Engineering
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)
+- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)
 - [`ccdawn-project-review`](skills/engineering/ccdawn-project-review/SKILL.md)

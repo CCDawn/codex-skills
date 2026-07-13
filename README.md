@@ -3,13 +3,13 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-21-2f81f7)](#完整-skill-目录)
+[![Skills](https://img.shields.io/badge/skills-22-2f81f7)](#完整-skill-目录)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **让 Codex 先理解你，再决定怎么做。**
 
-21 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、轻量开发、代码审查、UI 设计和 AI 研究工作流。
+22 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -64,11 +64,13 @@ sh ./install.sh
 | Skill 很多但不会自动选 | BRT 选择最具体 owner，并可动态组合多个意图 |
 | 简单修改被流程拖慢 | 按子任务风险控制重量，默认优先直接实现和验证 |
 | 审查只给结论、不继续推进 | 形成按依赖排序的行动队列，在边界内连续处理 |
+| 多个 Codex 会话修改同一项目发生冲突 | 协调 owner、暂停冲突会话，并在解除后主动通知恢复 |
 | AI 研究和普通开发混用流程 | 分离研究实验、评分循环、严谨性审查和软件 TDD |
 
 ## 精选 Skill
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)：默认适配层，负责意图理解、讨论式对齐、路由和流程重量控制。
+- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)：协调同一项目内多个 Codex 会话的冲突、暂停、恢复和交接。
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
@@ -110,6 +112,9 @@ sh ./install.sh
 
 - **`ccdawn-brt`**  
   CCDawn 最重要入口 skill。高置信度任务直接推进；低置信度且误解会返工时，先查证，再用一轮讨论式追问确认结果、范围、非目标和验收。每个问题提供具体推荐、理由和错判影响，用户可以只纠正不对的项。
+
+- **`ccdawn-thread-coordination`**
+  同一项目多会话协调 owner。发现写入冲突时使用暂停握手，确认对方已停在安全 checkpoint 后再处理；冲突解除后主动发送恢复通知并确认送达。
 
 - **`ccdawn-ui-design`**
   UI/UX 专项 owner，负责信息层级、交互状态、响应式、无障碍和浏览器视觉验证；机械前端小改不会自动升级成设计流程。
@@ -219,6 +224,7 @@ skills/
   engineering/
     README.md
     ccdawn-dawn-agent-html-memory/
+    ccdawn-thread-coordination/
     ccdawn-brt/
     ccdawn-ui-design/
     ccdawn-feature-reuse-research/
@@ -354,6 +360,7 @@ skills/
 - `这个 benchmark 分数退化了，帮我分析并继续优化`
 - `帮我把这个目标拆成可验证的执行计划`
 - `帮我给这个仓库初始化项目记忆`
+- `另一个会话也在改这些文件，协调一下并在完成后通知它恢复`
 
 BRT 会根据意图置信度控制交流成本：
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn 会话协调"
+  short_description: "协调同一项目内多个 Codex 会话的冲突、暂停与恢复"
+  default_prompt: "协调当前项目中的多个 Codex 会话；发现冲突时可靠暂停相关任务，并在冲突解除后主动通知恢复。"
