@@ -62,7 +62,7 @@ Transition rules:
 - Select Primary by priority: blocking evidence or safety/destructive risk first, then the user's explicit deliverable, then validation/reporting that can be naturally covered by the same contract.
 - Route by Primary first. Carry Secondary only when it is same-theme, low-risk, and does not change the Primary contract. Defer or ask when bundled intents conflict.
 - Show the bundle only when it changes execution order, skill owner, risk boundary, visible scope, or requires user tradeoff. Otherwise keep it internal.
-- A route is actionable only when it has a Route Contract: Owner, Mode, Next Output, Allowed Action, Success Evidence, and Stop Condition. If the next artifact or success evidence cannot be named, stay in BRT for a probe or one clarifying question.
+- A route is actionable only when it has a Route Contract: Owner, Mode, Next Output, Allowed Action, Success Evidence, and Stop Condition. If the next artifact or success evidence cannot be named, stay in BRT: probe first, then use one batched collaborative discussion for `LOW`, or one irreducible question for `BLOCKED`.
 - Run Owner Arbitration before planning, task splitting, development, or summary. List only signal-matched candidate owners, choose the most specific owner that can produce the next artifact and success evidence, and treat planning/development as downstream flow stages rather than default owners.
 - Parallelize only independent read-only research, review, audit, search, or evaluation work, and only when the speedup is worth the coordination cost. Any write action, shared file/module, shared verification, migration, release, or permission-sensitive work stays sequential in one current contract.
 - If the user explicitly restores a Superpowers method, do not inherit its chain. Re-evaluate every downstream action against the current BRT mode, remaining risk, and coordination cost.
@@ -96,7 +96,7 @@ Planning is not the default owner or a mandatory bridge to implementation. Enter
 
 Self-assess process weight before routing:
 
-- Use intent confidence before asking: `HIGH` acts, `MEDIUM` acts with stated assumptions, `LOW` asks or probes, `BLOCKED` asks one blocking question.
+- Use intent confidence before asking: `HIGH` acts, `MEDIUM` acts with stated low-risk assumptions, `LOW` probes and then actively discusses 2-4 related high-impact questions before writes, `BLOCKED` asks one irreducible blocking question.
 - If there are multiple intents, choose `COMPACT_FLOW` when they share a theme and can be ordered in one context; choose separate routing only when owner, risk, deliverable, or verification truly differs.
 - If the main value is adding a complex feature where external or internal reuse may change the plan, route to `ccdawn-feature-reuse-research` before `ccdawn-planning`.
 - If the main value is an AI/ML research question, paper/repository baseline reproduction, hypothesis-driven ablation, multi-round findings synthesis, or direction selection, route to `ccdawn-ai-research-loop`.

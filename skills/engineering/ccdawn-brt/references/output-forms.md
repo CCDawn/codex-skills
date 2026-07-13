@@ -12,22 +12,31 @@ Use when the user should understand the next move, but repeated clarification wo
 下一步建议: ...
 ```
 
-Do not ask required questions by default. Put defaultable scope, order, verification, and route into `默认推进`. If the current user message already grants execution permission and no natural gate exists, continue after the handshake.
+For `HIGH/MEDIUM`, do not ask required questions by default. Put defaultable scope, order, verification, and route into `默认推进`. If the current user message already grants execution permission and no natural gate exists, continue after the handshake. Use Collaborative Calibration instead when confidence is `LOW`.
 
 ## Collaborative Calibration
 
-Use when the agent's interpretation, route, plan, ordering, or tradeoff changes observable outcome, risk, validation, or next stage.
+Use when the agent's interpretation, route, plan, ordering, or tradeoff changes observable outcome, risk, validation, or next stage. For `LOW` confidence, this is a discussion gate rather than an optional presentation form.
 
 ```text
-协作校准: 我建议 ...；原因 ...；我排除 ...；这样理解/这样做对吗？
-意图理由: 信号=...；推断=...；推荐理由=...；错判代价=...
-默认推进: 无自然闸门时，我将 ...
-A. 按推荐继续（推荐）...
-B. 调整为 ...
-C. 暂停或先解释 ...
+讨论式对齐:
+我目前理解你真正要的是 ...，依据是 ...。
+我准备 ...；不会 ...；会用 ... 验收。
+这里有 ... 个地方如果理解错会改变结果，我的推荐是 ...，原因是 ...。
+
+需要一起确认（可直接回复“按推荐”，也可以只纠正不对的项）：
+1. ...？
+   推荐: ...；因为 ...。
+   选择 ... 时实际会变成 ...；如果判断错会 ...。
+2. ...？
+   推荐: ...；因为 ...。
+   选择 ... 时实际会变成 ...；如果判断错会 ...。
+
+你确认后，我会把答案锁定为 ... 并继续 ...。
+下一步建议: 回复“按推荐”或指出需要调整的编号。
 ```
 
-The question must include the recommended answer, choosing signal, and tradeoff. Do not use this shape for low-risk `FAST_PATH` unless a high-impact assumption remains.
+Use 2-4 related questions in one message, not one question per turn. Each question must include the recommended answer, choosing signal, concrete behavior difference, and cost of a wrong assumption. Do not use this shape for low-risk `FAST_PATH` unless a high-impact assumption remains.
 
 ## External Skill Output Normalization
 
@@ -84,11 +93,12 @@ Each option must name behavior difference, choosing signal, tradeoff, user signa
 
 Ask only questions that change observable outcome, scope, risk, verification, route, or implementation permission.
 
-- Start with behavior and acceptance, then technical choices.
-- Default 0 required questions; blocked asks 1; alignment asks 2-3 high-signal choices when needed.
+- Start with the agent's current interpretation and evidence, then discuss behavior and acceptance before technical choices.
+- `HIGH/MEDIUM` default to 0 required questions; `LOW` asks 2-4 related high-signal questions in one round; `BLOCKED` asks the current irreducible blocking question.
 - Rank by impact: goal > scope > risk/permission > output shape > test evidence.
 - Each option must include choosing signal or tradeoff and mark the recommended choice.
 - If the user says "按推荐来", lock the recommended option and continue.
+- Let the user correct only mismatched items; do not require a full rewritten specification or repeat settled questions.
 
 Do not ask local-context questions that tools can answer, equivalent naming/order questions, or implementation details that do not change user-visible results.
 

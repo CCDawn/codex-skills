@@ -16,7 +16,7 @@ Route Contract:
 - Stop Condition:
 ```
 
-If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe or ask one high-signal question before acting.
+If `Next Output` or `Success Evidence` is vague, the route is not ready. Probe first; if confidence remains `LOW`, run one batched collaborative discussion with 2-4 related high-impact questions before acting. Reserve a single question for a truly `BLOCKED` input.
 
 ## Owner Arbitration Gate
 
