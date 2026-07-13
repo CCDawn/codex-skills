@@ -10,6 +10,7 @@ DASHBOARD_PRESET_CHOICES = ("default", "ops-heavy", "review-heavy", "research-lo
 
 SECTION_KEYS = (
     "summary",
+    "collaboration",
     "lanes",
     "progress",
     "modules",
@@ -104,6 +105,7 @@ LABEL_PRESETS = {
 
 DEFAULT_SECTION_LAYOUTS = {
     "summary": "narrow",
+    "collaboration": "full",
     "progress": "wide",
     "lanes": "full",
     "techNotes": "full",

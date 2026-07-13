@@ -62,13 +62,13 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 | Many skills exist but routing is manual | BRT selects the most specific owner and can combine multiple intents |
 | Small changes trigger heavyweight process | Scale workflow weight per subtask and prefer direct implementation plus verification |
 | Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
-| Multiple Codex threads conflict in one project | Arbitrate ownership, pause safely, and actively notify the paused thread when work can resume |
+| Multiple Codex threads develop in one project | Share compact progress and coordinate scopes, discussion, pause/resume, and merge order |
 | Research experiments get treated like software tests | Separate research, score loops, rigor review, and deterministic software TDD |
 
 ## Featured Skills
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md): intent inference, collaborative alignment, routing, and workflow-weight control.
-- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md): same-project Codex thread conflict, pause, resume, and handoff coordination.
+- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md): shared progress, conflict, discussion, pause/resume, and fast-merge coordination for same-project agents.
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md): evidence-driven diagnosis, bounded repair, and verification.
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md): risk-ranked PR and diff review with merge-readiness evidence.
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md): UI/UX direction, responsive behavior, accessibility, and browser visual QA.

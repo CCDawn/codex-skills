@@ -188,11 +188,25 @@ def validate_skill(
             "CONFLICT_PAUSE_REQUEST",
             "`PAUSE_REQUEST` 不等于 `PAUSED`",
             "主动发送 `CONFLICT_RESOLVED`",
+            "DISCUSSION_REQUEST",
+            "MERGE_READY",
+            "sync_project_memory.py --coordination-id",
             "send_message_to_thread",
             "read_thread",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
+
+    if name == "ccdawn-dawn-agent-html-memory":
+        for marker in [
+            "agent_coordination.py",
+            "git-common-dir",
+            "coordination registry",
+            "--coordination-id",
+            "并行 worker 不直接同步 tracked memory",
+        ]:
+            if marker not in text:
+                errors.append(f"{label}: live coordination/memory bridge missing marker '{marker}'")
 
     if name == "ccdawn-task-splitting" and "实验 lane 不进入" not in text:
         errors.append(f"{label}: missing experiment-lane bypass for SIMPLE/BDD_TDD classification")

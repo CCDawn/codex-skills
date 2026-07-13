@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from html import escape
 from pathlib import Path
 
@@ -14,10 +15,13 @@ from memory_model import (
     write_shortcut,
 )
 from profile_model import DASHBOARD_PRESET_LABELS, effective_profile
+from coordination_model import load_registry as load_coordination_registry
+from coordination_model import public_snapshot, registry_path as coordination_registry_path
 
 
 SECTION_TITLES = {
     "summary": "Current Status",
+    "collaboration": "Active Agents",
     "lanes": "Work Lanes",
     "progress": "Progress",
     "modules": "Modules",
@@ -31,6 +35,7 @@ SECTION_TITLES = {
 
 SECTION_DESCRIPTIONS = {
     "summary": "Shared repository state carried between sessions.",
+    "collaboration": "Live project coordination without storing full conversations in repository memory.",
     "lanes": "Stable responsibility lanes keep concurrent work understandable.",
     "progress": "Milestones and completion signals keep the dashboard honest about motion.",
     "modules": "Subsystem snapshots that highlight active work and current shape.",
@@ -263,6 +268,13 @@ def render_index(memory: dict, profile: dict, lanes: list[dict]) -> str:
     project = memory.get("project", {})
     summary = memory.get("summary", {})
     counts = project_counts(memory, lanes)
+    collaboration = memory.get("_coordination", {})
+    active_agents = len(
+        [item for item in collaboration.get("agents", []) if item.get("state") not in {"completed", "stale"}]
+    )
+    open_coordination = len(
+        [item for item in collaboration.get("coordinations", []) if item.get("state") != "resolved"]
+    )
     return f"""# Project Memory Index
 
 ## Overview
@@ -274,6 +286,8 @@ def render_index(memory: dict, profile: dict, lanes: list[dict]) -> str:
 - Density: {DENSITY_LABELS.get(resolved_profile.get("density", "balanced"), "Balanced")}
 - Last updated: {summary.get("lastUpdated", "Unknown")}
 - Work lanes: {counts["lanes"]}
+- Active agents: {active_agents}
+- Open coordination: {open_coordination}
 
 ## Files
 
@@ -963,6 +977,77 @@ def render_lanes(memory: dict, *, title: str = "Work Lanes", layout_name: str = 
     """
 
 
+def render_collaboration(memory: dict, *, title: str = "Active Agents", layout_name: str = "full") -> str:
+    collaboration = memory.get("_coordination", {})
+    agents = [item for item in collaboration.get("agents", []) if item.get("state") != "completed"]
+    open_items = [item for item in collaboration.get("coordinations", []) if item.get("state") != "resolved"]
+    if not agents and not open_items:
+        return ""
+
+    cards = []
+    for agent in agents:
+        scopes = ", ".join(agent.get("scopes", [])) or "Unclaimed"
+        checkpoint = agent.get("lastCheckpoint") or agent.get("currentAction") or "No checkpoint published"
+        blocker = agent.get("blocker") or "None"
+        cards.append(
+            f"""
+            <article class="lane-card">
+              <div class="lane-top">
+                <div>
+                  <span class="lane-kicker">{escape(agent.get("id", "agent"))}</span>
+                  <h3>{escape(agent.get("label", "Agent"))}</h3>
+                </div>
+                {pill(agent.get("state", "unknown"))}
+              </div>
+              <div class="lane-meta">
+                <span>Branch: {escape(agent.get("branch") or "-")}</span>
+                <span>Stage: {escape(agent.get("stage") or "-")}</span>
+                <span>Updated: {escape(agent.get("updatedAt") or "-")}</span>
+              </div>
+              <div class="lane-focus"><strong>Task</strong><div>{escape(agent.get("task") or "Unspecified")}</div></div>
+              <div class="record-grid">
+                <div><strong>Scopes</strong><span>{escape(scopes)}</span></div>
+                <div><strong>Checkpoint</strong><span>{escape(checkpoint)}</span></div>
+                <div><strong>Blocker</strong><span>{escape(blocker)}</span></div>
+              </div>
+            </article>
+            """
+        )
+
+    coordination_html = ""
+    if open_items:
+        coordination_html = '<div class="records" style="margin-top: 14px;">' + "".join(
+            f"""
+            <article class="record">
+              <div class="record-head">
+                <h3>{escape(item.get("topic") or "Coordination")}</h3>
+                <div class="record-tags">{pill(item.get("kind", "coordination"))}</div>
+              </div>
+              <div class="record-grid">
+                <div><strong>Owner</strong><span>{escape(item.get("ownerAgentId") or "-")}</span></div>
+                <div><strong>Participants</strong><span>{escape(", ".join(item.get("participants", [])) or "-")}</span></div>
+                <div><strong>Surfaces</strong><span>{escape(", ".join(item.get("surfaces", [])) or "-")}</span></div>
+              </div>
+            </article>
+            """
+            for item in open_items
+        ) + "</div>"
+
+    return f"""
+    <section class="{band_class(layout_name)}">
+      <div class="section-head">
+        <div>
+          <h2>{escape(title)}</h2>
+          <p class="section-note">{escape(section_note("collaboration"))}</p>
+        </div>
+        <div class="section-meta">{len(agents)} agents / {len(open_items)} open</div>
+      </div>
+      <div class="lane-grid">{''.join(cards)}</div>
+      {coordination_html}
+    </section>
+    """
+
+
 def render_named_items(items: list[dict], empty_text: str, fields: list[tuple[str, str]]) -> str:
     if not items:
         return f'<p class="muted">{escape(empty_text)}</p>'
@@ -1038,6 +1123,8 @@ def render_section(section: str, memory: dict, profile: dict, lanes: list[dict],
     layout_name = section_layouts.get(section, "standard")
     if section == "summary":
         return render_summary(memory, title=title, layout_name=layout_name)
+    if section == "collaboration":
+        return render_collaboration(memory, title=title, layout_name=layout_name)
     if section == "lanes":
         return render_lanes(memory, title=title, layout_name=layout_name)
     if section == "progress":
@@ -1127,7 +1214,11 @@ def render_html(memory: dict, profile: dict, lanes: list[dict]) -> str:
 
     preferred = resolved_profile.get("sections", list(SECTION_TITLES))
     ordered_sections = []
-    for section in ["summary", "progress", "lanes"]:
+    leading_sections = ["summary"]
+    if memory.get("_coordination"):
+        leading_sections.append("collaboration")
+    leading_sections.extend(["progress", "lanes"])
+    for section in leading_sections:
         if section not in ordered_sections:
             ordered_sections.append(section)
     for section in preferred:
@@ -1150,8 +1241,11 @@ def refresh_outputs(project_root: Path, memory: dict | None = None, profile: dic
     profile = profile or load_json(memory_dir / "profile.json")
     lanes = list_lanes(project_root)
     update_memory_lane_index(memory, lanes)
-    (memory_dir / "overview.html").write_text(render_html(memory, profile, lanes), encoding="utf-8")
-    (memory_dir / "INDEX.md").write_text(render_index(memory, profile, lanes), encoding="utf-8")
+    render_memory = deepcopy(memory)
+    if coordination_registry_path(project_root).exists():
+        render_memory["_coordination"] = public_snapshot(load_coordination_registry(project_root))
+    (memory_dir / "overview.html").write_text(render_html(render_memory, profile, lanes), encoding="utf-8")
+    (memory_dir / "INDEX.md").write_text(render_index(render_memory, profile, lanes), encoding="utf-8")
     write_shortcut(project_root, memory.get("project", {}).get("name", project_root.name))
     return memory, profile, lanes
 

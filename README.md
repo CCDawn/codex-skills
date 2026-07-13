@@ -64,13 +64,13 @@ sh ./install.sh
 | Skill 很多但不会自动选 | BRT 选择最具体 owner，并可动态组合多个意图 |
 | 简单修改被流程拖慢 | 按子任务风险控制重量，默认优先直接实现和验证 |
 | 审查只给结论、不继续推进 | 形成按依赖排序的行动队列，在边界内连续处理 |
-| 多个 Codex 会话修改同一项目发生冲突 | 协调 owner、暂停冲突会话，并在解除后主动通知恢复 |
+| 多个 Codex 会话同时开发 | 共享紧凑进度，协调 scope、讨论、暂停恢复和合并顺序 |
 | AI 研究和普通开发混用流程 | 分离研究实验、评分循环、严谨性审查和软件 TDD |
 
 ## 精选 Skill
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)：默认适配层，负责意图理解、讨论式对齐、路由和流程重量控制。
-- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)：协调同一项目内多个 Codex 会话的冲突、暂停、恢复和交接。
+- [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)：共享同项目 Agent 进度，协调冲突、讨论、暂停恢复与快速合并。
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
@@ -114,7 +114,7 @@ sh ./install.sh
   CCDawn 最重要入口 skill。高置信度任务直接推进；低置信度且误解会返工时，先查证，再用一轮讨论式追问确认结果、范围、非目标和验收。每个问题提供具体推荐、理由和错判影响，用户可以只纠正不对的项。
 
 - **`ccdawn-thread-coordination`**
-  同一项目多会话协调 owner。发现写入冲突时使用暂停握手，确认对方已停在安全 checkpoint 后再处理；冲突解除后主动发送恢复通知并确认送达。
+  同一项目多会话协调 owner。用跨 worktree 的 live registry 共享任务、scope 和 checkpoint；通过收敛讨论、暂停握手和 merge order 减少冲突与回归。
 
 - **`ccdawn-ui-design`**
   UI/UX 专项 owner，负责信息层级、交互状态、响应式、无障碍和浏览器视觉验证；机械前端小改不会自动升级成设计流程。
@@ -153,7 +153,7 @@ sh ./install.sh
   CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。
 
 - **`ccdawn-dawn-agent-html-memory`**  
-  按需维护 `.docs/project-memory/` 的跨会话状态、关键决策、blocker、lane 和 HTML 总览；普通开发不会自动初始化、同步或创建 claim。
+  用不入 Git 的 live registry 保存 Agent 状态，用 `.docs/project-memory/` 持久化已确认决策、blocker 和合并结果；HTML 总览显示脱敏的 Active Agents。
 
 - **`ccdawn-goal-loop`**  
   这是一个目标执行 skill，用来把一个目标整理成带有证据、限制条件、允许范围、下一步判断规则和阻塞停止报告的可执行合同。
