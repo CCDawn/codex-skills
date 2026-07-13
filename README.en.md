@@ -16,6 +16,12 @@ CCDawn is a Chinese-first collection of 21 Agent Skills for intent alignment, dy
 
 **English** | [简体中文](README.md)
 
+## BRT in 20 Seconds
+
+![BRT moving from intent alignment to routing, implementation, and verification](assets/brt-demo.gif)
+
+This is an illustrative workflow: the user describes the task normally; BRT inspects available context, discusses only decisions that change the result, and hands the aligned task to the most specific skill.
+
 ## Quick Start
 
 Preview the main entry skill:
