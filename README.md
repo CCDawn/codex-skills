@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-21-2f81f7)](#完整-skill-目录)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
+[![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **让 Codex 先理解你，再决定怎么做。**
 
