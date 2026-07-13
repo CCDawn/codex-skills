@@ -1,6 +1,7 @@
 ---
 name: ccdawn-dawn-agent-html-memory
 description: Use when the user or project rules explicitly request project-local memory/dashboard initialization or updates, or when an existing `.docs/project-memory/` is needed for cross-session recovery, durable decisions, blockers, parallel-agent coordination, or formal handoff; do not auto-initialize or sync it for ordinary development.
+license: MIT
 ---
 
 # Agent HTML Memory

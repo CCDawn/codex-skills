@@ -1,6 +1,7 @@
 ---
 name: ccdawn-bug-review
 description: "Use when a bug, regression, failing test, build failure, abnormal behavior, performance symptom, or suspected root cause needs Chinese-first diagnosis, bounded repair, and evidence-based verification without loading a heavyweight debugging workflow."
+license: MIT
 ---
 
 # CCDawn Bug Review

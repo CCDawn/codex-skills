@@ -1,6 +1,7 @@
 ---
 name: ccdawn-goal-loop
 description: Use when the user explicitly wants a persistent iterative goal contract with bounded inputs/tools, strict constraints, success evidence, repeated next-step selection, and stop conditions, and no more specific CCDawn owner already controls the work; do not use for ordinary one-turn or finite implementation requests.
+license: MIT
 ---
 
 # Goal Loop

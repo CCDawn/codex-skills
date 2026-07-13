@@ -1,6 +1,7 @@
 ---
 name: ccdawn-research-rigor-review
 description: "Use when an AI/ML research result, baseline promotion, ablation conclusion, benchmark claim, paper claim, surprising finding, or high-cost next experiment needs an evidence-focused rigor review before it is accepted, generalized, published, or used to redirect the research program."
+license: MIT
 ---
 
 # 研究严谨性审查

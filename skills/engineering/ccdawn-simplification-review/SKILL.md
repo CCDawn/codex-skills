@@ -1,6 +1,7 @@
 ---
 name: ccdawn-simplification-review
 description: Use when the user explicitly asks whether a diff, PR, branch, commit range, or proposed patch is over-engineered or can be made smaller, or when concrete evidence makes removable complexity the primary review question; do not attach it to every code review.
+license: MIT
 ---
 
 # CCDawn 精简审查

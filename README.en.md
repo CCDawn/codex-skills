@@ -1,0 +1,103 @@
+# CCDawn Codex Skills
+
+[![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
+[![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
+[![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-21-2f81f7)](#skill-catalog)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
+
+**Let Codex understand what you mean before deciding how to work.**
+
+CCDawn is a Chinese-first collection of 21 Agent Skills for intent alignment, dynamic routing, lightweight development, code review, UI design, and AI research workflows.
+
+- Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
+- [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
+- Simple work stays simple. Planning, task splitting, and compact TDD are activated only when the risk justifies them.
+
+**English** | [简体中文](README.md)
+
+## Quick Start
+
+Preview the main entry skill:
+
+```bash
+gh skill preview CCDawn/codex-skills ccdawn-brt
+```
+
+List or install the skills with the Agent Skills CLI:
+
+```bash
+npx skills add CCDawn/codex-skills --list
+npx skills add CCDawn/codex-skills --skill '*' -g -a codex -y
+```
+
+For CCDawn's full installation policy, including dry-run, live-copy validation, and reversible conflict handling:
+
+```powershell
+git clone https://github.com/CCDawn/codex-skills.git
+Set-Location codex-skills
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+```bash
+git clone https://github.com/CCDawn/codex-skills.git
+cd codex-skills
+sh ./install.sh
+```
+
+The repository installer targets `~/.codex/skills` by default and avoids installing a duplicate copy into `~/.agents/skills`.
+
+## What Makes It Different
+
+| Problem | CCDawn approach |
+| --- | --- |
+| The request is incomplete | Inspect available evidence, then discuss only decisions that change the result |
+| Many skills exist but routing is manual | BRT selects the most specific owner and can combine multiple intents |
+| Small changes trigger heavyweight process | Scale workflow weight per subtask and prefer direct implementation plus verification |
+| Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
+| Research experiments get treated like software tests | Separate research, score loops, rigor review, and deterministic software TDD |
+
+## Featured Skills
+
+- [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md): intent inference, collaborative alignment, routing, and workflow-weight control.
+- [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md): evidence-driven diagnosis, bounded repair, and verification.
+- [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md): risk-ranked PR and diff review with merge-readiness evidence.
+- [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md): UI/UX direction, responsive behavior, accessibility, and browser visual QA.
+- [`ccdawn-ai-research-loop`](skills/research/ccdawn-ai-research-loop/SKILL.md): baseline reproduction, hypotheses, experiments, ablations, and research synthesis.
+- [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md): reuse research for complex feature decisions.
+
+## Skill Catalog
+
+### Engineering
+
+- [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)
+- [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)
+- [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)
+- [`ccdawn-project-review`](skills/engineering/ccdawn-project-review/SKILL.md)
+- [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)
+- [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md)
+- [`ccdawn-planning`](skills/engineering/ccdawn-planning/SKILL.md)
+- [`ccdawn-task-splitting`](skills/engineering/ccdawn-task-splitting/SKILL.md)
+- [`ccdawn-bdd-tdd-development`](skills/engineering/ccdawn-bdd-tdd-development/SKILL.md)
+- [`ccdawn-completion-summary`](skills/engineering/ccdawn-completion-summary/SKILL.md)
+- [`ccdawn-simplification-review`](skills/engineering/ccdawn-simplification-review/SKILL.md)
+- [`ccdawn-simplification-audit`](skills/engineering/ccdawn-simplification-audit/SKILL.md)
+- [`ccdawn-evaluation`](skills/engineering/ccdawn-evaluation/SKILL.md)
+- [`ccdawn-goal-loop`](skills/engineering/ccdawn-goal-loop/SKILL.md)
+- [`ccdawn-dawn-agent-html-memory`](skills/engineering/ccdawn-dawn-agent-html-memory/SKILL.md)
+
+### AI Research and Competition
+
+- [`ccdawn-ai-research-loop`](skills/research/ccdawn-ai-research-loop/SKILL.md)
+- [`ccdawn-research-rigor-review`](skills/research/ccdawn-research-rigor-review/SKILL.md)
+- [`ccdawn-competition-research-lifecycle`](skills/research/ccdawn-competition-research-lifecycle/SKILL.md)
+- [`ccdawn-score-loop`](skills/competition/ccdawn-score-loop/SKILL.md)
+- [`ccdawn-huawei-nslb-score-loop`](skills/competition/ccdawn-huawei-nslb-score-loop/SKILL.md)
+
+### Creativity
+
+- [`ccdawn-creative-toolbox`](skills/creative/ccdawn-creative-toolbox/SKILL.md)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for package rules and validation requirements. The repository is available under the [MIT License](LICENSE).

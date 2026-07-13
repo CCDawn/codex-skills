@@ -1,17 +1,79 @@
-# Dawn Codex Skills
+# CCDawn Codex Skills
 
-这是一个本地 skill 仓库，重点覆盖竞赛型研究流程、行为闸门式实现，以及持久化项目记忆。
+[![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
+[![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
+[![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-21-2f81f7)](#完整-skill-目录)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 
-最重要入口是 `ccdawn-brt`（在 Codex 里也可能显示为 `$ccdawn-brt` 或 `/brt`）。用户正常表达需求即可：意图明确时 agent 直接推进；意图不清且误解会导致返工时，agent 会先查证，再以讨论形式集中追问并给出推荐，确认后自动选择下游 skill。
+**让 Codex 先理解你，再决定怎么做。**
+
+21 个中文优先 Agent Skills，覆盖意图对齐、动态路由、轻量开发、代码审查、UI 设计和 AI 研究工作流。
+
+- 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
+- [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
+- 简单任务直接实现和验证；只有真实风险存在时才升级到规划、拆分或紧凑 TDD。
+
+[English](README.en.md) | **简体中文**
+
+## 快速体验
+
+先预览最重要的入口 Skill：
+
+```powershell
+gh skill preview CCDawn/codex-skills ccdawn-brt
+```
+
+使用 Agent Skills CLI 查看或安装：
+
+```powershell
+npx skills add CCDawn/codex-skills --list
+npx skills add CCDawn/codex-skills --skill '*' -g -a codex -y
+```
+
+需要 CCDawn 完整安装策略，包括安装演练、live copy 验证和可逆处理冲突入口时，使用仓库安装器：
+
+```powershell
+git clone https://github.com/CCDawn/codex-skills.git
+Set-Location codex-skills
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+macOS/Linux：
+
+```bash
+git clone https://github.com/CCDawn/codex-skills.git
+cd codex-skills
+sh ./install.sh
+```
+
+默认只安装到 `~/.codex/skills/<ccdawn-skill-name>`，不会同时写入 `~/.agents/skills` 造成重复入口。高级选项见[安装细节](#安装细节)。
+
+## 为什么使用 CCDawn
+
+| 常见问题 | CCDawn 的处理方式 |
+| --- | --- |
+| 用户没有写完整规格 | 先读取可查证上下文，再讨论真正会改变结果的问题 |
+| Skill 很多但不会自动选 | BRT 选择最具体 owner，并可动态组合多个意图 |
+| 简单修改被流程拖慢 | 按子任务风险控制重量，默认优先直接实现和验证 |
+| 审查只给结论、不继续推进 | 形成按依赖排序的行动队列，在边界内连续处理 |
+| AI 研究和普通开发混用流程 | 分离研究实验、评分循环、严谨性审查和软件 TDD |
+
+## 精选 Skill
+
+- [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)：默认适配层，负责意图理解、讨论式对齐、路由和流程重量控制。
+- [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
+- [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
+- [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
+- [`ccdawn-ai-research-loop`](skills/research/ccdawn-ai-research-loop/SKILL.md)：复现 baseline，推进假设、实验、消融与研究方向收敛。
+- [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md)：为复杂功能评估项目内外可复用方案。
 
 ## 懒人安装
 
-适合不想手动 clone、找目录、跑命令的用户：
+不想手动 clone、找目录或运行命令时，把下面的提示词直接发给 Codex。
 
-1. 打开一个新的 Codex 会话。
-2. 把下面整段提示词复制给 Codex。
-3. 等 Codex 自动完成 `dry-run -> install -> verify`。
-4. 安装器会可逆停用会抢占 BRT 的广触发流程入口；完成后重启客户端或新开会话。
+<details>
+<summary>展开一键安装提示词</summary>
 
 ```text
 请帮我一键安装 CCDawn 的 Codex skills 技能包。
@@ -31,34 +93,11 @@
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
 
-需要更严格限制写入范围时，用 [强约束版安装提示词](INSTALL_PROMPTS.md#强约束版)。
+</details>
 
-## 手动安装
+需要更严格限制写入范围时，用[强约束版安装提示词](INSTALL_PROMPTS.md#强约束版)。
 
-```bash
-git clone https://github.com/CCDawn/codex-skills.git
-cd codex-skills
-```
-
-Windows PowerShell 推荐用：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1
-```
-
-macOS/Linux 推荐用：
-
-```bash
-sh ./install.sh
-```
-
-默认安装目标是：
-
-- `~/.codex/skills/<ccdawn-skill-name>`：给 Codex 运行时直接加载的 live skill 目录
-
-安装器默认不写入 `~/.agents/skills`，并可逆停用完整 Superpowers 自动发现入口集，避免外部流程约束抢占 BRT 的轻重判断。演练、恢复、验证和高级目标见 [安装细节](#安装细节)。
-
-## 当前包含的 skill
+## 完整 Skill 目录
 
 ### 工程流程
 

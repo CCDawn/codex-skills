@@ -1,6 +1,7 @@
 ---
 name: ccdawn-task-splitting
 description: "Use when BRT or an accepted implementation plan has already found multiple independent deliverables, owners, dependency artifacts, risk gates, verification contracts, parallel lanes, or cross-session boundaries that genuinely require an executable task graph before development."
+license: MIT
 ---
 
 # CCDawn 任务拆分

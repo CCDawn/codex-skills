@@ -1,6 +1,7 @@
 ---
 name: ccdawn-competition-research-lifecycle
 description: Use when coordinating an end-to-end research competition or benchmark program across multiple lifecycle stages such as task definition, data, baseline, experiments, evidence, paper claims, and submission packaging; use score-loop for a single metric lane and ai-research-loop for a standalone research direction.
+license: MIT
 ---
 
 # 竞赛科研全流程（Competition Research Lifecycle）

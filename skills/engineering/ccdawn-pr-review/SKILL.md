@@ -1,6 +1,7 @@
 ---
 name: ccdawn-pr-review
 description: Use when the user explicitly requests review of a PR, diff, branch, commit range, merge readiness, or review feedback, or when a high-risk change has reached an explicit pre-integration review gate; do not trigger merely because ordinary development finished.
+license: MIT
 ---
 
 # CCDawn PR Review

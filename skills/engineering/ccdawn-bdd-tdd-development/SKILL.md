@@ -1,6 +1,7 @@
 ---
 name: ccdawn-bdd-tdd-development
 description: Use when a selected CCDawn subtask has meaningful behavior, regression, state, data, security, migration, public-contract, or cross-module risk that needs a failing test before implementation; simple or mechanical work should stay with its current owner and use targeted verification.
+license: MIT
 ---
 
 # CCDawn 紧凑 BDD/TDD

@@ -1,0 +1,45 @@
+name: Skill 建议
+description: 建议新增、替换或改进一个 CCDawn Skill
+title: "[Skill] "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景
+      description: 用户通常会怎样表达这个需求？请给出 1 至 3 个真实示例。
+    validations:
+      required: true
+
+  - type: textarea
+    id: gap
+    attributes:
+      label: 当前缺口
+      description: 现有 Skill 为什么不能有效完成？具体失败或浪费在哪里？
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 期望结果
+      description: 新增或修改后，Agent 应产生什么可观察结果？
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: 可复用资料
+      description: 可以填写相关仓库、论文、标准、Skill 或现有实现。
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 建议类型
+      options:
+        - 优化现有 Skill
+        - 新增 Skill
+        - 替换或吸收外部 Skill
+        - 调整 BRT 路由
+    validations:
+      required: true

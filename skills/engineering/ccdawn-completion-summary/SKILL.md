@@ -1,6 +1,7 @@
 ---
 name: ccdawn-completion-summary
 description: Use when completed work needs formal cross-stage or cross-session synthesis, resumed-task closure, durable handoff evidence, deferred-risk accounting, or PR/release readiness evidence that cannot be represented by the current owner's normal verification and concise final response.
+license: MIT
 ---
 
 # CCDawn Completion Summary

@@ -1,6 +1,7 @@
 ---
 name: ccdawn-creative-toolbox
 description: "Use when the user wants context-aware concept collision, unknown concept generation, divergent thinking, creative ideation, concept invention, paradigm exploration, unusual alternatives, product ideas, research concepts, strategy concepts, story concepts, or surprising but useful options."
+license: MIT
 ---
 
 # Creative Toolbox

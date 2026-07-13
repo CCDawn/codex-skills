@@ -1,0 +1,56 @@
+name: Bug 报告
+description: 报告安装、发现、路由或 Skill 行为问题
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: 感谢反馈。请提供能够复现问题的最少信息，避免粘贴敏感数据。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题表现
+      description: 实际发生了什么？
+      placeholder: 描述用户输入、Agent 输出以及不符合预期的部分。
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果
+      description: 你希望 Skill 如何理解、路由或执行？
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 安装方式
+        2. 使用的 Skill 或输入
+        3. 观察到的结果
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: 环境
+      description: Codex 版本、操作系统和仓库提交（如可用）
+      placeholder: Codex / Windows 11 / commit abc1234
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 日志或截图
+      description: 请删除令牌、账号、私有路径和其他敏感信息。
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前检查
+      options:
+        - label: 我已经确认没有同时安装重复的 `.codex/skills` 和 `.agents/skills` 副本。
+        - label: 我已经重启 Codex 或在新任务中重新验证。

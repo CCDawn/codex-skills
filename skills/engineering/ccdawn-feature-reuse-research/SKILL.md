@@ -1,6 +1,7 @@
 ---
 name: ccdawn-feature-reuse-research
 description: Use when a complex feature has an unresolved reuse decision and external projects, libraries, standards, examples, or in-project modules could materially change architecture, dependencies, scope, or implementation; do not use for routine work already covered by local patterns or standard platform capabilities.
+license: MIT
 ---
 
 # CCDawn Feature Reuse Research

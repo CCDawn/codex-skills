@@ -1,6 +1,7 @@
 ---
 name: ccdawn-planning
 description: "Use when aligned requirements need a persistent or reviewable implementation plan because real design choices, cross-boundary contracts, multiple owners, risky sequencing, migration, release, or cross-session handoff make an internal execution outline insufficient."
+license: MIT
 ---
 
 # CCDawn 实施规划

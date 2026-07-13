@@ -1,6 +1,7 @@
 ---
 name: ccdawn-ui-design
 description: Use when a CCDawn task materially involves UI/UX direction, information hierarchy, interaction states, responsive behavior, accessibility, frontend visual review, or browser-based visual QA; do not use for backend work or mechanical frontend edits that introduce no design decision.
+license: MIT
 ---
 
 # CCDawn UI Design

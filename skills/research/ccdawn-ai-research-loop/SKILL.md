@@ -1,6 +1,7 @@
 ---
 name: ccdawn-ai-research-loop
 description: "Use when AI/ML research engineering needs baseline reproduction, hypothesis-driven experiments, ablations, evaluation design, findings synthesis, research direction selection, plateau recovery, or a reproducible loop from a paper/repository/research question to evidence-backed results."
+license: MIT
 ---
 
 # AI 研究工程循环

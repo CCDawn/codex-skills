@@ -1,6 +1,7 @@
 ---
 name: ccdawn-brt
 description: "Use when a user message needs Chinese-first intent inference, low-confidence collaborative clarification, routing, workflow weight control, skill choice, review/testing/planning/debugging/evaluation routing, continuation handling, execution permission inference, or protection from process over-escalation."
+license: MIT
 ---
 
 # BRT

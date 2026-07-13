@@ -1,6 +1,7 @@
 ---
 name: ccdawn-evaluation
 description: Use when CCDawn workflow needs a Chinese-first evaluation adapter and no more specific existing skill already owns the review, debugging, PR, planning, feedback, verification, or goal task.
+license: MIT
 ---
 
 # CCDawn Evaluation

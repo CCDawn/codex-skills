@@ -1,6 +1,7 @@
 ---
 name: ccdawn-huawei-nslb-score-loop
 description: Use when optimizing, benchmarking, packaging, comparing baselines, handling online score feedback, or coordinating parallel agents for the Huawei Algorithm Challenge 37 NSLB project in C:\Users\17533\Documents\New project 5.
+license: MIT
 ---
 
 # Huawei NSLB Score Loop

@@ -113,6 +113,7 @@ def validate_skill(
     frontmatter = parse_frontmatter(skill_md)
     name = frontmatter.get("name", "")
     description = frontmatter.get("description", "")
+    license_id = frontmatter.get("license", "")
     label = str(skill_md.relative_to(repo_root))
 
     if not name:
@@ -127,6 +128,9 @@ def validate_skill(
             errors.append(f"{label}: description must start with 'Use when'")
         if len(description) > 500:
             warnings.append(f"{label}: description is {len(description)} chars; consider shortening")
+
+    if license_id != "MIT":
+        errors.append(f"{label}: frontmatter license must be 'MIT'")
 
     if not (skill_dir / "agents" / "openai.yaml").exists():
         errors.append(f"{skill_dir.relative_to(repo_root)}: missing agents/openai.yaml")

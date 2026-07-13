@@ -1,6 +1,7 @@
 ---
 name: ccdawn-project-review
 description: Use when CCDawn workflow needs a Chinese-first review of an entire repository, codebase, architecture, technical debt, test coverage, risk modules, maintainability, onboarding state, or project health before planning, refactoring, takeover, or prioritization.
+license: MIT
 ---
 
 # CCDawn Project Review

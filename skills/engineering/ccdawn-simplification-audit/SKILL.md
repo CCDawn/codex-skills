@@ -1,6 +1,7 @@
 ---
 name: ccdawn-simplification-audit
 description: Use when the user explicitly requests a repository/subsystem simplification audit, dependency-bloat review, or ranked removal plan, or when concrete evidence makes structural complexity the primary investigation; do not substitute it for ordinary project health review.
+license: MIT
 ---
 
 # CCDawn 精简审计
