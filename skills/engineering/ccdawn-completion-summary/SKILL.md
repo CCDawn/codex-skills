@@ -1,13 +1,13 @@
 ---
 name: ccdawn-completion-summary
-description: Use when CCDawn development, verification, or a workflow stage ends and fresh evidence, requirement coverage, residual risk, completion status, next-step choices, PR review readiness, commit/push readiness, or handoff state must be summarized.
+description: Use when completed work needs formal cross-stage or cross-session synthesis, resumed-task closure, durable handoff evidence, deferred-risk accounting, or PR/release readiness evidence that cannot be represented by the current owner's normal verification and concise final response.
 ---
 
 # CCDawn Completion Summary
 
 ## 目标
 
-用新鲜证据确认当前阶段是否真的完成，并给用户一个低噪声总结。此阶段只验证和汇报，不补做新功能。
+用新鲜证据完成正式交接或跨阶段收口。普通 FAST_PATH 和有界 COMPACT_FLOW 由当前 owner 验证后直接汇报，不单独加载本 skill。
 
 核心原则：
 
@@ -43,7 +43,7 @@ description: Use when CCDawn development, verification, or a workflow stage ends
 
 ## 进入条件
 
-使用前确认已有：
+只在至少存在一项额外价值时进入：跨会话恢复、跨 owner/stage 综合、正式交接、Deferred/未决风险需要持久化、或 PR/发布前需要独立证据包。进入前确认已有：
 
 - 已对齐需求或任务图；
 - 已完成的实现、验证或阶段产物；
@@ -51,7 +51,7 @@ description: Use when CCDawn development, verification, or a workflow stage ends
 - 涉及写入时，有当前 Execution Contract、保护边界和 Success Evidence；缺失时先从需求、任务图和 diff 快速补齐；
 - 需要汇报给用户的下一步决策。
 
-如果发现关键任务没做完，按任务的 Development Mode 回到轻量开发或 `ccdawn-bdd-tdd-development`；如果任务本身不清楚，回到 `ccdawn-task-splitting`，不要把未完成包装成总结。
+如果只是当前 owner 完成了普通实现和验证，直接给简短完成说明，不进入本 skill。如果发现关键任务没做完，回到最具体的开发/debug owner；任务边界本身错误时回 `ccdawn-planning` 或 `ccdawn-brt`，不要为补形式进入任务拆分。
 
 ## 验证门槛
 

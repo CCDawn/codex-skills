@@ -6,6 +6,9 @@ param(
 
     [string]$HomeDir,
 
+    [ValidateSet("warn", "disable", "restore", "ignore")]
+    [string]$ProcessSkillConflicts = "disable",
+
     [switch]$List,
     [switch]$DryRun,
     [switch]$VerifyOnly
@@ -16,7 +19,7 @@ $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $PSCommandPath
 $installer = Join-Path $repo "scripts\install_codex_library.py"
 
-$installerArgs = @($installer, "--agent", $Agent)
+$installerArgs = @($installer, "--agent", $Agent, "--process-skill-conflicts", $ProcessSkillConflicts)
 if ($HomeDir) {
     $installerArgs += @("--home", $HomeDir)
 }

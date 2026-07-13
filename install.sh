@@ -12,4 +12,4 @@ else
   exit 1
 fi
 
-exec "$PYTHON" "$SCRIPT_DIR/scripts/install_codex_library.py" "$@"
+exec "$PYTHON" "$SCRIPT_DIR/scripts/install_codex_library.py" --process-skill-conflicts disable "$@"

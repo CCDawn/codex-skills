@@ -47,7 +47,7 @@ State is a routing signal, not decoration.
 - EVALUATING: `ccdawn-evaluation` is judging a plan, workflow, skill, implementation, result, or current state.
 - BUG_REVIEWING: `ccdawn-bug-review` is inspecting a bug, regression, failing test, or abnormal behavior before choosing a fix path.
 - PLANNING: `ccdawn-planning` is producing an implementation plan.
-- TASK_SPLITTING: `ccdawn-task-splitting` is deciding `NO_SPLIT` or producing a task graph with per-task development modes.
+- TASK_SPLITTING: `ccdawn-task-splitting` is producing a task graph after BRT or planning has already found real dependency, owner, risk, parallel, verification, or handoff boundaries. `NO_SPLIT` stays an internal BRT/planning decision.
 - DEVELOPING: `ccdawn-bdd-tdd-development` is executing one selected task.
 - SUMMARIZING: `ccdawn-completion-summary` is checking evidence and reporting status.
 - PR_REVIEWING: `ccdawn-pr-review` is checking a PR, branch, commit range, or local diff against requirements and evidence.
@@ -74,7 +74,7 @@ Transition rules:
 - Each stage gives a next action after its output contract. Stop for user choice only at natural gates: blocker, failed verification that cannot be safely recovered inside the current contract, changed intent, scope expansion, destructive/high-risk action, release/merge action, or worktree conflict.
 - If the user changes the goal, return to `ccdawn-brt`.
 - If a later stage discovers the plan is wrong, return to `ccdawn-planning`.
-- If a selected task is unclear, return to `ccdawn-task-splitting`.
+- If an existing task boundary is unclear, return to `ccdawn-planning`; enter `ccdawn-task-splitting` only when a real split trigger remains.
 - A user may authorize continuous Critical Path execution after task splitting. Related tasks may remain one internal sequence; update a ledger only when handoff, resumption, blocker, deferred work, or high-risk evidence would otherwise be lost.
 - Continuous Critical Path execution must stop on blocker, failed verification that cannot be safely recovered inside the current Execution Contract, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
 - A failed verification is first a recovery signal, not automatically a handoff stop. If the cause is inside the current Execution Contract and safe to fix, route back to the owning development/debug stage, fix, and re-verify. Stop only when it becomes a natural gate.
@@ -113,7 +113,7 @@ Self-assess process weight before routing:
 - If the main value is project health, architecture, technical debt, test gaps, onboarding, or risk-module triage, route to `ccdawn-project-review`.
 - If the main value is diagnosing a failing behavior, route to `systematic-debugging`; use `ccdawn-bug-review` only when CCDawn handoff/ledger is needed.
 - If the main value is reviewing a PR/diff/branch before integration, route to `ccdawn-pr-review`.
-- If a step does not change outcome, reduce it: skip planning, choose `NO_SPLIT`, compress ledger, or keep `FAST_PATH`.
+- If a step does not change outcome, reduce it: skip planning, keep `NO_SPLIT` internal, compress ledger, or remain in `FAST_PATH`.
 - Prefer outcome gates over method gates: require scope, safety, evidence, and recovery; let the current model choose the shortest sound method.
 - Reuse the current worktree for one theme. Create a new worktree only for parallel work, conflict isolation, high-risk isolation, or explicit user request.
 
@@ -152,10 +152,9 @@ Owner boundaries:
 - `ccdawn-evaluation` owns quality judgment of a plan, workflow, skill, result, or current state after the user goal is known.
 - Once routed to `ccdawn-evaluation`, return to BRT only when the user's goal or evaluation object is unclear.
 
-`ccdawn-task-splitting` owns the split decision:
+`ccdawn-brt` or `ccdawn-planning` first decides whether splitting has value. `NO_SPLIT` routes directly to implementation without loading another skill. `ccdawn-task-splitting` owns only the `SPLIT` artifact when multiple dependent deliverables, distinct owners, independent risk gates, parallel lanes, cross-session handoff, different verification contracts, or user-requested decomposition remain.
 
-- `NO_SPLIT`: one low-risk execution unit, clear verification, no staged dependencies, no BDD/TDD need.
-- `SPLIT`: create subtasks and classify each subtask as `SIMPLE` or `BDD_TDD`.
+- `SPLIT`: create only the minimum subtasks needed by those boundaries and classify each as `SIMPLE` or `BDD_TDD`.
 - Experiment lane: bypass this engineering classification and stay with `ccdawn-score-loop`; only a separated deterministic defect may return as a SIMPLE/BDD_TDD subtask.
 
 Inside `SPLIT`, upgrade a subtask to `BDD_TDD` only when at least one signal is present:

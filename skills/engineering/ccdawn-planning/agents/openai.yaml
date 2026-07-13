@@ -1,4 +1,4 @@
 interface:
   display_name: "CCDawn Planning"
-  short_description: "需求对齐后的实施方案制定：范围、文件影响、风险、验证策略和下一路由。"
-  default_prompt: "使用 $ccdawn-planning：把已对齐需求转换成可实施方案，明确目标、范围边界、文件影响、复用决策、风险、验证策略、执行顺序和 Route Out；如果需求未对齐，先回到 $ccdawn-brt。"
+  short_description: "仅为真实设计分叉、高风险顺序或跨边界交接生成可复用实施方案。"
+  default_prompt: "使用 $ccdawn-planning：生成最小可实施方案并默认直接路由当前 owner 实施；只有已确认存在独立依赖、owner、风险或验证边界时才进入 $ccdawn-task-splitting。"

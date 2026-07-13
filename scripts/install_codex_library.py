@@ -5,6 +5,17 @@ import sys
 from pathlib import Path
 
 
+PROCESS_SKILL_CONFLICTS = (
+    "using-superpowers",
+    "brainstorming",
+    "test-driven-development",
+    "using-git-worktrees",
+    "writing-plans",
+    "subagent-driven-development",
+)
+DISABLED_SKILL_FILENAME = "SKILL.md.ccdawn-disabled"
+
+
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.exists():
         shutil.rmtree(dst)
@@ -54,6 +65,78 @@ def destination_roots(home: Path, agent: str) -> list[Path]:
 
 def codex_skills_root(home: Path) -> Path:
     return home / ".codex" / "skills"
+
+
+def targets_codex(home: Path, roots: list[Path]) -> bool:
+    return codex_skills_root(home) in roots
+
+
+def process_skill_conflict_state(home: Path) -> list[tuple[str, str]]:
+    root = codex_skills_root(home)
+    states = []
+    for name in PROCESS_SKILL_CONFLICTS:
+        skill_dir = root / name
+        active = (skill_dir / "SKILL.md").exists()
+        disabled = (skill_dir / DISABLED_SKILL_FILENAME).exists()
+        if active and disabled:
+            state = "conflict"
+        elif active:
+            state = "active"
+        elif disabled:
+            state = "disabled"
+        else:
+            state = "absent"
+        states.append((name, state))
+    return states
+
+
+def manage_process_skill_conflicts(home: Path, action: str, dry_run: bool = False) -> None:
+    if action == "ignore":
+        return
+
+    root = codex_skills_root(home)
+    changed = []
+    blocked = []
+    for name, state in process_skill_conflict_state(home):
+        skill_dir = root / name
+        active_path = skill_dir / "SKILL.md"
+        disabled_path = skill_dir / DISABLED_SKILL_FILENAME
+
+        if action == "warn":
+            if state == "active":
+                changed.append((name, "active"))
+            elif state == "conflict":
+                blocked.append((name, "both active and disabled entrypoints exist"))
+            continue
+
+        if state == "conflict":
+            blocked.append((name, "both active and disabled entrypoints exist"))
+            continue
+
+        if action == "disable" and state == "active":
+            changed.append((name, "would disable" if dry_run else "disabled"))
+            if not dry_run:
+                active_path.rename(disabled_path)
+        elif action == "restore" and state == "disabled":
+            changed.append((name, "would restore" if dry_run else "restored"))
+            if not dry_run:
+                disabled_path.rename(active_path)
+
+    if action == "warn" and changed:
+        print("Warning: broad process skills can override CCDawn BRT routing and increase planning/TDD/worktree/subagent cost:")
+        for name, _ in changed:
+            print(f"  {root / name / 'SKILL.md'}")
+        print("To disable only their auto-discovery entrypoints, rerun with --process-skill-conflicts disable.")
+    elif changed:
+        verb = "Planned process skill conflict changes" if dry_run else "Process skill conflict changes"
+        print(f"{verb}:")
+        for name, state in changed:
+            print(f"  {name}: {state}")
+
+    if blocked:
+        print("Process skill conflict entries requiring manual inspection:")
+        for name, reason in blocked:
+            print(f"  {root / name}: {reason}")
 
 
 def codex_validator_path(home: Path) -> Path:
@@ -149,6 +232,15 @@ def parse_args() -> argparse.Namespace:
         action="append",
         help="Install only the named skill. Repeat for multiple skills. Defaults to all skills in the repository.",
     )
+    parser.add_argument(
+        "--process-skill-conflicts",
+        choices=["warn", "disable", "restore", "ignore"],
+        default="warn",
+        help=(
+            "Manage broad local process skill entrypoints that can override BRT routing. "
+            "disable/restore renames only SKILL.md, preserving the original directory and content (default: warn)."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -177,6 +269,8 @@ def main() -> int:
     roots = destination_roots(home, args.agent)
     if args.dry_run:
         print_install_plan(home, roots, selected_skill_names_list)
+        if targets_codex(home, roots):
+            manage_process_skill_conflicts(home, args.process_skill_conflicts, dry_run=True)
         print("Dry run only; no files changed.")
         return 0
 
@@ -196,6 +290,7 @@ def main() -> int:
         print("Validated live Codex skills:")
         for path in validated_codex_skills:
             print(f"  {path}")
+        manage_process_skill_conflicts(home, "warn")
         return 0
 
     installed_skills = []
@@ -212,6 +307,8 @@ def main() -> int:
                 installed_codex_skills.append(destination)
 
     validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
+    if targets_codex(home, roots):
+        manage_process_skill_conflicts(home, args.process_skill_conflicts)
 
     print(f"Repository: {repo_root}")
     print(f"Home: {home}")

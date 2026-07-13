@@ -11,7 +11,7 @@
 1. 打开一个新的 Codex 会话。
 2. 把下面整段提示词复制给 Codex。
 3. 等 Codex 自动完成 `dry-run -> install -> verify`。
-4. 安装完成后，按 Codex 提示重启客户端或新开会话。
+4. 安装器会可逆停用会抢占 BRT 的广触发流程入口；完成后重启客户端或新开会话。
 
 ```text
 请帮我一键安装 CCDawn 的 Codex skills 技能包。
@@ -24,8 +24,9 @@
 3. 不要安装到 ~/.agents/skills，避免重复 slash-command。
 4. 先运行安装演练，再执行正式安装。
 5. 安装后验证 live skills 是否可用。
-6. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、验证是否通过、是否需要重启 Codex。
-7. 重点提醒我：最重要入口是 ccdawn-brt；安装/选择它之后，用户正常说需求即可，BRT 会在 agent 内部自动完成意图对齐和下游 skill 路由。
+6. 使用安装脚本默认可逆停用 using-superpowers、brainstorming、test-driven-development、using-git-worktrees、writing-plans、subagent-driven-development 的自动发现入口，保留原目录和内容，不要删除。
+7. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、冲突入口处理、验证是否通过、是否需要重启 Codex。
+8. 重点提醒我：最重要入口是 ccdawn-brt；安装/选择它之后，用户正常说需求即可，BRT 会在 agent 内部自动完成意图对齐和下游 skill 路由。
 
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
@@ -55,7 +56,7 @@ sh ./install.sh
 
 - `~/.codex/skills/<ccdawn-skill-name>`：给 Codex 运行时直接加载的 live skill 目录
 
-安装器默认不写入 `~/.agents/skills`，避免重复 slash-command。演练、验证、只安装部分 skill 和高级目标见 [安装细节](#安装细节)。
+安装器默认不写入 `~/.agents/skills`，并可逆停用会强制 brainstorming、planning、TDD、worktree 或子代理流程的广触发入口，避免它们抢占 BRT 的轻重判断。演练、恢复、验证和高级目标见 [安装细节](#安装细节)。
 
 ## 当前包含的 skill
 
@@ -68,16 +69,16 @@ sh ./install.sh
   复杂功能新增前的复用调研 skill，用来比较现有项目、库、示例和项目内模块，判断复用价值和实现边界。
 
 - **`ccdawn-planning`**
-  方案制定阶段 skill，用来在需求对齐后、动代码前形成实施方案。
+  只在真实设计分叉、高风险顺序或跨边界交接需要可复用方案时触发；默认方案完成后由当前 owner 直接实施。
 
 - **`ccdawn-task-splitting`**
-  任务拆分阶段 skill，用来把已确认方案拆成可审阅、可独立验证的任务单元。
+  只在已确认存在独立依赖、owner、风险或验证边界时建立最小任务图；普通 `NO_SPLIT` 不进入此阶段。
 
 - **`ccdawn-bdd-tdd-development`**
   仅对复杂、高回归风险子任务使用紧凑 TDD；复用已有 RED、运行窄验证，默认不派发逐任务子代理和 reviewer 链。
 
 - **`ccdawn-completion-summary`**
-  完成总结阶段 skill，用来做新鲜验证、需求对照和简洁交接总结。
+  只为跨阶段综合、恢复、正式交接、PR/发布前证据生成持久总结；普通实现由当前 owner 直接收口。
 
 - **`ccdawn-pr-review`**
   PR 审阅阶段 skill，用来把 PR、分支、提交范围或本地 diff 对照已确认需求、任务证据、回归风险和合并准备度进行审查。
@@ -199,7 +200,15 @@ scripts/
 py -3 scripts\install_codex_library.py
 ```
 
-安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。
+安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`：只把六个广触发流程 skill 的 `SKILL.md` 改名为 `SKILL.md.ccdawn-disabled`，不删除目录或内容。
+
+恢复这些入口：
+
+```powershell
+py -3 scripts\install_codex_library.py --agent codex --process-skill-conflicts restore
+```
+
+直接调用 Python 安装器时，默认只警告；要使用 BRT 的低噪声路由，显式加 `--process-skill-conflicts disable`。
 
 只演练安装计划，不改文件：
 

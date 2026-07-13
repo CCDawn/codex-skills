@@ -1,269 +1,93 @@
 ---
 name: ccdawn-task-splitting
-description: Use when an accepted CCDawn engineering implementation plan needs split/no-split routing before development, NO_SPLIT may be valid, or deterministic subtasks need SIMPLE vs BDD_TDD decisions, verification anchors, dependencies, boundaries, and handoff decisions.
+description: "Use when BRT or an accepted implementation plan has already found multiple independent deliverables, owners, dependency artifacts, risk gates, verification contracts, parallel lanes, or cross-session boundaries that genuinely require an executable task graph before development."
 ---
 
-# CCDawn Task Splitting
+# CCDawn 任务拆分
 
 ## 目标
 
-把已确认方案拆成可执行任务图，或明确判定无需拆分。此阶段只做拆分决策，不写代码。
-
-好的任务拆分应该让后续 agent 清楚知道：
-
-- 这个方案是否真的需要拆分；
-- 先做哪一项，为什么；
-- 每个任务的输入、输出和依赖；
-- 每个任务拥有哪个修改面，以及哪些相邻区域不能误碰；
-- 每个任务适合轻量实现还是需要 BDD/TDD；
-- 哪些任务是关键路径，哪些是可选优化；
-- 完成一个任务后怎样判断可以进入下一个任务。
+只为已经确认需要拆分的工作建立最小任务图。`NO_SPLIT` 默认由 BRT 或 Planning 内部判定，不把本 skill 当成每个方案都必须经过的审批阶段。
 
 ## BRT interface
 
-- Context Boundary: 已接受方案、复用决策、影响文件/模块、风险边界、验证策略、任务依赖和明确排除范围。
-- Output Contract: `NO_SPLIT` 直接执行单元，或 `SPLIT` 任务图；每个任务含 output、files/boundary、reuse、dependency、development mode、verification 和 Route Out。
-- Allowed Action: 只做拆分/不拆分判定；不写代码、不改测试、不运行迁移/删除/发布动作；发现方案不可执行时回 `ccdawn-planning`。
-- Success Evidence: `NO_SPLIT` 有明确理由和直接验证；`SPLIT` 的 critical tasks 都有 owner surface、protected boundary、Development Mode 和 verification condition。
-- Stop Condition: 方案未接受、文件边界不清、critical task 缺验证、BDD_TDD 缺紧凑 Test Anchor、高风险动作未确认或方案不可执行。
-- Route Out: `FAST_PATH` 轻量执行、`ccdawn-bdd-tdd-development`、`ccdawn-score-loop`、`ccdawn-completion-summary`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+- Context Boundary: 已接受方案、拆分触发原因、影响面、依赖、owner、风险与验证边界。
+- Output Contract: 最小 critical path、必要 task cards、开发模式和连续执行路由；误路由时返回紧凑 `NO_SPLIT`。
+- Allowed Action: 只做任务边界与依赖设计；不修改代码，不重新规划需求，不制造可合并的小任务。
+- Success Evidence: 每个任务都有独立产出、拥有面、依赖和验证，拆分能降低协调或误改风险。
+- Stop Condition: 方案未接受、拆分触发原因不成立、边界或验证不清、高风险动作未确认或任务图不能执行。
+- Route Out: 当前 owner 连续实施、`ccdawn-bdd-tdd-development`、`ccdawn-score-loop`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
-## 统一输出标准
+用户可见输出默认中文，并遵守 BRT 的自然闸门和下一步规范。
 
-- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
-- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
-- 若必须保留英文状态或枚举，先用中文解释其含义。
-- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+## 拆分闸门
 
-## Owner 接入规则
+至少满足一项才建立任务图：
 
-进入本 skill 前先做轻量 owner 自检：
-
-- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
-- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
-- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
-
-## 进入条件
-
-使用前确认已有：
-
-- 已接受的 `ccdawn-planning` 方案；
-- BRT、planning 阶段或用户已路由到拆分/不拆分判定；用户原始目标已包含执行许可时，可按自然闸门连续进入；
-- 方案中的目标、范围、文件影响、风险和验证策略；
-- 复杂新增功能的复用决策：REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / skipped；
-- 必要的代码或文档上下文。
-
-如果方案本身还没被用户接受，不要拆任务，先回到 `ccdawn-planning`。
-
-## 拆分原则
-
-- 一个任务只交付一个可审阅结果。
-- 每个任务必须能独立验证。
-- 任务之间依赖要显式写出，不能让后续 agent 猜。
-- 测试、脚手架、配置和文档不要单独漂浮；并入产出依赖它们的任务。
-- 不把多个无关模块塞进同一个任务。
-- 不把一次微小改动拆成无意义的小碎片。
-- 如果决定拆分，每个子任务必须标记 `SIMPLE` 或 `BDD_TDD`。
-- `SIMPLE` 子任务只要求明确产出和必要验证。
-- 只有 agent 判断子任务无法一次稳定完成、容易偏离、跨模块或高风险时，才标记为 `BDD_TDD`。
-- 如果方案本身就是一个可一次执行的单元，输出 `NO_SPLIT`，不要硬拆成任务。
-
-## 拆分判定
-
-选择 `NO_SPLIT`，当方案同时满足：
-
-- 一个实现单元即可完成；
-- 文件范围和验证方式清楚；
-- 不需要先后依赖或分阶段交付；
-- 不涉及迁移、删除、权限、安全、持久化、公共 API 或发布风险；
-- 失败可快速回滚；
-- 不需要 BDD/TDD 才能稳定实现。
-
-选择 `SPLIT`，当任一条件成立：
-
-- 需要多个先后依赖的产物；
-- 跨模块或跨页面，容易在一次实现中混乱；
-- 有高风险步骤需要单独验收；
-- 至少有一个子任务可能需要 BDD/TDD 才能稳定实现；
-- 需要并行 agent 或分 PR；
+- 多个独立交付物或 owner；
+- 后续任务必须消费前一任务产生的 artifact；
+- 高风险步骤需要独立验收、权限、回滚或发布闸门；
+- 需要并行、分 PR、跨会话交接或不同验证契约；
 - 用户明确要求拆分。
 
-## 子任务模式判定
-
-只在 `SPLIT` 后对子任务判定模式。
-
-实验 lane 不进入 `SIMPLE/BDD_TDD` 判定：当主要未知量是候选对 metric/score 的影响时，整条 lane 归 `ccdawn-score-loop`。分数下降、假设失败、online neutral/worse、跨模块实验或训练运行失败都不是 TDD RED。只有从实验中分离出的确定性工程 bug 才建立独立工程子任务。
-
-标记 `SIMPLE`，当子任务：
-
-- 范围局部，输出明确；
-- 不涉及状态迁移、权限、安全、持久化、公共 API 或发布风险；
-- 不需要新行为契约才能理解；
-- 直接验证或结构检查足够。
-
-标记 `BDD_TDD`，当子任务任一条件成立：
-
-- 行为、失败路径、状态流转或数据契约不清；
-- 跨模块协作，容易一次实现偏离；
-- 之前相同的确定性软件行为回归过；
-- 需要新增行为测试才可信；
-- 涉及权限、安全、迁移、持久化、公共 API、发布或回滚；
-- 用户要求谨慎 BDD/TDD。
-
-## Task Graph
-
-Task Graph 规则归入本阶段。每个任务必须说明：
-
-- input：本任务需要的需求、文件、数据、前置产物；
-- output：本任务完成后可观察或可复用的产物；
-- dependency：依赖的任务、确认、工具或环境状态；
-- verification condition：证明任务完成且对齐的证据。
-- owned surface / protected boundary：本任务负责的文件、模块、行为，以及不应顺手修改的相邻区域。
-
-任务图还要标出：
-
-- critical path：完成目标必须执行的任务；
-- optional path：有价值但非必需的优化；
-- high risk task：数据丢失、安全、回归、API 破坏或难回滚风险；
-- ambiguous task：仍依赖假设或实现分叉的任务。
-
-没有 verification condition 的 critical task 不允许进入开发。
-
-## 任务卡格式
-
-每个任务必须包含：
+多个文件、同机制批量修改、描述较长、普通跨模块实现或“可能需要测试”不构成拆分理由。如果误路由且一个上下文可以完成，输出：
 
 ```text
-Task N: 名称
-- Goal: 本任务要达成的可观察结果
-- Inputs: 来自需求、方案或前置任务的输入
-- Outputs: 后续任务依赖的产物
-- Files: 预计创建/修改/测试的路径
-- Boundary: 本任务拥有的修改面；明确不碰的相邻文件、行为或清理项
-- Reuse: 本任务继承的复用决策、候选模块/库、禁止误用边界；无则写“无”
-- Dependencies: 无 / Task X
-- Criticality: critical / optional
-- Development Mode: SIMPLE / BDD_TDD
-- Test Anchor: SIMPLE 写“轻量验证”；BDD_TDD 写一行目标行为、可复用 RED 或最小失败测试、最窄测试命令
-- Verification: 要运行的命令或结构性检查
-- Review Gate: 任务完成后审什么
-- Risk: 本任务最可能出偏差的点
+拆分判定: NO_SPLIT
+理由: <为什么一个执行单元更可靠>
+直接路由: 当前 owner 实施并验证
+下一步建议: 直接实施
 ```
 
-`SIMPLE` 子任务可用压缩卡片：
+然后继续，不建立 Task Graph、ledger 或 summary 阶段。
+
+## 任务设计
+
+- 一个任务交付一个后续步骤或独立验收真正需要的结果。
+- 测试、文档、配置和脚手架并入依赖它们的功能任务，不单独漂浮。
+- 共享文件、顺序依赖或共享验证的任务保持串行；只有写入面和证据独立才并行。
+- Critical Path 只包含完成用户目标必需的任务；可选优化放入 Deferred，不生成当前任务卡。
+- 默认连续执行 Critical Path。用户已有执行许可时，不在每个任务之间询问是否继续。
+
+实验 lane 不进入 `SIMPLE/BDD_TDD` 判定：当主要未知量是候选对 metric/score 的影响时，整条 lane 归 `ccdawn-score-loop`。只有从实验中分离出的确定性工程 bug 才建立工程任务。
+
+开发模式按任务判定：
+
+- `SIMPLE`：行为和边界明确，直接实现加风险相称的验证即可。
+- `BDD_TDD`：确定性行为存在重大回归、状态/数据/权限/迁移/公共契约风险，需要失败测试锚定预期；使用 `ccdawn-bdd-tdd-development`。
+
+不要因为文件多、跨模块、实现失败或用户要求“谨慎”就自动选择 BDD/TDD；先说明哪项确定性行为风险需要测试先行。
+
+## 紧凑任务卡
 
 ```text
-Task N: 名称
-- Output:
+Task N: <可观察产出>
 - Files/Boundary:
-- Reuse:
-- Development Mode: SIMPLE
+- Dependencies:
+- Mode: SIMPLE / BDD_TDD
 - Verification:
-- Risk:
+- Risk/Stop:
 ```
 
-## 输出契约
+只有下游确实需要时才补 Inputs、Reuse、回滚或详细 Test Anchor。禁止把每个函数、测试文件或机械编辑拆成任务。
 
-`NO_SPLIT` 输出：
-
-```text
-任务拆分判定:
-- Decision: NO_SPLIT
-- 理由: ...
-- Context Boundary: 已接受方案、影响文件、验证策略和风险边界...
-- 直接执行单元:
-  - Output:
-  - Files:
-  - Verification:
-  - Risk:
-- Success Evidence: NO_SPLIT 理由成立，直接执行单元有明确输出、文件边界和验证方式
-- Stop Condition: 方案未接受 / 文件边界不清 / 验证条件缺失 / 高风险动作未确认
-
-Ledger Update:
-- Current Stage: TASK_SPLITTING
-- Task Graph: 不需要
-- Current Task: 直接执行单元
-- Decisions: NO_SPLIT
-- Unresolved Risks: ...
-- Recommended Next Stage: 轻量执行 / ccdawn-completion-summary
-- Route Out: FAST_PATH 轻量执行 / ccdawn-completion-summary / ccdawn-planning
-
-下一步:
-推荐下一步：不拆分，直接执行。
-- 如果用户目标已经包含执行许可：直接进入轻量执行，不停下等确认。
-- 如果执行许可或风险边界缺失：只问一个阻塞问题。
-- 只有用户要求选择、方案有真实分叉、或存在高风险动作时，才列出“强制拆分 / 回到 planning / 暂停”等选项。
-```
-
-`SPLIT` 输出：
+## 输出
 
 ```text
-任务拆分:
+任务图:
+- 拆分理由:
 - Critical Path: Task 1 -> Task 2 -> ...
-- Optional Path: ...
-- 并行性: 哪些不能并行，哪些可以独立处理
-- Context Boundary: 已接受方案、复用决策、影响文件、风险和验证策略...
+- 并行/串行边界:
 
 Task 1: ...
 Task 2: ...
-Task 3: ...
 
-Ledger Update:
-- Current Stage: TASK_SPLITTING
-- Task Graph: Critical Path..., Optional Path...
-- Current Task: 推荐 Task 1
-- Verification Evidence: 拆分自审...
-- Decisions: ...
-- Unresolved Risks: ...
-- Recommended Next Stage: 轻量执行 Task 1 / ccdawn-bdd-tdd-development（仅 BDD_TDD 任务）/ 授权后连续 Critical Path
-- Route Out: FAST_PATH 轻量执行 / ccdawn-bdd-tdd-development / ccdawn-completion-summary / ccdawn-planning
-- Stop Condition: critical task 缺验证 / Boundary 不清 / BDD_TDD 缺紧凑 Test Anchor / 方案不可执行
-
-拆分自审:
-- 覆盖方案: PASS/NEEDS_CHANGE，证据...
-- 依赖清晰: PASS/NEEDS_CHANGE，证据...
-- 粒度合适: PASS/NEEDS_CHANGE，证据...
-- 验证可行: PASS/NEEDS_CHANGE，证据...
-
-下一步:
-任务拆分已完成。推荐下一步：执行 Task 1（按其 Development Mode 路由）。
-- 如果用户原始目标是完成整个方案、修复整个问题、或已说“继续/按推荐来”：进入 Task 1，不反复请求确认。
-- 如果连续执行全部 Critical Path 还没有授权，且一次性推进会改变用户授权边界：给出连续授权选项。
-- 如果用户要求选择、任务顺序有真实分叉、或存在高风险动作：再列出调整拆分、指定其他任务或暂停。
+执行路由:
+- 当前任务:
+- 连续执行: 是（默认）/ 否（说明自然闸门）
+- 成功证据:
+- 停止条件:
+下一步建议: 执行当前任务
 ```
 
-## 质量门槛
-
-- `BDD_TDD` 任务没有紧凑 Test Anchor 不合格；不要求长 Given/When/Then、`.feature` 文件或测试矩阵。
-- `SIMPLE` 任务不要补形式化 BDD/TDD；只要说明为什么轻量验证足够。
-- 任务不能只写“实现功能”“添加测试”“更新文档”。
-- 有误改风险的任务缺少 Boundary 不合格。
-- 复杂新增功能缺少 Reuse 字段不合格；如果选择自研，必须说明已研究或已跳过复用研究的原因。
-- 不能在拆分阶段改代码。
-- 如果拆分发现方案不可执行，回到 `ccdawn-planning`，不要硬拆。
-
-## Workflow Ledger
-
-任务拆分完成时必须更新账本增量：
-
-- `Accepted Plan` 必须来自 `ccdawn-planning`。
-- `Split Decision` 必须是 `NO_SPLIT` 或 `SPLIT`。
-- `NO_SPLIT` 时，`Task Graph` 写“不需要”，`Current Task` 写“直接执行单元”，`Recommended Next Stage` 写轻量执行或完成总结。
-- `SPLIT` 时，`Task Graph` 必须包含 critical path、optional path 和任务依赖。
-- `SPLIT` 时，`Current Task` 默认推荐第一个未完成 critical task，除非用户指定其他任务。
-- `SPLIT` 时，`Recommended Next Stage` 默认是第一个未完成 critical task，并标明 `SIMPLE` 或 `BDD_TDD`；只有授权边界确实需要用户选择时，才提供“连续执行全部 Critical Path”的明确授权选项。
-- 完整字段和压缩规则以 `ccdawn-brt/references/runtime.md` 为准；本阶段默认只输出 `Ledger Update`。
-
-## 阶段交接
-
-完成拆分判定后遵守 `ccdawn-brt/references/runtime.md` 的自然闸门规则：用户目标已包含执行许可时，按推荐任务继续；只有阻塞、高风险动作、验证失败、范围变化、目标变化、发布/合并/迁移/删除/权限动作前，才停下等用户选择。
-
-进入开发时，按任务的 `Development Mode` 执行：`SIMPLE` 任务轻量实现和验证；`BDD_TDD` 任务使用 `ccdawn-bdd-tdd-development`。只有用户明确选择“连续执行全部 Critical Path”或原始目标已经是完成整个 critical path 时，才连续执行全部任务；否则执行推荐的下一个任务。
-
-如果任务实际是 score/benchmark/validation/leaderboard 实验，不进入上述开发模式，直接回 `ccdawn-score-loop` 继续 baseline/candidate/gate 循环。
-
-如果用户选择连续执行全部 Critical Path：
-
-- 把该选择写入 `Decisions`：`Continuous Critical Path authorized`。
-- 后续执行细节、开发模式和停止条件以 `ccdawn-brt/references/runtime.md` 为准。
-- 全部 critical tasks 完成后，默认路由到 `ccdawn-completion-summary`，不要停在中间等待用户重复确认。
+任务完成后由当前 owner 用新鲜证据直接收口。只有跨阶段综合、恢复、正式交接或 PR 前需要持久证据时才使用 `ccdawn-completion-summary`，不能把它设为每条 Critical Path 的默认尾声。

@@ -55,8 +55,12 @@ def parse_frontmatter(skill_md: Path) -> dict[str, str]:
     return values
 
 
-def word_count(text: str) -> int:
-    return len(re.findall(r"\S+", text))
+def estimated_instruction_tokens(text: str) -> int:
+    """Cheap language-aware size proxy; whitespace counts badly undercount Chinese."""
+    cjk_chars = len(re.findall(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]", text))
+    latin_words = len(re.findall(r"[A-Za-z0-9_]+", text))
+    punctuation = len(re.findall(r"[^\w\s\u3400-\u9fff]", text))
+    return cjk_chars + round(latin_words * 1.3) + punctuation // 3
 
 
 def discover_skill_dirs(repo_root: Path) -> list[Path]:
@@ -139,11 +143,41 @@ def validate_skill(
     if name == "ccdawn-task-splitting" and "实验 lane 不进入" not in text:
         errors.append(f"{label}: missing experiment-lane bypass for SIMPLE/BDD_TDD classification")
 
-    words = word_count(text)
-    if name == "ccdawn-brt" and words > 1500:
-        warnings.append(f"{label}: {words} words; BRT is a hot entrypoint, consider moving details to references")
-    elif name != "ccdawn-brt" and words > 1600:
-        warnings.append(f"{label}: {words} words; consider progressive disclosure")
+    route_regressions = {
+        "ccdawn-planning": {
+            "required": ["默认 `DIRECT_IMPLEMENTATION`", "`NO_SPLIT` 是 BRT/Planning 的内部结论"],
+            "forbidden": ["默认进入 `ccdawn-task-splitting`"],
+        },
+        "ccdawn-task-splitting": {
+            "required": ["只为已经确认需要拆分", "不能把它设为每条 Critical Path 的默认尾声"],
+            "forbidden": ["默认路由到 `ccdawn-completion-summary`"],
+        },
+        "ccdawn-completion-summary": {
+            "required": ["普通 FAST_PATH 和有界 COMPACT_FLOW", "不单独加载本 skill"],
+            "forbidden": [],
+        },
+    }
+    if name in route_regressions:
+        contract = route_regressions[name]
+        for marker in contract["required"]:
+            if marker not in text:
+                errors.append(f"{label}: low-noise route contract missing marker '{marker}'")
+        for marker in contract["forbidden"]:
+            if marker in text:
+                errors.append(f"{label}: forced-stage regression marker found '{marker}'")
+
+    token_budgets = {
+        "ccdawn-brt": 4500,
+        "ccdawn-planning": 1800,
+        "ccdawn-task-splitting": 1600,
+        "ccdawn-completion-summary": 3000,
+    }
+    estimated_tokens = estimated_instruction_tokens(text)
+    budget = token_budgets.get(name)
+    if budget is not None and estimated_tokens > budget:
+        warnings.append(
+            f"{label}: about {estimated_tokens} instruction tokens exceeds the {budget} hot-route budget"
+        )
 
 
 def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str]) -> None:
