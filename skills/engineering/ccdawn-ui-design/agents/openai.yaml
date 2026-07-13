@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn UI 设计"
+  short_description: "界面设计、交互状态与浏览器视觉验证 owner"
+  default_prompt: "使用 $ccdawn-ui-design 用中文设计、实施或审查当前 UI/UX 任务，并用真实渲染证据验证结果。"

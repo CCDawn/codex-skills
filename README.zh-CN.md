@@ -65,8 +65,11 @@ sh ./install.sh
 - **`ccdawn-brt`**  
   CCDawn 最重要入口 skill。默认相信高能力模型可以内部完成推断、规划和自审，约束只用于防止误改与高风险错误；用户正常说需求即可，只有真实分叉、高风险取舍或阻塞时才增加流程和问题。
 
+- **`ccdawn-ui-design`**
+  UI/UX 专项 owner，负责信息层级、交互状态、响应式、无障碍和浏览器视觉验证；机械前端小改不会自动升级成设计流程。
+
 - **`ccdawn-feature-reuse-research`**
-  复杂功能新增前的复用调研 skill，用来比较现有项目、库、示例和项目内模块，判断复用价值和实现边界。
+  只在复用候选会实质改变复杂功能的架构、依赖或实现范围时调研现有项目、库、标准、示例和项目内模块。
 
 - **`ccdawn-planning`**
   只在真实设计分叉、高风险顺序或跨边界交接需要可复用方案时触发；默认方案完成后由当前 owner 直接实施。
@@ -99,7 +102,7 @@ sh ./install.sh
   CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。
 
 - **`ccdawn-dawn-agent-html-memory`**  
-  这是一个项目记忆 skill，用来在真实软件项目里创建并持续维护 `.docs/project-memory/`。它支持按职责拆分的多会话共享 lane，生成会聚合这些 lane 的 HTML 总览页，并在项目根目录生成一个 `PROJECT_MEMORY.html` 快捷入口。
+  按需维护 `.docs/project-memory/` 的跨会话状态、关键决策、blocker、lane 和 HTML 总览；普通开发不会自动初始化、同步或创建 claim。
 
 - **`ccdawn-goal-loop`**  
   这是一个目标执行 skill，用来把一个目标整理成带有证据、限制条件、允许范围、下一步判断规则和阻塞停止报告的可执行合同。
@@ -171,6 +174,7 @@ skills/
     README.md
     ccdawn-dawn-agent-html-memory/
     ccdawn-brt/
+    ccdawn-ui-design/
     ccdawn-feature-reuse-research/
     ccdawn-planning/
     ccdawn-task-splitting/

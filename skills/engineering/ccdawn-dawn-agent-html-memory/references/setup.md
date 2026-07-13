@@ -36,7 +36,7 @@ When setup is user-facing, confirm these points briefly:
 2. It will generate structured JSON plus a human-readable HTML overview.
 3. It should stay focused on project state, not personal history or unrelated notes.
 
-If the user is already asking for meaningful development work in a real repository, treat that as enough signal to initialize unless they object.
+Initialize only when the user explicitly requests project memory or repository rules require it. Ordinary development work is not implicit permission to add this system.
 
 ## Pick the project type
 
@@ -125,7 +125,7 @@ Supported values:
 Run:
 
 ```bash
-python <skill-root>/scripts/init_project_memory.py <project-root> --project-type <type> --dashboard-preset <preset> --visual-mode <mode> --density <density>
+python <skill-root>/scripts/init_project_memory.py <project-root> --project-type <type> --dashboard-preset <preset> --visual-mode <mode> --density <density> --skip-agents-rules
 ```
 
 Then confirm:
@@ -138,7 +138,7 @@ Then confirm:
 - any explicit `visualMode` or `density` overrides appear only when intentionally pinned
 - any explicit `sections` or `sectionLayouts` overrides appear only when intentionally customized
 
-If the repository has `AGENTS.md`, let initialization inject the `Project Memory Rules` block unless the user opts out.
+Inject the `Project Memory Rules` block into `AGENTS.md` only when the user or repository policy explicitly wants ongoing project-memory behavior; in that case, intentionally omit `--skip-agents-rules`.
 
 ## Choose the first lane
 

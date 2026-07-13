@@ -75,6 +75,30 @@ def rel_skill_path(repo_root: Path, skill_dir: Path) -> str:
     return "./" + skill_dir.relative_to(repo_root).as_posix()
 
 
+def validate_ccdawn_route_references(
+    repo_root: Path,
+    skill_names: set[str],
+    errors: list[str],
+) -> None:
+    references: dict[str, list[str]] = {}
+    for markdown_path in sorted((repo_root / "skills").rglob("*.md")):
+        text = read_text(markdown_path)
+        for referenced_name in sorted(set(re.findall(r"\bccdawn-[a-z0-9-]+\b", text))):
+            if referenced_name in skill_names:
+                continue
+            label = markdown_path.relative_to(repo_root).as_posix()
+            references.setdefault(referenced_name, []).append(label)
+
+    for missing_name, paths in sorted(references.items()):
+        locations = ", ".join(paths[:3])
+        if len(paths) > 3:
+            locations += f", and {len(paths) - 3} more"
+        errors.append(
+            f"unresolved CCDawn route '{missing_name}' referenced by {locations}; "
+            "package the skill or remove the route"
+        )
+
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -131,6 +155,11 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: compact debugging owner missing marker '{marker}'")
 
+    if name == "ccdawn-ui-design":
+        for marker in ["## 界面契约", "响应式边界", "浏览器验证", "现有设计系统"]:
+            if marker not in text:
+                errors.append(f"{label}: UI owner missing marker '{marker}'")
+
     if name == "ccdawn-score-loop":
         for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "## 研究回传契约"]:
             if marker not in text:
@@ -178,6 +207,8 @@ def validate_skill(
         "ccdawn-task-splitting": 1600,
         "ccdawn-completion-summary": 3000,
         "ccdawn-bug-review": 1800,
+        "ccdawn-ui-design": 2200,
+        "ccdawn-dawn-agent-html-memory": 2200,
     }
     estimated_tokens = estimated_instruction_tokens(text)
     budget = token_budgets.get(name)
@@ -218,6 +249,8 @@ def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str])
         missing_names = [name for name in skill_names if name not in readme_text]
         if missing_names:
             errors.append(f"{readme_name}: missing skill names {missing_names}")
+
+    validate_ccdawn_route_references(repo_root, set(skill_names), errors)
 
 
 def main() -> int:

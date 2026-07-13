@@ -1,6 +1,6 @@
 ---
 name: ccdawn-simplification-audit
-description: Use when an entire repository or subsystem may contain dependency bloat, dead flexibility, duplicate architecture, unnecessary wrappers, single-implementation abstractions, legacy paths, or maintainability drag that should be ranked for simplification.
+description: Use when the user explicitly requests a repository/subsystem simplification audit, dependency-bloat review, or ranked removal plan, or when concrete evidence makes structural complexity the primary investigation; do not substitute it for ordinary project health review.
 ---
 
 # CCDawn 精简审计

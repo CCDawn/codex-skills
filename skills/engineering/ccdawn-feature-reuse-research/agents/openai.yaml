@@ -1,4 +1,4 @@
 interface:
-  display_name: "CCDawn Feature Reuse Research"
-  short_description: "Research reusable projects, libraries, examples, and modules before planning complex features."
-  default_prompt: "Use ccdawn-feature-reuse-research before planning a complex feature to search for reusable projects or modules, evaluate reuse value, and choose REUSE, ADAPT, REFERENCE_ONLY, or BUILD_IN_HOUSE."
+  display_name: "CCDawn 功能复用调研"
+  short_description: "评估会实质改变方案的项目、库与现有模块"
+  default_prompt: "使用 $ccdawn-feature-reuse-research 用中文调研当前复杂功能的真实复用候选，并给出 REUSE、ADAPT、REFERENCE_ONLY 或 BUILD_IN_HOUSE 结论。"

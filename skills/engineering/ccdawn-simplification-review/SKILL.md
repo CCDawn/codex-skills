@@ -1,6 +1,6 @@
 ---
 name: ccdawn-simplification-review
-description: Use when a current diff, PR, branch, commit range, or proposed patch may contain over-engineering, unnecessary abstractions, avoidable dependencies, duplicate logic, dead flexibility, or code that should become smaller without changing required behavior.
+description: Use when the user explicitly asks whether a diff, PR, branch, commit range, or proposed patch is over-engineered or can be made smaller, or when concrete evidence makes removable complexity the primary review question; do not attach it to every code review.
 ---
 
 # CCDawn 精简审查

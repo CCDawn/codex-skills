@@ -1,6 +1,6 @@
 interface:
-  display_name: "CCDawn Goal Loop"
-  short_description: "Turn an objective into a verified execution contract."
-  default_prompt: "Use $ccdawn-goal-loop to turn the user's objective into a goal contract with evidence, constraints, allowed scope, next-step rules, and blocker reporting; then iterate until the goal is achieved or no valid path remains."
+  display_name: "CCDawn 目标循环"
+  short_description: "运行有边界、有证据和停止条件的持续目标"
+  default_prompt: "使用 $ccdawn-goal-loop 用中文建立明确的目标契约，并在允许范围内迭代，直到成功证据成立或触发停止条件。"
 
 

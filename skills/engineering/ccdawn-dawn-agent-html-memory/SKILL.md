@@ -1,119 +1,44 @@
 ---
 name: ccdawn-dawn-agent-html-memory
-description: Use when Codex needs project-local persistent memory under `.docs/project-memory/`, a generated HTML repository dashboard, durable progress/modules/decisions/issues/todos tracking, project memory initialization, project memory sync after meaningful development, or "update the project memory page" requests.
+description: Use when the user or project rules explicitly request project-local memory/dashboard initialization or updates, or when an existing `.docs/project-memory/` is needed for cross-session recovery, durable decisions, blockers, parallel-agent coordination, or formal handoff; do not auto-initialize or sync it for ordinary development.
 ---
 
 # Agent HTML Memory
 
-Create a project-local memory system under `.docs/project-memory/` and keep it current after meaningful work.
+## 目标
+
+按需维护仓库内 `.docs/project-memory/` 和 HTML 总览，让跨会话状态、关键决策与交接证据可恢复。它是持久化工具，不是普通开发的默认流程，也不替代聊天上下文、`AGENTS.md` 或其他 memory 系统。
 
 ## BRT interface
 
-- Context Boundary: target repository root, `.docs/project-memory/`, relevant lane files, project rules, and the current task result.
-- Output Contract: initialized or updated project memory files plus rendered dashboard/index evidence.
-- Allowed Action: edit only `.docs/project-memory/`, `PROJECT_MEMORY.html`, and the AGENTS memory block during initialization unless the user explicitly authorizes broader changes.
-- Success Evidence: changed lane/recent update is present in JSON, `overview.html`, `INDEX.md`, and root `PROJECT_MEMORY.html` when applicable.
-- Stop Condition: missing project root, malformed memory files, overlapping active claim, renderer failure, or user explicitly skips memory.
-- Route Out: return to the current CCDawn stage, `ccdawn-completion-summary`, or BLOCKED with one required fix/input.
+- Context Boundary: 目标仓库、现有 `.docs/project-memory/`、项目规则、本轮需要恢复或持久化的事实，以及明确授权的 memory surface。
+- Output Contract: 读取结论，或已初始化/更新的结构化 memory、索引和 HTML dashboard。
+- Allowed Action: 默认只读；写入时限于 `.docs/project-memory/`、根目录 `PROJECT_MEMORY.html`，初始化时可按明确授权更新 `AGENTS.md` memory block。
+- Success Evidence: 目标事实出现在对应 lane/JSON，并由 renderer 同步到 `INDEX.md`、`overview.html` 和适用的 `PROJECT_MEMORY.html`。
+- Stop Condition: 未满足激活闸门、项目根目录不明、memory 格式损坏、真实重叠 claim、renderer 失败，或写入会覆盖未理解的用户内容。
+- Route Out: 完成后返回当前 owner；正式跨阶段交接可转 `ccdawn-completion-summary`；阻塞则回 `ccdawn-brt`。
 
-## 统一输出标准
+## 激活闸门
 
-- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
-- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
-- 若必须保留英文状态或枚举，先用中文解释其含义。
-- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
+只有以下情况之一成立才加载或执行本 skill：
 
-## Owner 接入规则
+- 用户明确要求初始化、查看、更新、同步、渲染或修复项目 memory/dashboard。
+- 项目规则明确要求在当前任务读取或同步 `.docs/project-memory/`。
+- 仓库已存在该目录，且其中的跨会话状态、关键决策、blocker 或 lane ownership 会改变当前判断。
+- 当前任务需要把重要结果持久化给未来会话、并行 agent 或正式交接，且聊天上下文和普通文档不足以承载。
 
-进入本 skill 前先做轻量 owner 自检：
+普通实现、机械小改、一次性审查、简单问答和单会话可闭环任务默认不触发。目录不存在时，不因为“这是软件项目”而主动初始化；先有用户授权或项目规则。
 
-- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
-- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
-- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+## 工作模式
 
-## Load extra references when needed
+- `READ`：只读取 `INDEX.md`、`profile.json` 和会改变判断的 lane；不要无差别加载全部 JSON/历史。
+- `INIT`：仅在明确授权后初始化目录、profile、索引与 dashboard。是否注入 `AGENTS.md` 必须遵循用户选择或项目规则。
+- `SYNC`：只写本轮的 durable delta，例如决策、blocker、lane 状态、可复用技术事实或正式下一步；不记录完整对话和过程旁白。
+- `GUARD`：仅在确有并行 agent/session、活跃 claim 或项目强制规则时检查/认领；单 agent 普通工作不创建 claim。
 
-- Read `references/setup.md` on first initialization, or when the right project type, lane shape, or adoption approach is unclear.
-- Read `references/troubleshooting.md` when the memory system feels stale, noisy, misplaced, or inconsistent.
-- Read `references/html-design.md` when improving `overview.html` rendering or when the user wants a more polished dashboard presentation.
+能用 `READ` 回答就不 `SYNC`，能更新一个 lane 就不重写全局历史。不要把 memory sync 当成所有任务的 definition of done。
 
-## Enforcement model
-
-Treat project memory maintenance as part of the definition of done.
-
-- Before meaningful development or continuation work where memory can change the answer, read `INDEX.md`, `memory.json`, `profile.json`, and only the lane files relevant to the current responsibility.
-- When another agent may be working in the same project, run the work guard status/check before editing and claim the active lane when overlap risk exists.
-- During development, place raw findings in `inbox.json` when needed.
-- After meaningful development, update only the current lane file plus the global recent-updates feed, then run the sync command.
-- Do not end a task with stale project memory unless the user explicitly says to skip it.
-
-If the repository contains `.docs/project-memory/`, treat this skill as available for meaningful repository work, continuation, cross-session decisions, or memory updates. Do not automatically read or update it for trivial read-only questions, tiny one-off edits, or reviews where project memory cannot change the conclusion.
-
-## Relationship to built-in memory and other context
-
-This skill complements chat context, `AGENTS.md`, and any built-in or workspace memory system. It does not replace them.
-
-Use `.docs/project-memory/` for durable repository state such as:
-
-- subsystem progress
-- engineering decisions
-- blockers and follow-up threads
-- project-specific technical notes
-- cross-session next steps
-
-Do not use this skill for:
-
-- user-global personal memory
-- contact or relationship tracking
-- generic knowledge unrelated to the repository
-- secrets, credentials, or tokens
-- full chat transcript dumps
-
-If the repository already has another memory surface such as `MEMORY.md` or `memory/`, do not rewrite it just because this skill exists. Keep this system focused on project-local state and carry over only the facts that help future repository work.
-
-## Proactive initialization trigger
-
-When working inside a repository that does not yet contain `.docs/project-memory/`, proactively check whether this looks like a real software project that would benefit from persistent project memory.
-
-Strong signals include:
-
-- the repository contains `AGENTS.md`
-- the repository contains source folders such as `src/`, `app/`, `server/`, `backend/`, or `frontend/`
-- the repository contains build or package files such as `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, or similar
-- the user asks for ongoing implementation, debugging, refactoring, or project tracking
-
-When those signals are present:
-
-- briefly suggest initializing project memory if it is missing
-- if the user is asking you to do real development work and has not objected to project memory, prefer initializing it early in the session
-- after initialization, treat this skill as active for the rest of the project work
-
-Do not interrupt tiny one-off questions or trivial read-only tasks just to bootstrap memory.
-
-## Explicit initialization prompts
-
-When the user wants a one-time setup, accept direct prompts such as:
-
-- `Initialize project memory for this repo`
-- `Use ccdawn-dawn-agent-html-memory to initialize project memory for this backend project`
-- `Bootstrap persistent memory for this codebase`
-
-Treat those prompts as explicit permission to run the setup workflow immediately.
-
-## Continuous improvement
-
-Treat real usage as feedback for the skill itself.
-
-- When this skill causes repeated friction, update the skill instead of only working around the friction in one project.
-- Improve the smallest reusable layer that would help the next session: `SKILL.md`, Python scripts, templates, or references.
-- Record meaningful improvements in `IMPROVEMENT.md`.
-- Prefer changes that reduce repeated manual steps, tighten agent behavior, or make project memory more reliable.
-
-Do this only when the improvement is local, safe, and clearly useful. Do not derail urgent user work for speculative cleanup.
-
-## What this skill manages
-
-Maintain these files inside the target project:
+## 管理范围
 
 ```text
 .docs/project-memory/
@@ -124,172 +49,71 @@ Maintain these files inside the target project:
   inbox.json
   lanes/
   archive/
+  agent-claims.json  # 可选，仅并行协调
+PROJECT_MEMORY.html
 ```
 
-- `memory.json` is the shared shell for project-level metadata, lane index data, and global `recentUpdates`.
-- `profile.json` is the project adaptation layer.
-- `overview.html` is a generated static dashboard for humans.
-- `overview.html` should follow the renderer design guidance in `references/html-design.md`: polished, operational, and easy to scan, not generic template UI.
-- `INDEX.md` is the quick navigation entry for both humans and agents.
-- `inbox.json` is a staging area for quick capture during ongoing work.
-- `lanes/*.json` are the per-responsibility memory files that individual sessions should maintain.
-- `archive/` stores historical items moved out of the active dashboard.
-- `PROJECT_MEMORY.html` lives at the project root as the stable human-facing shortcut into the dashboard.
-- `agent-claims.json` is an optional coordination registry for active/ready agent work claims.
+- `memory.json`：项目元数据、lane 索引和精简的 `recentUpdates`。
+- `profile.json`：项目类型、dashboard preset、视觉模式和展示密度。
+- `lanes/*.json`：按稳定职责或子系统保存状态、决策、问题和下一步。
+- `inbox.json`：尚未归类但确有后续价值的临时事实；保持很小。
+- `archive/`：从 active state 移出的历史，不用于堆积本轮过程。
+- `overview.html`、`INDEX.md`、`PROJECT_MEMORY.html`：由脚本生成或刷新，不作为随意手改的事实源。
 
-Do not treat `overview.html` as the primary editable artifact unless the user explicitly asks for a one-off manual page.
+不得存储 secrets、token、个人关系信息、通用知识或完整聊天记录。仓库已有其他 memory surface 时，遵循现有 authority，不擅自迁移或建立双轨。
 
-## Work guard
+## 初始化
 
-Use `scripts/agent_work_guard.py` when work may overlap across sessions or agents.
+首次初始化时读取 `references/setup.md`，再运行：
 
-- `status` is read-only and shows active/ready claims.
-- `check` is read-only and returns nonzero when the requested lane or scope overlaps an active/ready claim.
-- `claim` writes an expiring claim to `agent-claims.json` only when no overlap exists, unless `--force` is used after manual review.
-- `release` closes the claim as `released`, `completed`, or `blocked`.
-- Claims expire automatically by TTL and are stored outside the main memory model, so they do not pollute the dashboard.
-
-Claim the smallest stable lane/scope that protects the work. Release the claim after the memory sync step finishes.
-
-## Setup
-
-For first-time setup details, load `references/setup.md`.
-
-When the project does not already have a memory system:
-
-1. Run `python <this-skill>/scripts/init_project_memory.py <project-root>`.
-2. Pick the closest project type:
-   - `frontend`
-   - `backend`
-   - `automation`
-   - `research`
-   - `general`
-3. Let initialization inject the `Project Memory Rules` block into `AGENTS.md` unless the user explicitly opts out.
-4. Confirm the generated files exist under `.docs/project-memory/`.
-
-## Update workflow
-
-After a meaningful task, update the memory system in this order:
-
-1. Read `.docs/project-memory/memory.json` and `.docs/project-memory/profile.json`.
-2. Read `inbox.json` when the task involved quick captures or unresolved notes.
-3. Resolve the current responsibility lane, such as `backend-auth` or `frontend-dashboard`.
-4. Update only that lane file unless the user explicitly asks for broader edits.
-5. Append a short entry to global `recentUpdates`.
-6. When there is a real behavior or architecture decision, append a `decisions` item inside the current lane.
-7. When there is a new blocker or investigation thread, append or update an `issues` item inside the current lane.
-8. Add or preserve cross-references such as related modules, issues, decisions, or files.
-9. Re-render `overview.html`, refresh `INDEX.md`, and refresh the root `PROJECT_MEMORY.html` shortcut with `python <this-skill>/scripts/render_overview.py <project-root>`.
-
-Prefer preserving existing history. Do not rewrite old entries just to make them prettier.
-
-## What to record
-
-Keep the memory high signal. Favor compact factual notes over narration.
-
-- `summary`: shared shell metadata, not a free-form scratchpad for every session
-- `progress`: completion summary and milestones
-- `modules`: feature or subsystem status with notes inside the current lane
-- `decisions`: context, decision, impact inside the current lane
-- `issues`: status, severity, impact, next step inside the current lane
-- `todos`: next actions with owner and status when known inside the current lane
-- `techNotes`: key implementation details worth reloading later inside the current lane
-- `recentUpdates`: chronological short log of meaningful work at the global level, with lane references
-
-Use lightweight cross-references when entries are related:
-
-- `relatedModules`
-- `relatedIssues`
-- `relatedDecisions`
-- `relatedFiles`
-
-## Adaptation rules
-
-Use `profile.json` to adapt the dashboard by project type.
-
-- `projectType`: broad mode such as `frontend` or `automation`
-- `dashboardPreset`: high-level composition family such as `default`, `ops-heavy`, `review-heavy`, or `research-log`
-- `visualMode`: named presentation style such as `briefing`, `console`, `studio`, or `lab`
-- `density`: information density such as `comfortable`, `balanced`, or `compact`
-- `sectionLayouts`: per-section layout spans such as `standard`, `narrow`, `wide`, or `full`
-- `sections`: ordered list of sections to emphasize in HTML
-- `labels`: display labels for project-specific wording
-
-Treat `dashboardPreset` as the base layer. Use the other fields only when you need explicit overrides on top of that preset.
-
-Keep adaptation light. Avoid building a large configuration DSL unless the project truly needs it.
-
-## Inbox and capture
-
-Use `inbox.json` for quick capture during a task when information is too raw to place immediately in the main memory.
-
-- Capture half-formed findings, observations, temporary blockers, and breadcrumbs.
-- Fold useful items into `memory.json` before the task closes.
-- Leave unresolved but important fragments in `inbox.json` only when they still need follow-up.
-- Keep `inbox.json` small. It is a staging area, not the main history.
-
-## Index
-
-Maintain `INDEX.md` as a compact navigation page.
-
-- Show the current project type, last updated time, and active files.
-- Link to `overview.html`, `memory.json`, `profile.json`, `inbox.json`, `lanes/`, `archive/`, and `PROJECT_MEMORY.html`.
-- Summarize counts for modules, open issues, decisions, todos, and recent updates.
-
-This file helps both humans and agents re-enter the project quickly.
-
-## Archive
-
-Archive old history instead of deleting it.
-
-- Move stale or resolved updates, issues, or decisions into `archive/` when active memory becomes noisy.
-- Keep active memory focused on current state plus near history.
-- Prefer archive files grouped by topic or time window, such as `issues-resolved.json` or `updates-2026-q2.json`.
-
-Archive by moving old entries out of active arrays and leaving a brief trace in active memory when necessary.
-
-## Update discipline
-
-Update the memory system when:
-
-- a task completes
-- a module status changes
-- a blocker appears or is resolved
-- a technical decision is made
-- the planned next step changes
-
-Skip updates only for trivial cosmetic work or when the user explicitly says not to maintain the memory page.
-
-## Verification
-
-If verification fails or the dashboard looks wrong, load `references/troubleshooting.md`.
-
-After updating memory:
-
-1. Run the renderer.
-2. Open the generated `overview.html` in a browser when practical, or at minimum inspect the file contents.
-3. Check that the latest task appears in `recentUpdates`.
-4. Check that the active lane shows the latest owner, focus, and update time.
-5. Check that any changed modules, todos, or issues are reflected in the HTML under the correct lane.
-6. Check that `INDEX.md` reflects the latest counts and file links.
-7. Check that the project-root `PROJECT_MEMORY.html` opens the overview.
-
-## Commands
-
-Replace `<skill-root>` with this skill folder path.
-
-```bash
-python <skill-root>/scripts/init_project_memory.py <project-root> --project-type frontend --dashboard-preset review-heavy --visual-mode studio --density comfortable
-python <skill-root>/scripts/render_overview.py <project-root>
-python <skill-root>/scripts/sync_project_memory.py <project-root> --lane backend-auth --focus "What changed" --update "Short summary of this task"
-python <skill-root>/scripts/capture_note.py <project-root> --lane backend-auth --title "Observation" --details "What you noticed"
-python <skill-root>/scripts/agent_work_guard.py <project-root> status
-python <skill-root>/scripts/agent_work_guard.py <project-root> check --lane backend-auth --scope src/auth
-python <skill-root>/scripts/agent_work_guard.py <project-root> claim --lane backend-auth --scope src/auth --agent codex-session --task "Auth changes"
-python <skill-root>/scripts/agent_work_guard.py <project-root> release --claim-id claim-id --status completed
-agent-html-memory-init <project-root> --project-type frontend --dashboard-preset review-heavy --visual-mode studio --density comfortable
-agent-html-memory-sync <project-root> --lane backend-auth --focus "What changed" --update "Short summary of this task"
-agent-html-memory-capture <project-root> --lane backend-auth --title "Observation" --details "What you noticed"
-agent-html-memory-guard <project-root> status
+```powershell
+py -3 <skill-root>\scripts\init_project_memory.py <project-root> --project-type <type> --dashboard-preset <preset> --skip-agents-rules
 ```
 
+选择最接近的 `frontend`、`backend`、`automation`、`research` 或 `general`，避免为分类反复追问。初始化后确认 JSON、lane/archive 目录、索引和 HTML 文件存在；只有用户或项目规则明确需要持续规则时，才去掉 `--skip-agents-rules` 并注入 `references/AGENTS-snippet.md`。
+
+## 读取与同步
+
+同步前只读取当前 lane、`profile.json` 和必要的 shared metadata。记录内容必须是未来会话会据此改变行动的事实：
+
+- 已验证的模块状态或 milestone
+- 行为/架构决策及其影响
+- 未解决 blocker、证据和下一步
+- 跨会话继续所需的技术事实
+- 正式 handoff 的 owner、范围和验证状态
+
+优先保留旧历史，只追加或更新本轮拥有的条目。同步命令：
+
+```powershell
+py -3 <skill-root>\scripts\sync_project_memory.py <project-root> --lane <lane> --focus "<current focus>" --update "<durable delta>"
+py -3 <skill-root>\scripts\capture_note.py <project-root> --lane <lane> --title "<title>" --details "<fact>"
+py -3 <skill-root>\scripts\render_overview.py <project-root>
+```
+
+`capture_note.py` 只用于尚需调查的高价值线索，不把每个观察都写入 inbox。
+
+## 并行 work guard
+
+只有存在真实并行或项目规则时使用 `scripts/agent_work_guard.py`：
+
+```powershell
+py -3 <skill-root>\scripts\agent_work_guard.py <project-root> status
+py -3 <skill-root>\scripts\agent_work_guard.py <project-root> check --lane <lane> --scope <scope>
+py -3 <skill-root>\scripts\agent_work_guard.py <project-root> claim --lane <lane> --scope <scope> --agent <session> --task "<task>"
+py -3 <skill-root>\scripts\agent_work_guard.py <project-root> release --claim-id <id> --status completed
+```
+
+只认领最小稳定 lane/scope；发现 active/ready 重叠才阻塞。没有 guard 脚本或 registry 不等于允许伪造 claim，也不应阻止无并行风险的普通工作。
+
+## 验证
+
+写入后运行 renderer，并检查：
+
+1. durable delta 出现在正确 lane 和 `recentUpdates`（需要全局记录时）。
+2. `INDEX.md` 的计数和链接一致。
+3. `overview.html` 与根目录入口可打开，最新状态归属正确。
+4. 没有覆盖无关 lane、旧历史或用户并行改动。
+
+渲染或结构异常时读取 `references/troubleshooting.md`；只在用户要求调整 dashboard 视觉时读取 `references/html-design.md`。
+
+用户可见输出默认中文，正文末尾保留：`下一步建议: <一个具体动作>`。

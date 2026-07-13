@@ -1,6 +1,6 @@
 ---
 name: ccdawn-competition-research-lifecycle
-description: Use when coordinating a research competition lifecycle, Kaggle-style challenge, academic contest, benchmark track, public leaderboard workflow, multi-agent experiment lanes, evidence ledger, paper claim traceability, or reproducible submission package.
+description: Use when coordinating an end-to-end research competition or benchmark program across multiple lifecycle stages such as task definition, data, baseline, experiments, evidence, paper claims, and submission packaging; use score-loop for a single metric lane and ai-research-loop for a standalone research direction.
 ---
 
 # 竞赛科研全流程（Competition Research Lifecycle）

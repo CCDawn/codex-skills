@@ -1,6 +1,6 @@
 ---
 name: ccdawn-pr-review
-description: Use when CCDawn development has completed or a PR/diff is ready for review before merge, push, release, or handoff; applies when code changes must be checked against aligned requirements, task graph, verification evidence, regressions, security/data risks, and merge readiness.
+description: Use when the user explicitly requests review of a PR, diff, branch, commit range, merge readiness, or review feedback, or when a high-risk change has reached an explicit pre-integration review gate; do not trigger merely because ordinary development finished.
 ---
 
 # CCDawn PR Review

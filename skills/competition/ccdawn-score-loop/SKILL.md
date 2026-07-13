@@ -1,6 +1,6 @@
 ---
 name: ccdawn-score-loop
-description: "Use when optimizing any measurable score, benchmark, leaderboard, validation metric, online/offline feedback loop, experiment lane, baseline promotion, or submission package where iterative evidence should guide code, model, or search changes."
+description: "Use when an experiment or competition lane has an explicit metric, baseline, candidate comparison, promotion gate, leaderboard/validation feedback, or submission iteration; do not use for ordinary software latency, performance debugging, or one-off measurements without a baseline-candidate loop."
 ---
 
 # Score Loop

@@ -1,6 +1,6 @@
 ---
 name: ccdawn-feature-reuse-research
-description: Use when CCDawn workflow is about adding a complex feature, capability, module, workflow, UI component, integration, parser, editor, search, visualization, algorithm, import/export, or reusable subsystem where existing projects, libraries, examples, or modules may change the implementation plan.
+description: Use when a complex feature has an unresolved reuse decision and external projects, libraries, standards, examples, or in-project modules could materially change architecture, dependencies, scope, or implementation; do not use for routine work already covered by local patterns or standard platform capabilities.
 ---
 
 # CCDawn Feature Reuse Research
