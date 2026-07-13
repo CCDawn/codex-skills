@@ -1,6 +1,6 @@
 ---
 name: ccdawn-huawei-nslb-score-loop
-description: Use when optimizing, benchmarking, packaging, comparing baselines, handling online score feedback, or coordinating parallel agents for the Huawei Algorithm Challenge 37 NSLB project in C:\Users\17533\Documents\New project 5.
+description: Use when optimizing, benchmarking, packaging, comparing baselines, handling online score feedback, or coordinating parallel agents for a Huawei Algorithm Challenge 37 NSLB workspace identified by its solver and score-loop artifacts.
 ---
 
 # Huawei NSLB Score Loop
@@ -9,10 +9,10 @@ This file is the full Huawei NSLB project profile for the generic `ccdawn-score-
 
 Default entrypoint: `../SKILL.md`. Load this profile only when project-specific commands, mutation families, worker prompts, score anchors, ledger paths, or online feedback rules are needed.
 
-Use this skill only for the Huawei Algorithm Challenge 37 NSLB workspace:
+Use this profile only for a Huawei Algorithm Challenge 37 NSLB workspace resolved by `../SKILL.md`:
 
 ```text
-C:\Users\17533\Documents\New project 5
+<project-root> containing src/Solution.cpp and the score-loop ledgers
 ```
 
 This is a leaderboard search skill, not a planning template. Its main job is to make agents continuously produce executable, isolated, evidence-rich code experiments.
@@ -29,7 +29,7 @@ Good outcome: each edit lane changes one concrete mechanism in `src/Solution.cpp
 
 ## 0. BRT Interface
 
-- Context Boundary: `C:\Users\17533\Documents\New project 5`, score-loop ledger/search graph, current baseline hash, isolated worker workspace, and the selected command/lane.
+- Context Boundary: resolved project root, score-loop ledger/search graph, current baseline hash, isolated worker workspace, and the selected command/lane.
 - Output Contract: status, epoch, worker, gate, package, online feedback, or recovery artifact with machine-readable evidence.
 - Success Evidence: command output, `child_result.json`, attempt card, ledger/search-graph update, compiled diff, gate decision, or registered short submission package.
 - Stop Condition: source drift, stale baseline hash, overlapping ledger/pool write, missing child result, invalid package, online feedback ambiguity, or user pause.
@@ -81,9 +81,9 @@ Soft signals may reduce confidence, change the first-kill test, or block promoti
 Before meaningful optimization, read enough current state to avoid stale decisions:
 
 ```powershell
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py status --project "C:\Users\17533\Documents\New project 5"
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py doctor --project "C:\Users\17533\Documents\New project 5" --min-score 0
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py drift --project "C:\Users\17533\Documents\New project 5"
+python $tool status --project $project
+python $tool doctor --project $project --min-score 0
+python $tool drift --project $project
 ```
 
 Also inspect the latest relevant parts of:
@@ -98,7 +98,7 @@ Also inspect the latest relevant parts of:
 - `docs/failed-diffs-index.json` and `docs/failed_diffs/`
 - `docs/nslb-history-for-ai-analysis.md`
 - `docs/risk-resurrection-shortlist-*.json` when stagnating
-- `C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\references\mutation_space.json`
+- `<codex-home>\skills\ccdawn-huawei-nslb-score-loop\references\mutation_space.json`
 
 Use logs, ledger, child results, and online feedback as primary evidence. Conversation memory is only a hint.
 
@@ -268,7 +268,7 @@ Legacy false-negative rescue:
 - First rebuild the failed-diff furnace from all historical child results:
 
 ```powershell
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py failed-diffs --project "C:\Users\17533\Documents\New project 5" --rebuild-from "C:\Users\17533\Documents\New project 5\tmp\score-loop-epochs" --write
+python $tool failed-diffs --project $project --rebuild-from (Join-Path $project "tmp\score-loop-epochs") --write
 ```
 
 - Then select resurrection candidates from `docs/failed-diffs-index.json`, not from memory alone.
@@ -299,8 +299,8 @@ Never discard partial work:
 After each epoch, run learning before opening the next one:
 
 ```powershell
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py learn-from-children --run-dir "<epoch-dir>" --project "C:\Users\17533\Documents\New project 5"
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py learn-from-children --run-dir "<epoch-dir>" --project "C:\Users\17533\Documents\New project 5" --write-index --write-search-graph --write-failed-diffs
+python $tool learn-from-children --run-dir "<epoch-dir>" --project $project
+python $tool learn-from-children --run-dir "<epoch-dir>" --project $project --write-index --write-search-graph --write-failed-diffs
 ```
 
 Use `--write-mutation-space` only for stable lessons that should affect future search.
@@ -337,8 +337,7 @@ Use tool primitives instead of handwritten state files.
 Default flow:
 
 ```powershell
-$project = "C:\Users\17533\Documents\New project 5"
-$tool = "C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py"
+# Resolve $project and $tool once using ../SKILL.md.
 
 python $tool doctor --project $project --min-score 0
 python $tool run-epoch --project $project --run-id "<epoch-id>"
@@ -415,8 +414,8 @@ Pure smoothing cannot promote. Local gain without online-aligned component evide
 If the user reports online feedback, parse the short package/result and update state. Use `online-feedback` when the package name maps to `docs/submission-map.json`; use `online-update` when the attempt/family/mechanism are known.
 
 ```powershell
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py online-feedback --project "C:\Users\17533\Documents\New project 5" --submitted-package "sub053.zip" --online-score "<score>" --write --write-ledger
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py online-update --project "C:\Users\17533\Documents\New project 5" --attempt "<attempt-id>" --online-score "<score>" --family "<family>" --mechanism "<mechanism>" --shape "<shape>" --predicted-direction up --hidden-hypothesis "<hypothesis>" --write --write-ledger
+python $tool online-feedback --project $project --submitted-package "sub053.zip" --online-score "<score>" --write --write-ledger
+python $tool online-update --project $project --attempt "<attempt-id>" --online-score "<score>" --family "<family>" --mechanism "<mechanism>" --shape "<shape>" --predicted-direction up --hidden-hypothesis "<hypothesis>" --write --write-ledger
 ```
 
 Use `--accept-best-update` only when the score strictly improves and the coordinator accepts it as the new online-best. Neutral or worse scores update calibration but do not move online-best.
@@ -424,7 +423,7 @@ Use `--accept-best-update` only when the score strictly improves and the coordin
 If online regresses, restore online-best:
 
 ```powershell
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py restore-online-best --project "C:\Users\17533\Documents\New project 5" --write --update-ledger
+python $tool restore-online-best --project $project --write --update-ledger
 ```
 
 ## 14. Packaging
@@ -433,7 +432,7 @@ Before giving the user a submission:
 
 ```powershell
 python tools\run_regression.py
-python C:\Users\17533\.codex\skills\ccdawn-huawei-nslb-score-loop\scripts\score_loop_tools.py register-submission --project "C:\Users\17533\Documents\New project 5" --package "subNNN.zip" --attempt "<attempt-id>" --family "<family>" --mechanism "<mechanism>" --shape "<shape>"
+python $tool register-submission --project $project --package "subNNN.zip" --attempt "<attempt-id>" --family "<family>" --mechanism "<mechanism>" --shape "<shape>"
 ```
 
 The uploaded file name must be short, normally `subNNN.zip`. Put long baseline names and metadata into `docs/submission-map.json`, not the zip name.
@@ -491,7 +490,7 @@ When launching a worker, prefer `spawnAgent.launchMessage` from `dispatch-epoch`
 
 ```text
 You are an isolated Huawei NSLB worker.
-Main project is read-only: C:\Users\17533\Documents\New project 5
+Main project is read-only: <project-root>
 Work only in assigned workspace: <workspace>
 Lane matrix row: <paste row>
 Baseline SHA256: <sha256>
@@ -507,8 +506,9 @@ Do not edit main workspace, ledger, memory, dist, submission-map, or online stat
 After meaningful work, update project memory and render the HTML overview unless the user explicitly says to skip:
 
 ```powershell
-python C:\Users\17533\.codex\skills\ccdawn-dawn-agent-html-memory\scripts\sync_project_memory.py "C:\Users\17533\Documents\New project 5" --lane "competition-huawei-nslb" --focus "<current focus>" --update "<what changed>"
-python C:\Users\17533\.codex\skills\ccdawn-dawn-agent-html-memory\scripts\render_overview.py "C:\Users\17533\Documents\New project 5"
+$memorySkill = Join-Path $codexHome "skills\ccdawn-dawn-agent-html-memory\scripts"
+python (Join-Path $memorySkill "sync_project_memory.py") $project --lane "competition-huawei-nslb" --focus "<current focus>" --update "<what changed>"
+python (Join-Path $memorySkill "render_overview.py") $project
 ```
 
 Memory sync is part of done. Record both promotions and rejected lessons.

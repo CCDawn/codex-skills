@@ -1,5 +1,4 @@
 interface:
-  display_name: "CCDawn Evaluation"
-  short_description: "CCDawn evaluation adapter that first reuses more specific review, debugging, planning, verification, or goal skills."
-  default_prompt: "Use ccdawn-evaluation only when no more specific skill owns the evaluation. First check reusable skills, then provide a concise evidence-led judgment, risks, and next route."
-
+  display_name: "CCDawn 通用评价"
+  short_description: "仅在没有更具体 owner 时给出证据化评价与行动建议"
+  default_prompt: "使用 $ccdawn-evaluation 评价当前对象；先排除更具体的审查、调试、规划或验证 owner，再用中文给出简洁结论、证据、风险和下一步路由。"

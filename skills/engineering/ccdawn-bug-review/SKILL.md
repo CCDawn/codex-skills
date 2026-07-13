@@ -17,9 +17,12 @@ license: MIT
 - Allowed Action: 用户要求修复且边界清楚时可直接读取、复现、修改和验证；只要求审查时保持只读。
 - Success Evidence: 失败可复现或有等价证据，根因与修复存在因果联系，目标验证通过且未越界。
 - Stop Condition: 缺少必要对象/权限、根因仍不稳定且写入会扩大误改、需要破坏性动作、需求冲突或风险越过当前授权。
-- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-bdd-tdd-development`、`ccdawn-planning`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-bdd-tdd-development`、`ccdawn-planning`、`ccdawn-development-cleanup`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
-用户可见输出默认中文，代码、命令、路径和错误原文保留原样；末尾给一个具体的 `下一步建议`。
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 调试契约
 

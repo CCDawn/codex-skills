@@ -19,6 +19,11 @@ license: MIT
 - Stop Condition: 审计范围不明、缺少源码/依赖证据、建议涉及行为或架构取舍、或问题主要属于正确性/安全/性能。
 - Route Out: `ccdawn-project-review`、`ccdawn-planning`、对应开发 owner、`ccdawn-brt` 或 BLOCKED。
 
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
+
 ## 审计规则
 
 1. 先定位入口、依赖清单和高变更/高耦合区域，不为“全面”盲扫全仓。

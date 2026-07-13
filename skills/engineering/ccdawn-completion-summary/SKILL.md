@@ -27,20 +27,10 @@ license: MIT
 - Stop Condition: 关键任务未完成、新鲜证据缺失、NEEDS_CHANGE 未解决、保护边界越界、需要用户决策或高风险交付动作。
 - Route Out: `ccdawn-development-cleanup`、`ccdawn-pr-review`、提交/PR 准备、对应开发模式、`ccdawn-bug-review`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
-## 统一输出标准
+## 统一调用契约
 
-- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
-- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
-- 若必须保留英文状态或枚举，先用中文解释其含义。
-- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
-
-## Owner 接入规则
-
-进入本 skill 前先做轻量 owner 自检：
-
-- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
-- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
-- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 进入条件
 
@@ -122,10 +112,10 @@ Ledger Update:
 - Verification Evidence: ...
 - Unresolved Risks: ...
 - Recommended Next Stage: ccdawn-development-cleanup / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
-- Route Out: ccdawn-development-cleanup / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
+- 路由选择: <从 BRT interface 的 Route Out 选择一个>
 
 下一步:
-默认路由：<收口 / ccdawn-development-cleanup / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED>，原因...
+默认路由：<从 BRT interface 的 Route Out 选择一个>，原因...
 执行规则：COMPLETE 且没有提交、推送、PR、合并、发布或补任务需求时直接收口；PARTIAL 时路由到最具体恢复阶段；BLOCKED 时只问一个阻塞问题；远程写入、发布、合并、删除或迁移动作前必须停下等用户授权。
 ```
 

@@ -19,9 +19,12 @@ license: MIT
 - Allowed Action: 使用 `list_threads`、`read_thread`、`send_message_to_thread` 和 `agent_coordination.py` 读取、注册、通知与更新协作状态；创建/fork/handoff/归档会话及远程 Git 动作仍需对应授权。
 - Success Evidence: registry revision 更新，目标 thread 已核对；暂停有 `PAUSED`，讨论有统一 `DECISION`，合并有 Git/测试证据，恢复消息由 `read_thread` 确认送达。
 - Stop Condition: 目标 thread 不明、工具不可用、owner 有争议、暂停未确认、registry/Git 状态漂移、破坏性或远程动作未授权。
-- Route Out: 原任务 owner、`ccdawn-pr-review`、`ccdawn-dawn-agent-html-memory`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 原任务 owner、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-dawn-agent-html-memory`、`ccdawn-brt` 或 BLOCKED。
 
-用户可见输出默认中文；协议状态、代码、命令、路径和工具名保留英文。末尾给一个具体的 `下一步建议`。
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## LIVE 接入
 

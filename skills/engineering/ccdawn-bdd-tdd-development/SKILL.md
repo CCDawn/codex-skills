@@ -17,7 +17,12 @@ license: MIT
 - Allowed Action: 只改当前行为所需的生产代码和测试；不扩大范围、不覆盖无关改动。
 - Success Evidence: RED 确认目标缺失或回归，GREEN 确认最小实现通过，相关回归检查通过。
 - Stop Condition: 行为预期不清、测试不能证明目标、边界冲突、修复需要扩大范围或高风险授权。
-- Route Out: 当前 owner、`ccdawn-score-loop`、下一个已授权任务、`ccdawn-completion-summary`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 当前 owner、`ccdawn-score-loop`、下一个已授权任务、`ccdawn-development-cleanup`、`ccdawn-completion-summary`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 模式闸门
 

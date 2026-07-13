@@ -19,7 +19,10 @@ license: MIT
 - Stop Condition: 方案未接受、拆分触发原因不成立、边界或验证不清、高风险动作未确认或任务图不能执行。
 - Route Out: 当前 owner 连续实施、`ccdawn-bdd-tdd-development`、`ccdawn-score-loop`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
-用户可见输出默认中文，并遵守 BRT 的自然闸门和下一步规范。
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 拆分闸门
 

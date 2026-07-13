@@ -38,6 +38,46 @@ BRT_CORE_MARKERS = [
     "一次集中提出 2-4 个",
 ]
 
+UNIFIED_CONTRACT_MARKERS = [
+    "## 统一调用契约",
+    "用户可见内容默认中文",
+    "下一步建议: <一个具体动作>",
+    "Route Out 仅以 BRT interface 为准",
+]
+
+DIRECT_WRITE_OWNERS = {
+    "ccdawn-bdd-tdd-development",
+    "ccdawn-bug-review",
+    "ccdawn-thread-coordination",
+    "ccdawn-ui-design",
+}
+
+TOKEN_BUDGETS = {
+    "ccdawn-ai-research-loop": 2200,
+    "ccdawn-bdd-tdd-development": 1800,
+    "ccdawn-brt": 4500,
+    "ccdawn-bug-review": 1200,
+    "ccdawn-competition-research-lifecycle": 2500,
+    "ccdawn-completion-summary": 2400,
+    "ccdawn-creative-toolbox": 1400,
+    "ccdawn-dawn-agent-html-memory": 2250,
+    "ccdawn-development-cleanup": 1900,
+    "ccdawn-evaluation": 2200,
+    "ccdawn-feature-reuse-research": 2100,
+    "ccdawn-goal-loop": 1100,
+    "ccdawn-huawei-nslb-score-loop": 1200,
+    "ccdawn-planning": 1600,
+    "ccdawn-pr-review": 2600,
+    "ccdawn-project-review": 2900,
+    "ccdawn-research-rigor-review": 1600,
+    "ccdawn-score-loop": 2200,
+    "ccdawn-simplification-audit": 1000,
+    "ccdawn-simplification-review": 1000,
+    "ccdawn-task-splitting": 1350,
+    "ccdawn-thread-coordination": 1700,
+    "ccdawn-ui-design": 1650,
+}
+
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
@@ -59,6 +99,19 @@ def parse_frontmatter(skill_md: Path) -> dict[str, str]:
         key, value = stripped.split(":", 1)
         values[key.strip()] = value.strip().strip("'\"")
     return values
+
+
+def parse_openai_interface(openai_yaml: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for line in read_text(openai_yaml).splitlines():
+        match = re.match(r'^\s{2}(display_name|short_description|default_prompt):\s*["\'](.*)["\']\s*$', line)
+        if match:
+            values[match.group(1)] = match.group(2)
+    return values
+
+
+def contains_cjk(text: str) -> bool:
+    return bool(re.search(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]", text))
 
 
 def estimated_instruction_tokens(text: str) -> int:
@@ -134,8 +187,21 @@ def validate_skill(
     if license_id != "MIT":
         errors.append(f"{label}: frontmatter license must be 'MIT'")
 
-    if not (skill_dir / "agents" / "openai.yaml").exists():
+    openai_yaml = skill_dir / "agents" / "openai.yaml"
+    if not openai_yaml.exists():
         errors.append(f"{skill_dir.relative_to(repo_root)}: missing agents/openai.yaml")
+    else:
+        interface = parse_openai_interface(openai_yaml)
+        metadata_label = str(openai_yaml.relative_to(repo_root))
+        for field in ["display_name", "short_description", "default_prompt"]:
+            value = interface.get(field, "")
+            if not value:
+                errors.append(f"{metadata_label}: missing interface field '{field}'")
+            elif name.startswith("ccdawn-") and not contains_cjk(value):
+                errors.append(f"{metadata_label}: '{field}' must be Chinese-first")
+        prompt = interface.get("default_prompt", "")
+        if name and f"${name}" not in prompt:
+            errors.append(f"{metadata_label}: default_prompt must invoke '${name}'")
 
     if name.startswith("ccdawn-") and name != "ccdawn-brt":
         if "## BRT interface" not in text:
@@ -143,6 +209,26 @@ def validate_skill(
         for field in BRT_INTERFACE_FIELDS:
             if field not in text:
                 errors.append(f"{label}: missing BRT interface field '{field}'")
+
+        for marker in UNIFIED_CONTRACT_MARKERS:
+            if marker not in text:
+                errors.append(f"{label}: unified call contract missing marker '{marker}'")
+
+        route_out_count = len(re.findall(r"(?m)^- Route Out:", text))
+        if route_out_count != 1:
+            errors.append(
+                f"{label}: expected exactly one canonical BRT interface Route Out, found {route_out_count}"
+            )
+        example_route_outs = re.findall(r"(?m)^Route Out:[^\r\n]*", text)
+        if any(line.strip() not in {"Route Out:", "Route Out: <沿用 BRT interface>"} for line in example_route_outs):
+            errors.append(f"{label}: output examples must not redefine the canonical Route Out")
+        if re.search(r"(?m)^默认路由：<(?!从 BRT interface)[^>]+>", text):
+            errors.append(f"{label}: default route examples must select from the BRT interface")
+
+        if name in DIRECT_WRITE_OWNERS:
+            route_out = re.search(r"(?m)^- Route Out:.*$", text)
+            if route_out is None or "ccdawn-development-cleanup" not in route_out.group(0):
+                errors.append(f"{label}: direct write owner must route verified residue to ccdawn-development-cleanup")
 
         if re.search(r"(?m)^Route Out: .*暂停", text):
             errors.append(f"{label}: Route Out should use BLOCKED or a concrete owner, not generic pause")
@@ -251,19 +337,8 @@ def validate_skill(
             if marker in text:
                 errors.append(f"{label}: forced-stage regression marker found '{marker}'")
 
-    token_budgets = {
-        "ccdawn-brt": 4500,
-        "ccdawn-planning": 1800,
-        "ccdawn-task-splitting": 1600,
-        "ccdawn-completion-summary": 3000,
-        "ccdawn-bug-review": 1800,
-        "ccdawn-ui-design": 2200,
-        "ccdawn-dawn-agent-html-memory": 2200,
-        "ccdawn-thread-coordination": 1800,
-        "ccdawn-development-cleanup": 2200,
-    }
     estimated_tokens = estimated_instruction_tokens(text)
-    budget = token_budgets.get(name)
+    budget = TOKEN_BUDGETS.get(name)
     if budget is not None and estimated_tokens > budget:
         warnings.append(
             f"{label}: about {estimated_tokens} instruction tokens exceeds the {budget} hot-route budget"
@@ -301,6 +376,19 @@ def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str])
         missing_names = [name for name in skill_names if name not in readme_text]
         if missing_names:
             errors.append(f"{readme_name}: missing skill names {missing_names}")
+
+    brt_root = repo_root / "skills" / "engineering" / "ccdawn-brt"
+    brt_text = "\n".join(read_text(path) for path in sorted(brt_root.rglob("*.md")))
+    missing_routes = [name for name in skill_names if name != "ccdawn-brt" and name not in brt_text]
+    if missing_routes:
+        errors.append(f"ccdawn-brt: missing package owner routes {missing_routes}")
+
+    huawei_root = repo_root / "skills" / "competition" / "ccdawn-huawei-nslb-score-loop"
+    for markdown_path in sorted(huawei_root.rglob("*.md")):
+        if re.search(r"(?i)[A-Z]:\\Users\\", read_text(markdown_path)):
+            errors.append(
+                f"{markdown_path.relative_to(repo_root)}: project adapter must not hard-code a user profile path"
+            )
 
     validate_ccdawn_route_references(repo_root, set(skill_names), errors)
 

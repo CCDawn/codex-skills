@@ -1,4 +1,4 @@
 interface:
-  display_name: "CCDawn Planning"
+  display_name: "CCDawn 实施规划"
   short_description: "仅为真实设计分叉、高风险顺序或跨边界交接生成可复用实施方案。"
   default_prompt: "使用 $ccdawn-planning：生成最小可实施方案并默认直接路由当前 owner 实施；只有已确认存在独立依赖、owner、风险或验证边界时才进入 $ccdawn-task-splitting。"

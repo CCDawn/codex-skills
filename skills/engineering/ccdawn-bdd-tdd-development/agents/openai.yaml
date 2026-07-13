@@ -1,4 +1,4 @@
 interface:
   display_name: "CCDawn 紧凑 BDD/TDD"
   short_description: "以最少 RED/GREEN 证据完成高风险行为子任务。"
-  default_prompt: "只对当前复杂子任务使用紧凑 TDD：复用现有 RED，写最小实现并运行窄验证；默认不派子代理，不输出过程旁白。"
+  default_prompt: "使用 $ccdawn-bdd-tdd-development 只对当前复杂子任务执行紧凑 TDD：复用现有 RED，写最小实现并运行窄验证；默认不派子代理，不输出过程旁白。"

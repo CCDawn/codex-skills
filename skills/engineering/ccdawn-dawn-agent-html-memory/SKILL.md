@@ -19,6 +19,11 @@ license: MIT
 - Stop Condition: 未满足激活闸门、项目根目录不明、memory 格式损坏、真实重叠 claim、renderer 失败，或写入会覆盖未理解的用户内容。
 - Route Out: 完成后返回当前 owner；正式跨阶段交接可转 `ccdawn-completion-summary`；阻塞则回 `ccdawn-brt`。
 
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
+
 ## 激活闸门
 
 只有以下情况之一成立才加载或执行本 skill：

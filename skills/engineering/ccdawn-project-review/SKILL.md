@@ -24,22 +24,12 @@ license: MIT
 - Allowed Action: 默认只读审查；不编辑文件、不移动分支、不改 index；用户要求边审边改时先回 `ccdawn-brt` 建立 Execution Contract。
 - Success Evidence: findings 均有位置/命令/文件证据，行动队列能路由到具体 skill 或阶段。
 - Stop Condition: 审查范围不明、需要写代码、发现 PR/diff 对象、发现具体 bug 需转调试、或用户目标变成实施。
-- Route Out: `ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-pr-review`、`ccdawn-completion-summary`、`ccdawn-evaluation`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `ccdawn-simplification-audit`、`ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-pr-review`、`ccdawn-completion-summary`、`ccdawn-brt` 或 BLOCKED。
 
-## 统一输出标准
+## 统一调用契约
 
-- 用户可见输出默认中文；只有代码、命令、路径、错误原文、API/协议名、skill 名、状态枚举和外部专名保留英文。
-- 报告、方案、审查、阶段文档和交接摘要使用中文标题与中文字段；内部字段对外翻译为：上下文边界、输出契约、允许动作、成功证据、停止条件、路由出口、下一步建议。
-- 若必须保留英文状态或枚举，先用中文解释其含义。
-- 用户可见正文末尾保留 `下一步建议: ...`，除非被更高优先级系统附录隔开。
-
-## Owner 接入规则
-
-进入本 skill 前先做轻量 owner 自检：
-
-- 如果用户主目标不属于本 skill 的 owner 范围，不继续执行；回 `ccdawn-brt` 做 Owner 仲裁，或转交更具体 owner。
-- 如果本 skill 只覆盖复合任务的一部分，只处理当前路由契约覆盖的 Primary/Secondary，不吞掉其他 owner。
-- 如果发现 planning/development 正在替代更具体 owner，先输出路由修正，再进入正确 owner。
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
+- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 进入条件
 
@@ -188,10 +178,10 @@ Findings:
 - 1. ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]；为什么排在这里...；Success Evidence...
 
 下一步:
-默认路由：<Ordered Fix Queue / ccdawn-planning / ccdawn-bug-review / ccdawn-pr-review / ccdawn-completion-summary / ccdawn-evaluation / ccdawn-brt / BLOCKED>，原因...
+默认路由：<从 BRT interface 的 Route Out 选择一个>，原因...
 执行规则：若有多个可连续修复项，输出 Ordered Fix Queue 并在用户说“继续/开始修复/按顺序修”后从第 1 项推进；若只有一个明确后续 owner，直接路由；只有审查范围、修复顺序或高风险动作需要用户取舍时，才列出选项。
 
-Route Out: Ordered Fix Queue / ccdawn-planning / ccdawn-bug-review / ccdawn-pr-review / ccdawn-completion-summary / ccdawn-evaluation / ccdawn-brt / BLOCKED
+Route Out: <沿用 BRT interface>
 ```
 
 ## 质量门槛

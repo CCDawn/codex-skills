@@ -1,4 +1,4 @@
 interface:
-  display_name: "CCDawn Score Loop"
+  display_name: "CCDawn Score 评分循环"
   short_description: "通用分数/榜单/benchmark 迭代模板：baseline、单因果变更、验证、晋升、反馈校准。"
   default_prompt: "使用 $ccdawn-score-loop：实验候选保持在 baseline/candidate/delta/gate 循环，不使用 TDD RED/GREEN；先确认 profile、metric 和 active baseline，再运行最小决定性 evaluation，最后给出 promote/reject/hold。"
