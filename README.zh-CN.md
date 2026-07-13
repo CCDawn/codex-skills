@@ -3,13 +3,13 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-22-2f81f7)](#完整-skill-目录)
+[![Skills](https://img.shields.io/badge/skills-23-2f81f7)](#完整-skill-目录)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **让 Codex 先理解你，再决定怎么做。**
 
-22 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、代码审查、UI 设计和 AI 研究工作流。
+23 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -65,12 +65,14 @@ sh ./install.sh
 | 简单修改被流程拖慢 | 按子任务风险控制重量，默认优先直接实现和验证 |
 | 审查只给结论、不继续推进 | 形成按依赖排序的行动队列，在边界内连续处理 |
 | 多个 Codex 会话同时开发 | 共享紧凑进度，协调 scope、讨论、暂停恢复和合并顺序 |
+| 功能完成后残留临时文件和旧分支 | 验证后静默检查，只清理有归属证据的残留和已吸收本地 Git 资源 |
 | AI 研究和普通开发混用流程 | 分离研究实验、评分循环、严谨性审查和软件 TDD |
 
 ## 精选 Skill
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)：默认适配层，负责意图理解、讨论式对齐、路由和流程重量控制。
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)：共享同项目 Agent 进度，协调冲突、讨论、暂停恢复与快速合并。
+- [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md)：清理开发残留，并安全收尾已合并本地分支、worktree 和 claim。
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
@@ -115,6 +117,9 @@ sh ./install.sh
 
 - **`ccdawn-thread-coordination`**
   同一项目多会话协调 owner。用跨 worktree 的 live registry 共享任务、scope 和 checkpoint；通过收敛讨论、暂停握手和 merge order 减少冲突与回归。
+
+- **`ccdawn-development-cleanup`**
+  每次代码开发验证后做静默清理检查；只在存在实际候选时加载，清理可证明的临时残留，并在合并后安全删除已吸收、clean、未占用且无 active claim 的本地 branch/worktree。
 
 - **`ccdawn-ui-design`**
   UI/UX 专项 owner，负责信息层级、交互状态、响应式、无障碍和浏览器视觉验证；机械前端小改不会自动升级成设计流程。
@@ -225,6 +230,7 @@ skills/
     README.md
     ccdawn-dawn-agent-html-memory/
     ccdawn-thread-coordination/
+    ccdawn-development-cleanup/
     ccdawn-brt/
     ccdawn-ui-design/
     ccdawn-feature-reuse-research/

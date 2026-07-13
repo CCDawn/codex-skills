@@ -7,6 +7,7 @@
                    "./skills/creative/ccdawn-creative-toolbox",
                    "./skills/engineering/ccdawn-dawn-agent-html-memory",
                    "./skills/engineering/ccdawn-thread-coordination",
+                   "./skills/engineering/ccdawn-development-cleanup",
                    "./skills/engineering/ccdawn-feature-reuse-research",
                    "./skills/engineering/ccdawn-planning",
                    "./skills/engineering/ccdawn-task-splitting",

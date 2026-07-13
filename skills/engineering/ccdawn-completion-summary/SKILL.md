@@ -25,7 +25,7 @@ license: MIT
 - Allowed Action: 只验证、读取证据和总结；不补写新功能、不削弱测试、不提交/推送/发布；可恢复缺口必须路由到最具体开发/debug/验证阶段。
 - Success Evidence: 每个完成 claim 都有新鲜命令、检查、日志、截图或结构性证据支撑，并对照 critical tasks 和已确认意图。
 - Stop Condition: 关键任务未完成、新鲜证据缺失、NEEDS_CHANGE 未解决、保护边界越界、需要用户决策或高风险交付动作。
-- Route Out: `ccdawn-pr-review`、提交/PR 准备、对应开发模式、`ccdawn-bug-review`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `ccdawn-development-cleanup`、`ccdawn-pr-review`、提交/PR 准备、对应开发模式、`ccdawn-bug-review`、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一输出标准
 
@@ -85,6 +85,7 @@ license: MIT
 - 副作用检查没有未披露风险。
 - 变更没有越过保护边界，或越界点已被用户明确接受。
 - residual risks 已列出并说明是否接受。
+- 代码写入型开发已完成静默清理检查；状态为 `CLEAN / NOOP`，或尚未集成时明确为 `DEFERRED_INTEGRATION`。已经集成后不得继续用 deferred 状态收口。
 
 如果验证失败或证据不足：
 
@@ -120,11 +121,11 @@ Ledger Update:
 - Completed Tasks: ...
 - Verification Evidence: ...
 - Unresolved Risks: ...
-- Recommended Next Stage: ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
-- Route Out: ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
+- Recommended Next Stage: ccdawn-development-cleanup / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
+- Route Out: ccdawn-development-cleanup / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED
 
 下一步:
-默认路由：<收口 / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED>，原因...
+默认路由：<收口 / ccdawn-development-cleanup / ccdawn-pr-review / 提交或 PR 准备 / 对应开发模式补任务 / ccdawn-bug-review / ccdawn-planning / ccdawn-brt / BLOCKED>，原因...
 执行规则：COMPLETE 且没有提交、推送、PR、合并、发布或补任务需求时直接收口；PARTIAL 时路由到最具体恢复阶段；BLOCKED 时只问一个阻塞问题；远程写入、发布、合并、删除或迁移动作前必须停下等用户授权。
 ```
 
@@ -155,5 +156,7 @@ Ledger Update:
 ## 阶段交接
 
 总结后按自然闸门给下一步：如果工作已经完成且没有提交、推送、PR、合并、发布或补任务需求，可以直接收口；如果存在后续动作，给默认路由和原因。只有存在真实分叉、高风险动作或需要用户授权时，才给用户选项。
+
+代码写入型工作尚未做清理检查时，先路由 `ccdawn-development-cleanup`。合并前保留 branch/worktree 可记为 `DEFERRED_INTEGRATION` 并继续 PR 流程；合并完成后必须清理或明确 BLOCKED，不能把旧 branch/worktree 永久留作默认尾项。
 
 如果用户选择继续开发，按任务的 Development Mode 执行；`BDD_TDD` 子任务使用 `ccdawn-bdd-tdd-development`。如果用户发现需求方向不对，回到 `ccdawn-brt`。如果用户要进入 PR、提交、推送、合并或发布前审阅，使用 `ccdawn-pr-review`。

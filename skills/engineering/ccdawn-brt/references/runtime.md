@@ -79,6 +79,7 @@ Transition rules:
 - Continuous Critical Path execution must stop on blocker, failed verification that cannot be safely recovered inside the current Execution Contract, changed intent, scope expansion, high-risk unconfirmed action, or worktree conflict.
 - A failed verification is first a recovery signal, not automatically a handoff stop. If the cause is inside the current Execution Contract and safe to fix, route back to the owning development/debug stage, fix, and re-verify. Stop only when it becomes a natural gate.
 - Any flow may complete from fresh verification in the current owner when no handoff, deferred item, or unresolved risk remains. Use `ccdawn-completion-summary` only for cross-stage synthesis, resumed work, formal handoff, or evidence that must persist.
+- After code-writing work passes verification, perform one silent cleanup eligibility check. Record `NOOP` without loading another skill when clean; route actual residue, merged local branches, disposable worktrees, or completed claims to `ccdawn-development-cleanup`.
 - Do not enter `MERGE_READY` before `ccdawn-pr-review` verifies the diff or PR. `COMPLETED` means the current route's success evidence passed; `MERGE_READY` means integration review passed.
 
 ## Flow and Task Mode Gates
@@ -223,6 +224,7 @@ Stage skills should not repeat the full ledger when a compact update is enough. 
 - `ccdawn-task-splitting`: `Current Stage`, `Split Decision`, `Task Graph`, `Current Task`, `Decisions`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-bdd-tdd-development`: `Current Stage`, `Current Task`, `Development Mode`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 - `ccdawn-completion-summary`: `Current Stage`, `Completed Tasks`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
+- `ccdawn-development-cleanup`: `Cleanup State`, `Removed`, `Preserved or Deferred`, `Post-clean Evidence`, `Route Out`.
 - `ccdawn-pr-review`: `Current Stage`, `Verification Evidence`, `Unresolved Risks`, `Recommended Next Stage`.
 
 Use the full ledger when resuming, blocked, handing off to another agent, or when a missing field would change the route.
@@ -257,11 +259,12 @@ Ask one blocking question only. If several questions are useful but not required
 
 ## Completion Gate
 
-The current owner may mark a FAST_PATH or bounded COMPACT_FLOW implementation `COMPLETED` when fresh success evidence passes. `ccdawn-completion-summary` owns FULL_FLOW, resumed, cross-stage, or formal handoff completion synthesis. Only `ccdawn-pr-review` can mark a PR or diff `MERGE_READY`.
+The current owner may mark a FAST_PATH or bounded COMPACT_FLOW implementation `COMPLETED` when fresh success evidence passes and the cleanup check is `CLEAN`, `NOOP`, or pre-integration `DEFERRED_INTEGRATION`. `ccdawn-completion-summary` owns FULL_FLOW, resumed, cross-stage, or formal handoff completion synthesis. Only `ccdawn-pr-review` can mark a PR or diff `MERGE_READY`.
 
 Runtime owns the state transition; the stage skills own the detailed criteria.
 
 - Do not mark `COMPLETED` without fresh evidence from the current route; require `ccdawn-completion-summary` only for FULL_FLOW, resumed, cross-stage, or formal handoff work.
+- After integration, `DEFERRED_INTEGRATION` is no longer a completed cleanup state; rerun `ccdawn-development-cleanup` before final closure.
 - Do not mark `MERGE_READY` without `ccdawn-pr-review` evidence.
 - If evidence is missing, stale, or contradicted by the diff, route to the owning stage instead of claiming readiness.
 - If the gap is fixable inside the current Execution Contract, recommend the recovery route; if it requires new scope, permission, or intent change, stop at the natural gate.

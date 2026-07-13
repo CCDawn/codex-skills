@@ -1,0 +1,79 @@
+---
+name: ccdawn-development-cleanup
+description: "Use when a verified or integrated software change has concrete temporary artifacts, generated noise, stale claims, merged local branches, or disposable worktrees to clean, or when the user explicitly asks to remove development residue or old branches."
+license: MIT
+---
+
+# CCDawn Development Cleanup
+
+## 目标
+
+在不丢失用户工作、恢复证据或未合并实现的前提下，清掉开发产生的可证明噪音，并完成 feature branch、worktree 和 claim 的生命周期收尾。
+
+核心原则：无法证明“可重建、已吸收、无 owner”时就保留。清理不是重构，也不是扩大范围的理由。
+
+## BRT interface
+
+- Context Boundary: 当前项目真实根目录、实现范围、验证结果、Git target/base/head、working tree、untracked/ignored 文件、worktree、claim、用户或项目清理授权。
+- Output Contract: `CLEAN / NOOP / DEFERRED_INTEGRATION / BLOCKED`、已删除项、保留项、延后条件、清理后证据和 Route Out。
+- Allowed Action: 先只读审计；只删除已证明属于本轮且可重建的本地残留。删除本地 branch/worktree 还需当前用户明确清理请求或项目长期策略。远程分支、push、合并、发布和无法归属的文件不自动处理。
+- Success Evidence: 清理后 `git status`、branch/worktree inventory 和 coordination registry 与预期一致；源代码、用户改动、未合并提交和必要证据仍存在。
+- Stop Condition: 根目录或 integration target 不明、工作区 dirty 且归属不清、branch 未吸收、worktree 被占用、claim 仍 active、路径安全无法证明、删除需要远程或 force 动作。
+- Route Out: 当前开发 owner、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-completion-summary`、`ccdawn-brt` 或 BLOCKED。
+
+## 进入时机
+
+- 每次代码写入型开发通过风险相称的验证后，BRT 先做静默清理检查。
+- 存在临时产物、任务专用缓存、scratch 文件、claim、feature branch 或 worktree 时加载本 skill；完全干净时由当前 owner 记为 `NOOP`，不展开流程。
+- 合并前清理开发残留，但保留仍用于 PR/合并的 branch/worktree，状态为 `DEFERRED_INTEGRATION`；合并后再次收尾这些 Git 资源。
+- 纯规划、只读审查、研究结果归档或尚未通过验证的开发不进入删除阶段。
+
+## 审计与分类
+
+先确认真实 repo root、当前 branch、integration target 和本轮 owned surface，再读取：
+
+- `git status --short --branch`、相关 diff、untracked/ignored 候选；
+- `git worktree list --porcelain` 和本地分支占用；
+- `git merge-base --is-ancestor <branch-tip> <target>` 或等价吸收证据；
+- coordination registry 中的 Agent/claim 状态；
+- 项目规则、官方 closeout 命令和 Windows junction/reparse point。
+
+把候选分成四类：
+
+- `REMOVE_NOW`：本轮创建、可重建、删除后不影响行为或证据。
+- `CLOSE_AFTER_INTEGRATION`：当前 feature branch/worktree 已完成但尚未被 target 吸收。
+- `KEEP`：源码、用户内容、验收证据、未合并提交、归属不明或仍被依赖。
+- `BLOCKED`：删除需要 force、远程动作、所有权裁决或路径风险未解除。
+
+## 噪音清理
+
+- 只按明确的 literal path 删除，不使用 `git clean -fdx`、仓库根目录递归删除或宽泛通配符。
+- `git clean -ndX` 只能用于预览；`node_modules`、`.venv`、下载缓存、模型/数据、密钥、用户日志和共享依赖默认保留。
+- 临时 patch、scratch 脚本、测试/构建缓存、过期截图和日志只有在本轮创建或项目规则明确可丢弃时才删除。
+- accepted plan、迁移、lockfile、fixture、snapshot、基准结果和失败复现不是噪音，除非已有替代且用户明确同意。
+- 不修改 `.gitignore` 来隐藏无法解释的残留；先判断它为何存在。
+
+## Branch、worktree 与 claim
+
+本地分支只有同时满足以下条件才可删除：目标分支已包含 tip、没有 target 之外的提交、未被任何 worktree checkout、没有 active claim、不是当前或受保护分支。只用安全删除 `git branch -d`；拒绝时保留，不升级 `-D`，也不为通过删除而切换用户正在使用的 checkout。
+
+当前功能分支在用户已给清理授权时可自动收尾。其他历史分支只删除已满足全部门槛且被当前请求或项目长期策略覆盖的项；否则报告候选，不顺手扩大清理范围。远程分支删除必须单独授权。
+
+worktree 只有在 clean、branch 已吸收、claim 已关闭且不再承担恢复/运行职责时才移除。不要从目标 worktree 内删除自身；从已确认的稳定 repo/worktree 操作。Windows 上先验证绝对目标位于预期 worktree 父目录，检查 junction/reparse point；只移除已确认属于该 worktree 的链接本身，不递归进入共享目标，再使用 `git worktree remove`。禁止 force 删除 dirty worktree。
+
+claim 仅在实现确实完成或明确取消后标记 completed/released；存在 blocker 或交接时保留真实状态。需要多 Agent 裁决时路由 `ccdawn-thread-coordination`。
+
+## 执行与验证
+
+1. 先输出或内部建立候选分类；有安全候选才执行。
+2. 按 exact path 和单个 Git 对象逐项清理，每一步失败就停止扩大动作。
+3. 重新读取 Git、worktree 和 registry；清理触及源码、依赖或运行环境时才重跑受影响验证，普通缓存删除不重复完整测试套件。
+4. 工作区只剩预期源码/文档变更，或已 clean；所有延后项都有明确触发条件。
+
+## 低噪声输出
+
+无候选时只说 `清理检查: NOOP`。有动作时仅汇报：已清理、保留/延后、验证证据和一个下一步建议；不打印完整文件树、全部分支或命令日志。
+
+只有远程删除、force、dirty/未合并内容、归属冲突或路径不确定时才停下来询问。用户已明确授权的安全本地清理不重复确认。
+
+用户可见输出默认中文，代码、命令、路径、Git 状态和 skill 名保留英文。正文最后一行使用：`下一步建议: <一个具体动作>`。
