@@ -50,6 +50,23 @@ def run_git(*args: str, cwd: Path) -> str:
     return result.stdout.strip()
 
 
+def run_coordination(
+    project: Path,
+    codex_home: Path,
+    *args: str,
+    check: bool = True,
+) -> subprocess.CompletedProcess[str]:
+    environment = dict(os.environ)
+    environment["CODEX_HOME"] = str(codex_home)
+    return subprocess.run(
+        [sys.executable, str(SCRIPT_DIR / "agent_coordination.py"), str(project), *args],
+        check=check,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+
 class AgentCoordinationTests(unittest.TestCase):
     def test_git_worktrees_share_one_coordination_root(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -65,6 +82,211 @@ class AgentCoordinationTests(unittest.TestCase):
             run_git("worktree", "add", "-b", "worker", str(worktree), cwd=root)
 
             self.assertEqual(coordination_root(root), coordination_root(worktree))
+
+    def test_cli_worktree_conflict_pause_resume_completion_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "repo"
+            worktree_a = Path(temp) / "agent-a"
+            worktree_b = Path(temp) / "agent-b"
+            codex_home = Path(temp) / "codex-home"
+            root.mkdir()
+            run_git("init", "-b", "main", cwd=root)
+            run_git("config", "user.email", "test@example.com", cwd=root)
+            run_git("config", "user.name", "Test User", cwd=root)
+            (root / "shared").mkdir()
+            (root / "shared" / "router.ts").write_text("export const route = 'base';\n", encoding="utf-8")
+            run_git("add", "shared/router.ts", cwd=root)
+            run_git("commit", "-m", "init", cwd=root)
+            run_git("worktree", "add", "-b", "agent-a", str(worktree_a), cwd=root)
+            run_git("worktree", "add", "-b", "agent-b", str(worktree_b), cwd=root)
+
+            for project, agent_id, branch in (
+                (worktree_a, "agent-a", "agent-a"),
+                (worktree_b, "agent-b", "agent-b"),
+            ):
+                run_coordination(
+                    project,
+                    codex_home,
+                    "join",
+                    "--agent",
+                    agent_id,
+                    "--agent-id",
+                    agent_id,
+                    "--thread-id",
+                    f"thread-{agent_id}",
+                    "--task",
+                    "shared router work",
+                    "--branch",
+                    branch,
+                    "--worktree",
+                    str(project),
+                    "--scope",
+                    "shared/router.ts",
+                    "--json",
+                )
+
+            claim_b = json.loads(
+                run_coordination(
+                    worktree_b,
+                    codex_home,
+                    "claim",
+                    "--lane",
+                    "router-b",
+                    "--scope",
+                    "shared/router.ts",
+                    "--agent-id",
+                    "agent-b",
+                    "--task",
+                    "extend router",
+                    "--json",
+                ).stdout
+            )["claim"]
+            blocked_claim = run_coordination(
+                worktree_a,
+                codex_home,
+                "claim",
+                "--lane",
+                "router-a",
+                "--scope",
+                "shared/router.ts",
+                "--agent-id",
+                "agent-a",
+                "--task",
+                "repair router",
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, blocked_claim.returncode)
+
+            coordination = json.loads(
+                run_coordination(
+                    worktree_a,
+                    codex_home,
+                    "open",
+                    "--kind",
+                    "conflict",
+                    "--owner-agent-id",
+                    "agent-a",
+                    "--participant",
+                    "agent-b",
+                    "--topic",
+                    "shared router overlap",
+                    "--surface",
+                    "shared/router.ts",
+                    "--json",
+                ).stdout
+            )
+            coordination_id = coordination["id"]
+            run_coordination(
+                worktree_b,
+                codex_home,
+                "pause",
+                "--agent-id",
+                "agent-b",
+                "--coordination-id",
+                coordination_id,
+                "--reason",
+                "yield shared router",
+                "--json",
+            )
+            claim_a = json.loads(
+                run_coordination(
+                    worktree_a,
+                    codex_home,
+                    "claim",
+                    "--lane",
+                    "router-a",
+                    "--scope",
+                    "shared/router.ts",
+                    "--agent-id",
+                    "agent-a",
+                    "--task",
+                    "repair router",
+                    "--json",
+                ).stdout
+            )["claim"]
+            run_coordination(
+                worktree_a,
+                codex_home,
+                "resolve",
+                "--coordination-id",
+                coordination_id,
+                "--agent-id",
+                "agent-a",
+                "--decision",
+                "repair verified",
+                "--reason",
+                "release repair claim before resume",
+                "--json",
+            )
+
+            early_complete = run_coordination(
+                worktree_a,
+                codex_home,
+                "complete",
+                "--agent-id",
+                "agent-a",
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, early_complete.returncode)
+            early_resume = run_coordination(
+                worktree_b,
+                codex_home,
+                "resume",
+                "--agent-id",
+                "agent-b",
+                "--coordination-id",
+                coordination_id,
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, early_resume.returncode)
+
+            run_coordination(
+                worktree_a,
+                codex_home,
+                "release",
+                "--claim-id",
+                claim_a["id"],
+                "--status",
+                "completed",
+                "--reason",
+                "repair verified",
+                "--json",
+            )
+            run_coordination(
+                worktree_b,
+                codex_home,
+                "resume",
+                "--agent-id",
+                "agent-b",
+                "--coordination-id",
+                coordination_id,
+                "--json",
+            )
+            run_coordination(
+                worktree_a,
+                codex_home,
+                "complete",
+                "--agent-id",
+                "agent-a",
+                "--summary",
+                "repair and resume closed",
+                "--json",
+            )
+
+            registry = json.loads(
+                run_coordination(worktree_a, codex_home, "status", "--json").stdout
+            )
+            agents = {item["id"]: item for item in registry["agents"]}
+            claims = {item["id"]: item for item in registry["claims"]}
+            closed = next(item for item in registry["coordinations"] if item["id"] == coordination_id)
+            self.assertEqual("completed", agents["agent-a"]["state"])
+            self.assertEqual("active", agents["agent-b"]["state"])
+            self.assertEqual("active", claims[claim_b["id"]]["status"])
+            self.assertEqual([], closed["resumePendingAgentIds"])
+            self.assertEqual("closed", closed["recoveryState"])
 
     def test_concurrent_agent_registration_keeps_every_agent(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
