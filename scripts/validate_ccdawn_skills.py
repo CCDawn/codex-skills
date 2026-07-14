@@ -311,6 +311,88 @@ def validate_ui_routing_cases(
                 )
 
 
+def validate_package_routing_cases(
+    repo_root: Path,
+    skill_names: set[str],
+    errors: list[str],
+) -> None:
+    cases_path = repo_root / "tests" / "routing_cases.json"
+    if not cases_path.exists():
+        errors.append("tests/routing_cases.json: missing")
+        return
+
+    try:
+        cases = json.loads(read_text(cases_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"tests/routing_cases.json: invalid JSON: {exc}")
+        return
+
+    if not isinstance(cases, list) or len(cases) < len(skill_names):
+        errors.append(
+            "tests/routing_cases.json: expected at least one routing case per packaged skill"
+        )
+        return
+
+    seen_ids: set[str] = set()
+    primary_coverage: set[str] = set()
+    forbidden_coverage: set[str] = set()
+    composite_count = 0
+    for index, case in enumerate(cases):
+        label = f"tests/routing_cases.json[{index}]"
+        if not isinstance(case, dict):
+            errors.append(f"{label}: expected an object")
+            continue
+
+        required_fields = {"id", "prompt", "primary", "support", "forbidden_primary"}
+        missing_fields = sorted(required_fields - set(case))
+        if missing_fields:
+            errors.append(f"{label}: missing fields {missing_fields}")
+            continue
+
+        case_id = case["id"]
+        prompt = case["prompt"]
+        primary = case["primary"]
+        support = case["support"]
+        forbidden = case["forbidden_primary"]
+
+        if not isinstance(case_id, str) or not case_id or case_id in seen_ids:
+            errors.append(f"{label}: id must be a non-empty unique string")
+        seen_ids.add(case_id)
+        if not isinstance(prompt, str) or not prompt or not contains_cjk(prompt):
+            errors.append(f"{label}: prompt must be Chinese-first")
+        if primary not in skill_names:
+            errors.append(f"{label}: unknown primary owner '{primary}'")
+        else:
+            primary_coverage.add(primary)
+        if not isinstance(support, list) or len(support) > 1:
+            errors.append(f"{label}: support must contain at most one owner")
+            support = []
+        if support:
+            composite_count += 1
+        if not isinstance(forbidden, list) or not forbidden:
+            errors.append(f"{label}: forbidden_primary must be a non-empty list")
+            forbidden = []
+        for owner in support + forbidden:
+            if owner not in skill_names:
+                errors.append(f"{label}: unknown referenced owner '{owner}'")
+        if primary in support or primary in forbidden:
+            errors.append(f"{label}: primary owner cannot also be support or forbidden")
+        forbidden_coverage.update(forbidden)
+
+    missing_primary = sorted(skill_names - primary_coverage)
+    if missing_primary:
+        errors.append(f"tests/routing_cases.json: missing positive cases for {missing_primary}")
+    if composite_count < 2:
+        errors.append("tests/routing_cases.json: expected at least two composite routing cases")
+
+    missing_negative = sorted(skill_names - forbidden_coverage)
+    if missing_negative:
+        errors.append(
+            "tests/routing_cases.json: missing negative boundary coverage for "
+            f"{missing_negative}"
+        )
+
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -630,6 +712,7 @@ def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str])
             )
 
     validate_ccdawn_route_references(repo_root, set(skill_names), errors)
+    validate_package_routing_cases(repo_root, set(skill_names), errors)
     validate_ui_routing_cases(repo_root, set(skill_names), errors)
 
 
