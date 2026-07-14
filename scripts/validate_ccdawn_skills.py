@@ -103,6 +103,7 @@ BRT_REFERENCE_REQUIRED_MARKERS = {
     "capability-routing.md": [
         "Preferred owner（可用时）",
         "同一动作只设一个 primary",
+        "不是再次索要许可",
         "Preferred owner 不可用时",
     ],
     "output-forms.md": [

@@ -31,6 +31,7 @@
 - UI 设计并实现仍由 UI/Visual owner 贯穿；Browser、Figma、Imagegen 是按需能力，不产生新阶段。
 - 文件制品请求直接命中对应 artifact owner，不先进入 Planning；只有内容、结构或高风险取舍仍未对齐时才回 BRT。
 - 多动作请求按依赖动态组合，例如“修 CI 后 push 并开 PR”依次使用 CI owner、当前代码 owner、发布 owner，不同时加载全部 skill。
+- 用户已明确说“修复/处理/实现”时，诊断完成后可在原 scope 内直接实施；专项 owner 的“先检查再修复”是执行顺序，不是再次索要许可。`push`、发布、破坏性操作、权限或范围扩大仍是独立授权边界。
 - Preferred owner 不可用时说明能力缺口并使用最低充分 fallback；需要安装指定插件时才进入安装流程。
 
 ## 无专项 skill 的软件任务

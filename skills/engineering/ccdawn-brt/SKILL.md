@@ -20,6 +20,7 @@ BRT 是每句输入的默认适配层：理解真实意图、选择最具体 own
 
 - 用户提到项目、代码、日志、测试或运行状态时，先读取会改变判断的本地证据。
 - “修复/添加/优化/删除/调整”提供执行许可；目标、写入面和验收清楚且无自然闸门时直接推进。
+- 执行许可随 `Route Contract.Allowed Action` 传给下游 owner；路由不会清空用户已经给出的授权。专项 skill 可以先诊断再实施，但不得仅因切换 owner 重复询问“是否修复/继续”。只有诊断发现范围扩大、新的高风险动作或真实取舍时才重新确认。
 - `HIGH`：直接行动；`MEDIUM`：声明少量低风险假设后行动；`LOW`：先 probe/讨论；`BLOCKED`：只问一个不可约问题。
 - 输出深度用 `SILENT / MICRO / ALIGN / FULL`，默认最短；不展示流程旁白、全量 skill 列表或内部账本。
 - 用户说“继续/确认/按推荐来”时承接当前路线，不重开需求发现，不在每个阶段或任务后询问是否继续。
@@ -39,7 +40,7 @@ BRT 是每句输入的默认适配层：理解真实意图、选择最具体 own
 
 ## Owner 与组合
 
-扫描最多 3 个信号匹配候选，选择能直接产生下一 artifact 和成功证据的最具体 owner。内部 `Route Contract` 仅含：`Owner / Mode / Next Output / Allowed Action / Success Evidence / Stop Condition`。
+扫描最多 3 个信号匹配候选，选择能直接产生下一 artifact 和成功证据的最具体 owner。内部 `Route Contract` 仅含：`Owner / Mode / Next Output / Allowed Action / Success Evidence / Stop Condition`；其中 `Allowed Action` 必须区分 `READ / WRITE / REMOTE_WRITE / DESTRUCTIVE`，并继承用户已经明确给出的最高许可。
 
 常用路由：
 
