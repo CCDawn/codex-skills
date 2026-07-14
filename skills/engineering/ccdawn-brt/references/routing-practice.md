@@ -45,6 +45,8 @@
 - UI PR 仍由 PR review 主责；只有需要真实界面证据时才把 UI review 作为 support，不重复审查同一代码风险。
 - 单页面或单组件问题不升级为 design system；只有共享事实源、多个消费者或迁移契约成为主要问题时才进入该 owner。
 - UI design 决定任务、结构和交互；visual design 决定品牌与视觉表达。普通产品 UI 不因“更好看”自动加载两个 owner。
+- “设计并实现”由主要设计 owner 贯穿落地和一次浏览器验收，不再串联 Frontend Engineering；只有方案单独交付、跨 owner handoff，或进入时契约已确定才由 Frontend Engineering 主责。
+- Design System 负责契约和代表性消费者，不把同一迁移机械拆给页面 owner；只有剩余页面形成独立交付边界时才切换。
 - 具体 bug 交给 bug owner；整仓测试健康度和架构风险交给 project review。
 - Bug Review 持有从根因到修复的完整闭环；必要 RED/GREEN 是其内部测试锚点，不再二次加载 TDD skill。TDD 只主责已明确的新行为或实现契约。
 - planning 解决设计分叉，并仅在真实独立边界存在时内嵌 `TASK_GRAPH`；`NO_SPLIT` 不产生额外阶段。

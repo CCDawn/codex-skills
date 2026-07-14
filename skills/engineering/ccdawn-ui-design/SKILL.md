@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 在 BRT 授权范围内检查或修改 UI owning surface；不顺带重做品牌、后端协议或无关页面。
 - Success Evidence: 浏览器截图、DOM/布局检查、目标视口验证、交互状态检查，或无法渲染时的明确限制。
 - Stop Condition: 目标 surface 不明、品牌/设计系统冲突、关键产品取舍未定、应用不可运行且代码证据不足，或修改将越过授权边界。
-- Route Out: 品牌表达或视觉语言转 `ccdawn-visual-design`；界面契约确定后的生产实现转 `ccdawn-frontend-engineering`；已有界面审查转 `ccdawn-ui-review`；跨组件 token、主题或组件治理转 `ccdawn-design-system`；复杂外部复用决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；PR 正确性审查转 `ccdawn-pr-review`；阻塞则回 `ccdawn-brt`。
+- Route Out: 品牌表达成为主要未知量时转 `ccdawn-visual-design`；只交付方案或需要独立实施 handoff 时转 `ccdawn-frontend-engineering`；已有界面审查转 `ccdawn-ui-review`；跨组件事实源治理转 `ccdawn-design-system`；复杂外部复用决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；PR 正确性审查转 `ccdawn-pr-review`；阻塞则回 `ccdawn-brt`。
 
 ## 统一调用契约
 
@@ -31,6 +31,10 @@ license: MIT
 - `FULL_FLOW`：跨页面信息架构、设计系统、品牌重构、复杂编辑器或高影响可访问性改造。只保留会改变决策的方案和闸门。
 
 默认 0 个问题。用户只说“更好看/更现代”时，先结合产品类型、现有界面和主要任务给出推荐方向；仅当不同方向会显著改变布局、交互或品牌结果时，集中给出 2-3 个具体选项，并标出推荐和代价。
+
+## 单 owner 贯穿
+
+用户同时要求设计并实现时，本 owner 完成最小界面契约后直接实施和浏览器验证，不再二次加载 Frontend Engineering。只有用户只要设计方案、需要跨会话/独立 owner 交接，或实现范围超出当前授权时才 Route Out。视觉细节和现有 token 使用是本任务内部决策；只有品牌语言或共享事实源成为主要问题时才切换专项 owner。
 
 ## 界面契约
 
@@ -64,9 +68,5 @@ license: MIT
 5. 画布、3D、图片或动效是核心时，补充像素非空、构图、资源加载或运动证据。
 
 代码检查只能证明结构，不能替代可运行 UI 的视觉证据。浏览器不可用时，明确说明未验证项，不声称“视觉已完成”。
-
-## 审查输出
-
-UI 审查以 findings 开头，按影响排序：问题、证据、用户影响、最小建议。没有问题时明确说通过，并列出尚未覆盖的视口或状态。默认中文，不输出空洞的审美评分矩阵。
 
 用户可见正文末尾保留：`下一步建议: <一个具体动作>`。

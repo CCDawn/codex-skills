@@ -486,7 +486,7 @@ def validate_skill(
                 errors.append(f"{label}: compact debugging owner missing marker '{marker}'")
 
     if name == "ccdawn-ui-design":
-        for marker in ["## 界面契约", "响应式边界", "浏览器验证", "现有设计系统"]:
+        for marker in ["## 界面契约", "## 单 owner 贯穿", "响应式边界", "浏览器验证", "现有设计系统"]:
             if marker not in text:
                 errors.append(f"{label}: UI owner missing marker '{marker}'")
 
@@ -496,17 +496,17 @@ def validate_skill(
                 errors.append(f"{label}: UI review owner missing marker '{marker}'")
 
     if name == "ccdawn-frontend-engineering":
-        for marker in ["## 生产实现", "关键状态", "响应式", "真实浏览器", "ccdawn-ui-design"]:
+        for marker in ["## 生产实现", "最终写入 owner 执行一次", "关键状态", "响应式", "真实浏览器", "ccdawn-ui-design"]:
             if marker not in text:
                 errors.append(f"{label}: frontend implementation owner missing marker '{marker}'")
 
     if name == "ccdawn-design-system":
-        for marker in ["## 系统闸门", "## 事实源与契约", "## 渐进迁移", "多个消费者", "Figma/code"]:
+        for marker in ["## 系统闸门", "## 事实源与契约", "## 渐进迁移", "代表性消费者", "Figma/code"]:
             if marker not in text:
                 errors.append(f"{label}: design-system owner missing marker '{marker}'")
 
     if name == "ccdawn-visual-design":
-        for marker in ["## 语境判断", "## 视觉契约", "产品类型", "一个有依据的推荐方向", "reduced-motion"]:
+        for marker in ["## 语境判断", "## 单 owner 贯穿", "## 视觉契约", "产品类型", "一个有依据的推荐方向", "reduced-motion"]:
             if marker not in text:
                 errors.append(f"{label}: visual-design owner missing marker '{marker}'")
 

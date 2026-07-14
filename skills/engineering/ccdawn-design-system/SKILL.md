@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 在授权范围内修改共享 token、主题、组件、文档/Storybook、映射和必要测试；不顺带重新设计产品页面或改变无关业务行为。
 - Success Evidence: token/类型/组件测试、代表性消费者验证、主题和 variants 状态检查、浏览器截图或 Figma/code 映射证据，以及迁移兼容性结果。
 - Stop Condition: 品牌或产品方向未定、事实源所有权冲突、破坏性迁移缺少授权、消费者范围不可界定，或设计工具权限/环境阻止关键验证。
-- Route Out: 产品交互方向转 `ccdawn-ui-design`；品牌与视觉语言转 `ccdawn-visual-design`；页面实施转 `ccdawn-frontend-engineering`；系统审查转 `ccdawn-ui-review`；真实外部库决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
+- Route Out: 产品交互方向转 `ccdawn-ui-design`；品牌与视觉语言转 `ccdawn-visual-design`；独立页面实现 handoff 转 `ccdawn-frontend-engineering`；系统审查转 `ccdawn-ui-review`；真实外部库决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
 
 ## 统一调用契约
 
@@ -34,6 +34,8 @@ license: MIT
 - 共享组件的改变需要兼容多个消费者、版本或发布边界。
 
 只有“想统一一下”“代码不够整齐”不足以触发。先在现有系统中寻找已有 primitive、token 和组件 API，避免平行事实源。
+
+系统 owner 负责新契约及为证明迁移有效所需的代表性消费者，不把每个消费者机械转交 Frontend Engineering。只有剩余工作已经变成独立产品页面实现、拥有不同边界或需要跨会话交接时才 Route Out；同一迁移的浏览器证据只运行一次。
 
 ## 事实源与契约
 
