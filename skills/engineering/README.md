@@ -8,11 +8,11 @@
 - **[ccdawn-frontend-engineering](./ccdawn-frontend-engineering/SKILL.md)** - Production frontend implementation owner for aligned UI contracts, interaction states, responsive behavior, accessibility, and runtime evidence.
 - **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Live local Agent registry plus durable cross-session project memory and a redacted collaboration dashboard.
 - **[ccdawn-thread-coordination](./ccdawn-thread-coordination/SKILL.md)** - Same-project Agent progress, conflict, discussion, pause/resume, and fast-merge coordination.
-- **[ccdawn-development-cleanup](./ccdawn-development-cleanup/SKILL.md)** - Post-development residue, merged local branch, disposable worktree, and completed claim cleanup.
+- **[ccdawn-development-cleanup](./ccdawn-development-cleanup/SKILL.md)** - Cleanup only for known residue, merged local branches, disposable worktrees, completed claims, or explicit cleanup requests.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research only when external or in-project candidates can materially change a complex feature plan.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
 - **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Compact TDD for already-defined new behavior or high-risk implementation contracts; it does not re-own diagnosed bugs.
-- **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Evidence-backed completion checks and stage summaries.
+- **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Compact cross-session handoff and formal evidence packages, never a default completion stage.
 - **[ccdawn-pr-review](./ccdawn-pr-review/SKILL.md)** - Explicit PR, branch, commit-range, or diff review against requirements, evidence, regression risk, and merge readiness.
 - **[ccdawn-project-review](./ccdawn-project-review/SKILL.md)** - Repository, architecture, technical debt, test gap, and project health review.
 - **[ccdawn-simplification-review](./ccdawn-simplification-review/SKILL.md)** - On-demand diff review focused on evidence-backed removal of unnecessary complexity.

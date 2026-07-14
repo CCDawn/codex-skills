@@ -33,7 +33,7 @@
 | 用户明确需要持久目标、反复迭代和 stop condition，且无专项 owner | `ccdawn-goal-loop` | COMPACT/FULL | 有界 goal contract 与下一轮证据 |
 | 多会话进度、冲突、暂停恢复、讨论或合并 | `ccdawn-thread-coordination` | COMPACT | registry 状态或协调闭环 |
 | 用户/项目明确要求 memory、dashboard、跨会话恢复 | `ccdawn-dawn-agent-html-memory` | FAST/COMPACT | 持久 delta 或恢复上下文 |
-| 已验证工作存在临时产物、旧 branch/worktree/claim | `ccdawn-development-cleanup` | FAST/COMPACT | CLEAN/NOOP/DEFERRED/BLOCKED |
+| 已知存在临时产物、旧 branch/worktree/claim，或用户明确要求清理 | `ccdawn-development-cleanup` | FAST/COMPACT | CLEAN/DEFERRED/BLOCKED |
 | 当前 diff/PR 是否过度设计 | `ccdawn-simplification-review` | COMPACT | 可删与保留判断 |
 | 整仓/子系统冗余复杂度与依赖膨胀 | `ccdawn-simplification-audit` | COMPACT | 排序后的精简队列 |
 

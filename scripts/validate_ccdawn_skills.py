@@ -580,6 +580,7 @@ def validate_skill(
     if name == "ccdawn-development-cleanup":
         for marker in [
             "静默清理检查",
+            "不扫描全仓寻找可能的噪音",
             "DEFERRED_INTEGRATION",
             "git clean -fdx",
             "git branch -d",
@@ -595,11 +596,11 @@ def validate_skill(
             "forbidden": ["ccdawn-task-splitting", "默认路由到 `ccdawn-completion-summary`"],
         },
         "ccdawn-completion-summary": {
-            "required": ["普通 FAST_PATH 和有界 COMPACT_FLOW", "不单独加载本 skill"],
-            "forbidden": [],
+            "required": ["普通 FAST_PATH 和有界 COMPACT_FLOW", "不单独加载本 skill", "无持久状态需求时不生成 Ledger"],
+            "forbidden": ["总结时必须读取并更新账本", "代码写入型工作尚未做清理检查时"],
         },
         "ccdawn-development-cleanup": {
-            "required": ["完全干净时由当前 owner 记为 `NOOP`", "禁止 force 删除 dirty worktree"],
+            "required": ["没有已知候选时直接收口", "禁止 force 删除 dirty worktree"],
             "forbidden": ["git clean -fdx --force", "git branch -D"],
         },
     }

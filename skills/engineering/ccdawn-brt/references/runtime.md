@@ -72,7 +72,7 @@ BDD/TDD 只用于预期行为确定且回归风险显著的子任务。已知失
 - 新鲜验证通过；
 - 无 unresolved blocker 或未披露副作用；
 - 未越过保护边界；
-- 清理资格为 `CLEAN/NOOP`，或集成前明确 `DEFERRED_INTEGRATION`。
+- 已知产生的临时产物或 Git/claim 生命周期已处理，或集成前明确 `DEFERRED_INTEGRATION`；没有已知候选不运行专项清理。
 
 只有跨阶段综合、恢复、正式交接或持久风险才使用 `ccdawn-completion-summary`。PR/diff 的 `MERGE_READY` 由 `ccdawn-pr-review` 判断。集成后不得继续用 `DEFERRED_INTEGRATION` 收口。
 

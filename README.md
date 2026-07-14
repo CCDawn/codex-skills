@@ -123,7 +123,7 @@ sh ./install.sh
   同一项目多会话协调 owner。用跨 worktree 的 live registry 共享任务、scope 和 checkpoint；通过收敛讨论、暂停握手和 merge order 减少冲突与回归。
 
 - **`ccdawn-development-cleanup`**
-  每次代码开发验证后做静默清理检查；只在存在实际候选时加载，清理可证明的临时残留，并在合并后安全删除已吸收、clean、未占用且无 active claim 的本地 branch/worktree。
+  只在已知产生临时残留、branch/worktree/claim，或用户明确要求时加载；安全清理可证明无用且已吸收的开发噪音。
 
 - **`ccdawn-ui-design`**
   UI/UX 专项 owner，负责信息层级、交互状态、响应式、无障碍和浏览器视觉验证；机械前端小改不会自动升级成设计流程。
@@ -150,7 +150,7 @@ sh ./install.sh
   仅对预期已明确的新行为或高风险实现契约使用紧凑 TDD；未知根因和 bug 修复仍由 Bug Review 全程持有。
 
 - **`ccdawn-completion-summary`**
-  只为跨阶段综合、恢复、正式交接、PR/发布前证据生成持久总结；普通实现由当前 owner 直接收口。
+  只为跨阶段/会话恢复、正式交接或独立证据包生成紧凑总结；普通实现由当前 owner 直接收口，不生成固定账本。
 
 - **`ccdawn-pr-review`**
   PR 审阅阶段 skill，用来把 PR、分支、提交范围或本地 diff 对照已确认需求、任务证据、回归风险和合并准备度进行审查。
