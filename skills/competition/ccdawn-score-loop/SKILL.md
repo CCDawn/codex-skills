@@ -1,247 +1,67 @@
 ---
 name: ccdawn-score-loop
-description: "Use when an experiment or competition lane has an explicit metric, baseline, candidate comparison, promotion gate, leaderboard/validation feedback, or submission iteration; do not use for ordinary software latency, performance debugging, or one-off measurements without a baseline-candidate loop."
+description: "Use when repeated work is governed by an explicit metric, active baseline, candidate comparison, promotion gate, leaderboard feedback, or submission iteration; do not use for a one-off research check that its current owner can execute directly."
 license: MIT
 ---
 
-# Score Loop
+# CCDawn Score Loop
 
-## Goal
+## 目标
 
-Run score-driven work as an evidence loop:
-
-```text
-baseline -> one causal change -> smallest decisive check -> promotion/rejection -> ledger update -> next change
-```
-
-This is a generic template. A project-specific profile must define the metric, commands, files, promotion gate, and ledger surfaces. If no profile exists, first build a compact profile instead of inventing commands.
+围绕一个明确 metric 连续比较 baseline 与 candidate，并用可复现证据决定 `PROMOTE / REJECT / HOLD`。这是单条量化 lane owner，不负责整个研究方向或竞赛生命周期。
 
 ## BRT interface
 
-- Context Boundary: project root, score metric, active baseline, allowed write surface, experiment ledger, validation commands, and selected lane.
-- Output Contract: status, experiment lane, worker contract, gate decision, package record, online feedback update, or recovery artifact.
-- Allowed Action: only the profile-approved write surface, one causal mechanism per lane, no baseline promotion/package/submission without a parsed gate decision.
-- Success Evidence: command output, score delta, diff, result JSON/report, ledger/search update, promotion decision, or registered package.
-- Stop Condition: source drift, stale baseline, missing metric definition, invalid validation command, overlapping writes, unsafe promotion, ambiguous online feedback, or user pause.
-- Route Out: continue score loop, launch/recover worker lane, promote/reject candidate, package/submit, update project memory, or BLOCKED with one required input.
-
-## 实验 owner 独占
-
-只要当前工作的主要未知量是“候选是否改善 metric/score”，该修改就属于 score-loop experiment lane，即使它改代码、跨模块或结果变差，也不进入通用 `SIMPLE/BDD_TDD` 分类。
-
-- score regression、候选分数下降、假设被拒、online neutral/worse 都是实验 gate 结果，不是 TDD RED，也不代表代码 bug。
-- 实验使用 `BASELINE / CANDIDATE / DELTA / PROMOTE / REJECT / HOLD`，不要用 RED/GREEN 描述方向。
-- 只有发现工程缺陷，例如 metric 计算、解析、数据 schema、seed、shape、NaN、打包或评测脚本错误，才临时路由到 `ccdawn-bug-review`；其内部可按风险使用测试锚点。
-- 临时工程修复必须写清确定性行为，修复并验证后返回原 baseline/lane；测试 GREEN 只能证明工具行为正确，不能证明实验候选应晋升。
-- 文件数量、跨模块、运行失败或分数回退本身都不能把整个实验升级成 BDD/TDD。
+- Context Boundary: metric、active baseline、candidate/lane、评价命令、允许写入面、晋升条件和预算。
+- Output Contract: candidate 结果、delta、gate 决策、必要记录和下一 lane/回传。
+- Allowed Action: 在已确认范围内一次改变一个主要机制并评估；不静默改变 metric、数据、baseline 或提交目标。
+- Success Evidence: baseline/candidate 身份、命令、解析后的指标、diff/config、关键副指标和 artifact。
+- Stop Condition: baseline/协议漂移、metric 不明、结果不可解析、写入冲突、预算耗尽或继续无信息价值。
+- Route Out: 继续当前 loop、返回 `ccdawn-ai-research-loop`、返回 `ccdawn-competition-research-lifecycle`、`ccdawn-bug-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
 - 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
 - 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
-## Required profile
+## 实验 owner 独占
 
-Before meaningful optimization, identify or create:
+只有主要未知量是“候选能否持续改善明确 metric，并需要晋升/淘汰循环”时进入。AI Research 中可在同一上下文完成的一次低成本实验由研究 owner 直接执行，不为一次比较加载本 skill。
 
-```text
-Project:
-- Root:
-- Metric:
-- Higher is better / lower is better:
-- Active baseline:
-- Online/best-known anchor:
-- Allowed write files:
-- Protected files:
-- Status command:
-- Fast validation:
-- Full validation:
-- Packaging command:
-- Ledger paths:
-- Result artifact schema:
-- Promotion gate:
-- Stop conditions:
-```
+分数下降、candidate reject 和 online neutral/worse 是实验结果，不是 TDD RED。确定性的 metric/parser/schema/seed/shape/NaN/打包 bug 临时路由 `ccdawn-bug-review`，修复后返回原 lane。
 
-Project adapters may keep this in their own `references/*profile.md` or repository docs.
+## 自适应重量
 
-## When to use
+- `QUICK`：已有 baseline、命令和 gate，直接比较一个 candidate；不创建 profile、ledger、worker 或独立 artifact。
+- `STANDARD`：反复候选、跨会话或需要晋升历史；维护最小记录。
+- `FULL`：leaderboard/online feedback、提交包、昂贵运行或并行 lane；使用项目 profile 和持久 artifact。
 
-Use this skill for:
+缺少正式 profile 不阻塞 QUICK；只要 metric、baseline、命令、范围和 gate 足以解释结果即可。STANDARD/FULL 才持久化这些字段，优先读取项目已有事实源，不创建平行 ledger。
 
-- benchmark or leaderboard optimization;
-- repeated local validation with promotion gates;
-- online/offline score disagreement;
-- multiple candidate implementations or model variants;
-- worker lanes that need isolated evidence;
-- package/submission registration;
-- recovery of partial or failed experiment diffs.
+## 最小循环
 
-Do not use it for ordinary feature implementation, one-off bugfixes, or scoreless refactors. Route those to BRT, planning, debugging, or development skills.
+1. 确认当前 baseline、source/config、metric、数据/seed 和评价协议没有漂移。
+2. 定义一个主要机制、预期信号、`smallestDecisiveEvaluation` 和 kill condition。
+3. 先运行最小决定性检查；有希望时再扩到代表性检查或完整 gate。
+4. 解析 baseline/candidate/delta 与副作用，得到 `PROMOTE / REJECT / HOLD / BLOCKED`。
+5. 只有晋升、跨会话恢复、online feedback 或可复用失败教训才写记录；普通 QUICK 直接汇报。
+6. 有执行许可且下一 lane 明确时连续推进，不逐候选询问。
 
-## Operating rules
+一个 lane 只改变一个可归因机制。Smoke/proxy 用于淘汰和排序，不替代目标评估；online score 是稀疏外部证据，不覆盖干净本地协议。没有新的因果变量、诊断信号或校准价值时停止重复尝试。
 
-- One lane tests one causal mechanism.
-- Prefer a small decisive check before broad validation.
-- Do not promote on stale source, unclear metric, missing artifact, or unparsed output.
-- Failed attempts still become searchable lessons.
-- Online feedback updates calibration; it does not replace clean local validation.
-- Hard harness failures block execution; soft confidence issues change lane choice or first-kill tests.
-- Coordinator applies promotions; workers do not mutate the main baseline or ledger directly unless the profile explicitly allows it.
+## 并行与回传
 
-## Lane matrix
+默认不创建 worker、worktree 或 lane matrix。只有候选写入面独立、资源允许且并行收益明显时才隔离；worker 只返回 diff、命令、指标和 artifact，不能自行晋升共享 baseline。
 
-Every executable lane must fit this shape:
+由 AI Research 发起时只回传：`Candidate / Hypothesis outcome / Metric evidence / Mechanism evidence / Caveat / Reusable lesson / Pivot signal`，研究方向仍由研究 owner 决定。由 Competition Lifecycle 发起时回传 gate 与提交/榜单影响。
 
-```json
-{
-  "laneId": "short-id",
-  "attemptId": "short-attempt-id",
-  "targetComponent": "module/function/model/data fold",
-  "mutationType": "edit | architecture | controlled-risk | diagnostic | dataset | fusion",
-  "hypothesis": "one causal mechanism only",
-  "intendedMetric": "primary or component metric",
-  "nonScoreSignal": "secondary signal, legality, runtime, or diagnostic proof",
-  "smallestDecisiveEvaluation": "single case, narrow suite, trace, or bounded run",
-  "killCondition": "flat, regression, timeout, illegal output, or missing target",
-  "expectedDiffSurface": ["path/to/file"],
-  "negativeControls": ["known failed family or baseline comparison"],
-  "recoveryArtifact": "result JSON, report, diff, or dataset path"
-}
-```
-
-Proposal-only lanes are valid only for diagnostics, dataset/proxy construction, or when the lane explicitly cannot edit code. They still need a concrete artifact.
-
-## Worker contract
-
-Workers are diff-first executors:
-
-1. Work only in the assigned isolated workspace.
-2. Confirm baseline/source identity before editing.
-3. Implement exactly one mechanism or produce one diagnostic artifact.
-4. Run the smallest decisive evaluation before broad suites.
-5. Preserve diff, report, logs, and parsed metrics.
-6. Write a result artifact before finishing.
-
-Minimum result fields:
+## 输出
 
 ```text
-laneId, attemptId, baselineId, hypothesis, mutationType, changedFiles,
-commandsRun, checksRun, smallestDecisiveEvaluationResult, metricsBeforeAfter,
-promotionCandidate, result, summary, avoidNextTime, artifactPaths, diffSummary
-```
-
-Existing profiles may continue reading legacy `smallestDecisiveTest` / `smallestDecisiveTestResult` fields, but new instructions and artifacts use `evaluation` to avoid confusing experiment evidence with TDD.
-
-## Evaluation and promotion
-
-Use `smoke -> screen -> parent gate`:
-
-- Smoke: cheap proof that the target signal moves or the idea is impossible.
-- Screen: 2-3 representative checks for promising candidates.
-- Parent gate: full validation, legality, runtime, package shape, ledger update, and rollback readiness.
-
-Promote only when:
-
-- candidate is based on the current baseline;
-- diff scope matches the lane;
-- validation output is parsed, not eyeballed;
-- failure modes and secondary signals are acceptable;
-- ledger/search graph records the decision;
-- package or release artifacts match the project profile.
-
-Reject or hold when the gain is unparsed, overfit to one fold, illegal, too slow, dependent on stale state, or missing a reproducible artifact.
-
-## Online/offline feedback
-
-Treat online score, hidden tests, external review, or public leaderboard as sparse validation folds:
-
-1. Record the exact package/candidate and score.
-2. Compare against local validation and expected direction.
-3. Identify which local fold or proxy lied.
-4. Update trust weights or diagnostic cases.
-5. Continue only with a named causal explanation or new calibration lane.
-
-Never move best-known online/baseline on neutral or worse feedback unless the user explicitly accepts a tradeoff.
-
-## Recovery loop
-
-When progress stalls:
-
-- inspect failed diffs, partial workers, rejected attempts, and stale labels;
-- revive only candidates with a new causal variable, new witness, or reusable artifact;
-- rewrite broad old ideas into one-mechanism lanes;
-- preserve rejected compiled diffs as search material;
-- stop if no safe new causal variable can be named.
-
-## 研究回传契约
-
-当本 lane 由 `ccdawn-ai-research-loop` 发起时，gate 决策后把实验信息交回研究 owner，而不是自行决定整个研究方向：
-
-```text
-Candidate:
-Hypothesis outcome: supported / rejected / unresolved
-Metric evidence:
-Mechanism evidence:
-Confidence and caveat:
-Reusable lesson:
-Next-hypothesis signal:
-Pivot signal:
-Artifact paths:
-```
-
-- metric 没有提升但排除了关键机制时，仍可标记为高信息价值；不得伪装成 promotion。
-- 单次分数提升但缺少机制证据时，只能晋升候选 baseline，不能直接扩写成研究 claim。
-- 连续 lane 出现相同失败、结果冲突、强 seed/split 敏感或信息增益降低时，设置 `Pivot signal`，交回外层综合。
-- QUICK 模式可把这些字段压缩进短汇报；只有跨会话、高成本或需要交接时才写独立 artifact。
-- score-loop 不负责生成新的研究总规划；下一假设由研究 owner 结合多轮证据选择。
-
-## Compact outputs
-
-Status:
-
-```text
-Score Loop Status:
-- Baseline:
-- Best score:
-- Active lanes:
-- Drift/blockers:
-- Recommended next lane:
-- Success Evidence:
-- 路由选择: <从 BRT interface 的 Route Out 选择一个>
-```
-
-Gate:
-
-```text
-Gate Decision:
-- Candidate:
-- Evidence:
-- Verdict: promote / reject / hold / blocked
-- Reason:
-- Next action:
-```
-
-Research return:
-
-```text
-研究回传:
-- 假设结果:
-- 指标证据:
-- 机制证据:
-- 可复用教训:
-- 下一假设/转向信号:
-- Artifact:
-```
-
-Online feedback:
-
-```text
-Online Feedback:
-- Package/candidate:
-- Score:
-- Local expectation:
-- Calibration lesson:
-- Best-known update: yes/no
-- Next lane:
+Gate: PROMOTE / REJECT / HOLD / BLOCKED
+- Baseline / Candidate:
+- Metric delta 与关键副作用:
+- 机制判断与证据:
+- 记录/Artifact: <仅需要时>
+下一步建议: <一个具体动作>
 ```

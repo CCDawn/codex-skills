@@ -185,14 +185,12 @@ sh ./install.sh
   重要 baseline、反直觉结果和论文级结论晋升前的轻量严谨性审查；普通实验 lane 不强制触发。
 
 - **`ccdawn-competition-research-lifecycle`**  
-  这是一个面向研究竞赛和 benchmark 项目的端到端工作流 skill，覆盖任务定义、数据准备、文献和方案调研、baseline 搭建、训练与实验、分析与消融、论文写作和提交打包。
-
-  它把 `ccdawn-brt` 视为流程治理层，用来定义每个阶段的目标、评审点和验收标准，同时附带参考指南、更紧的响应契约，以及可直接复用的阶段模板。
+  只在请求跨越多个竞赛/benchmark 阶段时协调规则、数据、baseline、claim 和提交依赖；具体工作交给当前最具体 owner，不强制逐阶段 gate 或并行 lane。
 
 ### 竞赛与评分
 
 - **`ccdawn-score-loop`**
-  通用 score loop 模板。实验使用 `BASELINE/CANDIDATE/DELTA/GATE`，分数回退或假设失败不进入 TDD；只有分离出的确定性工程 bug 才临时使用 RED/GREEN。
+  用于反复 metric 晋升、榜单反馈或提交迭代；AI Research 中可直接完成的一次低成本比较不额外加载本 skill。
 
 - **`ccdawn-huawei-nslb-score-loop`**  
   Huawei Algorithm Challenge 37 NSLB 项目的 score loop 适配层，基于通用模板保留项目命令、ledger、mutation space、online feedback 和打包规则。

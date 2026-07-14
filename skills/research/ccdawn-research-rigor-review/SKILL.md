@@ -30,7 +30,7 @@ license: MIT
 
 满足任一条件才进行完整审查：
 
-- 候选准备晋升为 active baseline 或 best-known result；
+- 候选将成为重要 best-known 结果、改变研究方向，或晋升依据超出普通 score gate；
 - 结论准备进入论文、报告、README、发布说明或对外宣传；
 - 结果反直觉、与先验冲突或将触发研究方向转向；
 - 下一步需要显著更多算力、数据、人工或外部提交机会；

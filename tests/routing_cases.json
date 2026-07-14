@@ -27,6 +27,7 @@
   {"id":"ui-findings","prompt":"只读审查现有页面的体验、状态、响应式和无障碍问题，按影响输出 findings","primary":"ccdawn-ui-review","support":[],"forbidden_primary":["ccdawn-ui-design","ccdawn-frontend-engineering"]},
   {"id":"design-system-governance","prompt":"治理多个组件共享的 semantic token、主题、variants 和 Figma/code 映射并渐进迁移","primary":"ccdawn-design-system","support":[],"forbidden_primary":["ccdawn-visual-design","ccdawn-frontend-engineering"]},
   {"id":"ai-research","prompt":"复现论文 baseline，提出假设、设计消融实验并根据证据选择研究方向","primary":"ccdawn-ai-research-loop","support":[],"forbidden_primary":["ccdawn-score-loop","ccdawn-research-rigor-review"]},
+  {"id":"single-research-candidate","prompt":"在当前 AI 研究 baseline 上跑一个低成本消融候选并解释结果","primary":"ccdawn-ai-research-loop","support":[],"forbidden_primary":["ccdawn-score-loop","ccdawn-research-rigor-review"]},
   {"id":"metric-score-lane","prompt":"在普通 benchmark 项目中围绕固定 validation metric 比较 baseline 和 candidate，按 gate 决定是否晋升","primary":"ccdawn-score-loop","support":[],"forbidden_primary":["ccdawn-ai-research-loop","ccdawn-bdd-tdd-development","ccdawn-huawei-nslb-score-loop"]},
   {"id":"huawei-nslb-lane","prompt":"在 Huawei Algorithm Challenge 37 NSLB 工作区推进 score epoch、ledger、online feedback 和提交包","primary":"ccdawn-huawei-nslb-score-loop","support":[],"forbidden_primary":["ccdawn-score-loop","ccdawn-competition-research-lifecycle"]},
   {"id":"research-claim-review","prompt":"审查这个反直觉消融结论是否有足够证据支撑论文 claim，给出接受、限定或拒绝","primary":"ccdawn-research-rigor-review","support":[],"forbidden_primary":["ccdawn-ai-research-loop","ccdawn-evaluation"]},

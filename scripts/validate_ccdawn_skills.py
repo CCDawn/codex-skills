@@ -511,7 +511,7 @@ def validate_skill(
                 errors.append(f"{label}: visual-design owner missing marker '{marker}'")
 
     if name == "ccdawn-score-loop":
-        for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "## 研究回传契约"]:
+        for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "默认不创建 worker"]:
             if marker not in text:
                 errors.append(f"{label}: experiment/TDD boundary missing marker '{marker}'")
 
@@ -524,6 +524,11 @@ def validate_skill(
         for marker in ["## 触发闸门", "## 审查方法", "ACCEPT", "QUALIFY", "REJECT", "BLOCKED"]:
             if marker not in text:
                 errors.append(f"{label}: research rigor gate missing marker '{marker}'")
+
+    if name == "ccdawn-competition-research-lifecycle":
+        for marker in ["全项目协调层", "不默认创建 3-6 lanes", "普通 candidate gate 不经过 Rigor Review"]:
+            if marker not in text:
+                errors.append(f"{label}: competition lifecycle ownership boundary missing marker '{marker}'")
 
     if name == "ccdawn-thread-coordination":
         for marker in [
