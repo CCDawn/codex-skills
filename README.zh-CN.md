@@ -9,7 +9,7 @@
 
 **让 Codex 先理解你，再决定怎么做。**
 
-25 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
+26 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -77,6 +77,7 @@ sh ./install.sh
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
 - [`ccdawn-ui-review`](skills/engineering/ccdawn-ui-review/SKILL.md)：使用用户任务和浏览器证据审查已有界面，并输出按影响排序的 findings。
+- [`ccdawn-design-system`](skills/engineering/ccdawn-design-system/SKILL.md)：治理跨组件 token、主题、variants、共享组件和 Figma/code 一致性。
 - [`ccdawn-frontend-engineering`](skills/engineering/ccdawn-frontend-engineering/SKILL.md)：把已确定的界面契约实现为生产级前端代码并做运行时验证。
 - [`ccdawn-ai-research-loop`](skills/research/ccdawn-ai-research-loop/SKILL.md)：复现 baseline，推进假设、实验、消融与研究方向收敛。
 - [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md)：为复杂功能评估项目内外可复用方案。
@@ -128,6 +129,9 @@ sh ./install.sh
 
 - **`ccdawn-ui-review`**
   已有界面审查 owner，以真实用户任务和浏览器证据检查体验、视觉层级、状态、响应式、无障碍和设计系统一致性。
+
+- **`ccdawn-design-system`**
+  设计系统治理 owner，只处理跨消费者的 token、主题、组件 API、variants、Figma/code 映射和渐进迁移。
 
 - **`ccdawn-frontend-engineering`**
   前端生产实现 owner，在界面结果明确后负责组件、状态、响应式和无障碍实现，并使用真实浏览器证据收口。
@@ -242,6 +246,7 @@ skills/
     ccdawn-brt/
     ccdawn-ui-design/
     ccdawn-ui-review/
+    ccdawn-design-system/
     ccdawn-frontend-engineering/
     ccdawn-feature-reuse-research/
     ccdawn-planning/

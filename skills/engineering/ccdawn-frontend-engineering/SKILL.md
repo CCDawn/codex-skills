@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 在 BRT 授权 surface 内修改前端组件、样式和必要测试；不改变无关后端协议、品牌方向或全局设计系统。
 - Success Evidence: 目标测试、类型或构建检查，以及真实浏览器中的主路径、关键状态、目标视口和 console 检查。
 - Stop Condition: 界面结果仍有高影响歧义、需要新的产品/视觉方向、数据契约不可用、修改越过授权边界，或运行环境阻止关键验收。
-- Route Out: 产品或交互分叉转 `ccdawn-ui-design`；复杂外部组件决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
+- Route Out: 产品或交互分叉转 `ccdawn-ui-design`；跨消费者 token、主题或共享组件治理转 `ccdawn-design-system`；复杂外部组件决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
 
 ## 统一调用契约
 

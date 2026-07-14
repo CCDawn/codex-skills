@@ -20,6 +20,7 @@
 | 新建或重定 UI/UX、信息层级、交互模型、响应式或无障碍决策 | `ccdawn-ui-design` | FAST/COMPACT | 可实施 UI 契约 |
 | 已有 UI 契约或项目模式，需要组件、状态、响应式和无障碍生产实现 | `ccdawn-frontend-engineering` | FAST/COMPACT | 前端代码与浏览器运行证据 |
 | 审查已有页面、截图、UI 流程、视觉回归、响应式或无障碍 | `ccdawn-ui-review` | COMPACT | findings 与浏览器证据 |
+| 跨组件 token、主题、variants、共享组件 API 或 Figma/code 一致性 | `ccdawn-design-system` | COMPACT/FULL | 系统契约、渐进迁移与消费者证据 |
 | 复杂功能存在实质性的外部复用决策 | `ccdawn-feature-reuse-research` | COMPACT | 复用/借鉴/自建判断 |
 | 目标已对齐但有真实设计分叉、迁移或跨边界契约 | `ccdawn-planning` | COMPACT/FULL | 最小实施方案 |
 | 已确认存在独立交付、owner、依赖或验证边界 | `ccdawn-task-splitting` | COMPACT | 可执行任务图 |
@@ -42,6 +43,7 @@
 
 - PR/diff 正确性由 PR review 主责；只有目标明确指向删减时才叠加 simplification review。
 - UI PR 仍由 PR review 主责；只有需要真实界面证据时才把 UI review 作为 support，不重复审查同一代码风险。
+- 单页面或单组件问题不升级为 design system；只有共享事实源、多个消费者或迁移契约成为主要问题时才进入该 owner。
 - 具体 bug 交给 bug owner；整仓测试健康度和架构风险交给 project review。
 - planning 解决设计分叉；task splitting 只表达真实独立边界，不能用来输出 `NO_SPLIT`。
 - 实验 metric 未提升不是 TDD RED；确定性 harness/parser/schema bug 才进入工程 TDD。

@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 读取代码和设计资料、运行应用、操作浏览器并做只读检查；除非 BRT 另行授权修复，否则不修改产品代码。
 - Success Evidence: 可复现的浏览器观察、截图/DOM/无障碍树/console 证据、设计系统偏差或紧邻代码证据；审美判断必须关联用户任务。
 - Stop Condition: 目标 surface 或用户任务不明、无法访问关键状态且静态证据不足、缺少必要权限，或审查将越过隐私和授权边界。
-- Route Out: 已确认修复转 `ccdawn-frontend-engineering`；需要重新决定体验或视觉方向转 `ccdawn-ui-design`；整份 PR 正确性由 `ccdawn-pr-review` 主责；阻塞回 `ccdawn-brt`。
+- Route Out: 已确认修复转 `ccdawn-frontend-engineering`；系统性 token、主题或组件问题转 `ccdawn-design-system`；需要重新决定体验或视觉方向转 `ccdawn-ui-design`；整份 PR 正确性由 `ccdawn-pr-review` 主责；阻塞回 `ccdawn-brt`。
 
 ## 统一调用契约
 

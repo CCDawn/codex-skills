@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn 设计系统"
+  short_description: "治理跨组件设计令牌、变体、主题及设计代码事实源一致性"
+  default_prompt: "使用 $ccdawn-design-system 用中文治理当前设计系统范围，并给出可验证的迁移结果。"

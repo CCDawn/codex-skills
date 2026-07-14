@@ -48,6 +48,7 @@ UNIFIED_CONTRACT_MARKERS = [
 DIRECT_WRITE_OWNERS = {
     "ccdawn-bdd-tdd-development",
     "ccdawn-bug-review",
+    "ccdawn-design-system",
     "ccdawn-frontend-engineering",
     "ccdawn-thread-coordination",
     "ccdawn-ui-design",
@@ -63,6 +64,7 @@ TOKEN_BUDGETS = {
     "ccdawn-creative-toolbox": 1400,
     "ccdawn-dawn-agent-html-memory": 1400,
     "ccdawn-development-cleanup": 1900,
+    "ccdawn-design-system": 1500,
     "ccdawn-evaluation": 1000,
     "ccdawn-feature-reuse-research": 2100,
     "ccdawn-frontend-engineering": 1500,
@@ -318,6 +320,11 @@ def validate_skill(
         for marker in ["## 生产实现", "关键状态", "响应式", "真实浏览器", "ccdawn-ui-design"]:
             if marker not in text:
                 errors.append(f"{label}: frontend implementation owner missing marker '{marker}'")
+
+    if name == "ccdawn-design-system":
+        for marker in ["## 系统闸门", "## 事实源与契约", "## 渐进迁移", "多个消费者", "Figma/code"]:
+            if marker not in text:
+                errors.append(f"{label}: design-system owner missing marker '{marker}'")
 
     if name == "ccdawn-score-loop":
         for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "## 研究回传契约"]:
