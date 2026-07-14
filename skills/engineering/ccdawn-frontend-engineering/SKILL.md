@@ -1,0 +1,51 @@
+---
+name: ccdawn-frontend-engineering
+description: Use when an aligned UI contract or established project pattern needs production frontend implementation across components, layouts, interaction states, responsive behavior, accessibility, or runtime browser verification; do not use when the primary uncertainty is product direction, visual identity, design-system governance, or review-only findings.
+license: MIT
+---
+
+# CCDawn Frontend Engineering
+
+## 目标
+
+把已对齐的界面契约实现为符合项目约定、状态完整且可在真实浏览器验证的前端代码。优先复用现有组件、token 和数据契约；不重新发明视觉方向，也不把局部实现升级成长设计流程。
+
+## BRT interface
+
+- Context Boundary: 已对齐的用户结果、目标页面或组件、现有设计系统与相邻实现、技术栈、数据契约和可运行环境。
+- Output Contract: 最小生产实现、关键状态覆盖、响应式与无障碍处理，以及与声明相称的运行时证据。
+- Allowed Action: 在 BRT 授权 surface 内修改前端组件、样式和必要测试；不改变无关后端协议、品牌方向或全局设计系统。
+- Success Evidence: 目标测试、类型或构建检查，以及真实浏览器中的主路径、关键状态、目标视口和 console 检查。
+- Stop Condition: 界面结果仍有高影响歧义、需要新的产品/视觉方向、数据契约不可用、修改越过授权边界，或运行环境阻止关键验收。
+- Route Out: 产品或交互分叉转 `ccdawn-ui-design`；复杂外部组件决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
+
+## 统一调用契约
+
+- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或最具体 owner，不吞并产品设计、PR 审查或后端任务。
+- 用户可见内容默认中文，只报告关键实现、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
+
+## 实施边界
+
+- `FAST_PATH`：既有模式下的单组件、样式、状态或响应式修复，直接实现并做目标验证。
+- `COMPACT_FLOW`：一个页面或多个紧密相关组件，内部确认短契约后连续实现和验证，不逐组件询问。
+- 出现跨页面信息架构、品牌方向或设计系统治理时停止扩张，转给对应设计 owner；不要在本 skill 内生成多套视觉提案。
+
+## 生产实现
+
+1. 读取 owning component、相邻页面、组件库、token、数据流和相关测试，确认项目真实模式。
+2. 选择满足契约的最小结构；组件只在形成稳定复用边界或显著降低复杂度时拆分。
+3. 覆盖主路径及相关的 loading、empty、error、disabled、success、权限和长内容状态，不凭空增加无关状态。
+4. 使用语义元素和原生控件，保证标签、键盘路径、焦点、非颜色提示和必要 ARIA；保留现有无障碍基线。
+5. 使用现有响应式策略和 token，稳定固定格式元素的尺寸，检查换行、溢出、窄屏降级和动态内容。
+6. 保持服务端/客户端边界、请求缓存、状态所有权和渲染成本符合当前框架约定；性能优化必须针对可观察问题。
+
+避免为了“更工程化”引入新的组件层、状态库、样式体系或依赖。真实复用决策会改变架构或依赖时，先转 `ccdawn-feature-reuse-research`。
+
+## 验证
+
+- 先运行与改动最接近的测试、类型检查或构建检查；不机械运行全仓命令。
+- 可运行时使用本轮 Available skills 中的浏览器能力验证目标 route。至少检查主路径、受影响状态、相关桌面/移动视口、console 和明显溢出。
+- 截图只证明当时的视觉状态；交互、网络和状态同步需要对应运行证据。无法启动应用时明确列出未验证面。
+- 实际结果不符合界面契约时先判断是实现、契约、环境还是数据问题，不通过削弱用户行为来换取测试通过。
+
+正文末行保留：`下一步建议: <一个具体动作>`。

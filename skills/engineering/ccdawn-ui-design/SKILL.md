@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 在 BRT 授权范围内检查或修改 UI owning surface；不顺带重做品牌、后端协议或无关页面。
 - Success Evidence: 浏览器截图、DOM/布局检查、目标视口验证、交互状态检查，或无法渲染时的明确限制。
 - Stop Condition: 目标 surface 不明、品牌/设计系统冲突、关键产品取舍未定、应用不可运行且代码证据不足，或修改将越过授权边界。
-- Route Out: 实施由当前 owner 继续；复杂可复用组件转 `ccdawn-feature-reuse-research`；验证后按候选转 `ccdawn-development-cleanup`；PR 正确性审查转 `ccdawn-pr-review`；阻塞则回 `ccdawn-brt`。
+- Route Out: 界面契约确定后的生产实现转 `ccdawn-frontend-engineering`；复杂可复用组件转 `ccdawn-feature-reuse-research`；验证后按候选转 `ccdawn-development-cleanup`；PR 正确性审查转 `ccdawn-pr-review`；阻塞则回 `ccdawn-brt`。
 
 ## 统一调用契约
 

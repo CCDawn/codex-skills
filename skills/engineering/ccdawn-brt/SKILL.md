@@ -44,7 +44,7 @@ BRT 是每句输入的默认适配层：理解真实意图、选择最具体 own
 常用路由：
 
 - bug/失败测试：`ccdawn-bug-review`；PR/diff：`ccdawn-pr-review`；整仓/架构：`ccdawn-project-review`。
-- UI/UX/响应式/视觉验证：`ccdawn-ui-design`。
+- UI/UX 方向、信息层级或视觉决策：`ccdawn-ui-design`；契约明确后的生产前端实现：`ccdawn-frontend-engineering`。
 - 当前 diff 过度设计：`ccdawn-simplification-review`；整仓冗余治理：`ccdawn-simplification-audit`。
 - AI/ML 研究：`ccdawn-ai-research-loop`；单条 metric lane：`ccdawn-score-loop`；重要 claim：`ccdawn-research-rigor-review`。
 - 多会话冲突/合并：`ccdawn-thread-coordination`；真实开发残留：`ccdawn-development-cleanup`。

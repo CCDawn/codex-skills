@@ -18,6 +18,7 @@
 | 审整仓、架构、技术债、测试体系、接手摸底 | `ccdawn-project-review` | COMPACT | 风险排序 findings 与执行队列 |
 | 评价流程、方案、skill、输出质量，且无更具体 owner | `ccdawn-evaluation` | MICRO/COMPACT | 证据化判断与高 ROI 建议 |
 | UI/UX、信息层级、交互状态、响应式、无障碍、视觉 QA | `ccdawn-ui-design` | FAST/COMPACT | UI 契约、实现或视觉 findings |
+| 已有 UI 契约或项目模式，需要组件、状态、响应式和无障碍生产实现 | `ccdawn-frontend-engineering` | FAST/COMPACT | 前端代码与浏览器运行证据 |
 | 复杂功能存在实质性的外部复用决策 | `ccdawn-feature-reuse-research` | COMPACT | 复用/借鉴/自建判断 |
 | 目标已对齐但有真实设计分叉、迁移或跨边界契约 | `ccdawn-planning` | COMPACT/FULL | 最小实施方案 |
 | 已确认存在独立交付、owner、依赖或验证边界 | `ccdawn-task-splitting` | COMPACT | 可执行任务图 |
@@ -42,7 +43,7 @@
 - 具体 bug 交给 bug owner；整仓测试健康度和架构风险交给 project review。
 - planning 解决设计分叉；task splitting 只表达真实独立边界，不能用来输出 `NO_SPLIT`。
 - 实验 metric 未提升不是 TDD RED；确定性 harness/parser/schema bug 才进入工程 TDD。
-- UI 文件的机械修改可留在 FAST_PATH；存在设计判断、状态或视觉验收时才进入 UI owner。
+- UI 文件的机械修改可留在 FAST_PATH；产品、交互或视觉结果未定时由 UI design 主责，结果已定且主要工作是生产实现时由 frontend engineering 主责。
 - 普通完成由当前 owner 收口；正式跨阶段证据包才进入 completion summary。
 
 ## 多动作推进
