@@ -634,7 +634,28 @@ def validate_skill(
 
 def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str]) -> None:
     skill_names = sorted(path.name for path in skill_dirs)
+    skill_name_set = set(skill_names)
     expected_plugin_paths = sorted(rel_skill_path(repo_root, path) for path in skill_dirs)
+
+    for skill_dir in skill_dirs:
+        metadata_path = skill_dir / "agents" / "openai.yaml"
+        if not metadata_path.exists():
+            continue
+        prompt = parse_openai_interface(metadata_path).get("default_prompt", "")
+        referenced = set(re.findall(r"\$(ccdawn-[a-z0-9-]+)", prompt))
+        stale = sorted(referenced - skill_name_set)
+        if stale:
+            errors.append(
+                f"{metadata_path.relative_to(repo_root)}: default_prompt references missing skills {stale}"
+            )
+
+        skill_text = read_text(skill_dir / "SKILL.md")
+        referenced_in_skill = set(re.findall(r"`(ccdawn-[a-z0-9-]+)`", skill_text))
+        stale_in_skill = sorted(referenced_in_skill - skill_name_set)
+        if stale_in_skill:
+            errors.append(
+                f"{(skill_dir / 'SKILL.md').relative_to(repo_root)}: references missing skills {stale_in_skill}"
+            )
 
     plugin_path = repo_root / ".claude-plugin" / "plugin.json"
     if not plugin_path.exists():
