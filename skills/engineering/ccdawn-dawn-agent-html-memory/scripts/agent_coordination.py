@@ -9,11 +9,14 @@ from coordination_model import (
     AGENT_STATES,
     CoordinationConflict,
     activate_claim,
+    cancel_resume_obligation,
     complete_agent,
     create_claim,
     find_claim_conflicts,
+    heartbeat_coordination_owner,
     load_registry,
     mark_expired_claims,
+    mark_stale_coordination_owners,
     mark_stale_agents,
     mutate_registry,
     open_coordination,
@@ -26,6 +29,7 @@ from coordination_model import (
     respond_coordination,
     resume_agent,
     slugify,
+    take_over_coordination,
     update_agent,
 )
 
@@ -47,8 +51,15 @@ def print_conflicts(conflicts: list[dict]) -> None:
 
 def command_status(project_root: Path, args: argparse.Namespace) -> int:
     registry = load_registry(project_root)
-    if mark_stale_agents(registry) + mark_expired_claims(registry):
-        mutate_registry(project_root, lambda value: mark_stale_agents(value) + mark_expired_claims(value))
+    if mark_stale_agents(registry) + mark_expired_claims(registry) + mark_stale_coordination_owners(registry):
+        mutate_registry(
+            project_root,
+            lambda value: (
+                mark_stale_agents(value)
+                + mark_expired_claims(value)
+                + mark_stale_coordination_owners(value)
+            ),
+        )
         registry = load_registry(project_root)
     payload = public_snapshot(registry) if args.public else registry
     if args.json:
@@ -57,7 +68,11 @@ def command_status(project_root: Path, args: argparse.Namespace) -> int:
     visible_agents = [
         item for item in registry.get("agents", []) if args.include_completed or item.get("state") != "completed"
     ]
-    open_coordinations = [item for item in registry.get("coordinations", []) if item.get("state") != "resolved"]
+    open_coordinations = [
+        item
+        for item in registry.get("coordinations", [])
+        if item.get("state") != "resolved" or item.get("resumePendingAgentIds")
+    ]
     active_claims = [
         item
         for item in registry.get("claims", [])
@@ -80,7 +95,8 @@ def command_status(project_root: Path, args: argparse.Namespace) -> int:
     for item in open_coordinations:
         print(
             f"- {item.get('id')} [{item.get('kind')}/{item.get('state')}] "
-            f"owner={item.get('ownerAgentId')} topic={item.get('topic')}"
+            f"owner={item.get('ownerAgentId')} recovery={item.get('recoveryState', '-')} "
+            f"resumePending={','.join(item.get('resumePendingAgentIds', [])) or '-'} topic={item.get('topic')}"
         )
     return 0
 
@@ -258,6 +274,7 @@ def command_open(project_root: Path, args: argparse.Namespace) -> int:
             surfaces=args.surface,
             summary=args.summary,
             target_branch=args.target_branch,
+            owner_ttl_minutes=args.owner_ttl_minutes,
         ),
     )
     if args.json:
@@ -301,6 +318,61 @@ def command_resolve(project_root: Path, args: argparse.Namespace) -> int:
         print_json(coordination)
     else:
         print(f"Resolved {coordination['id']}: {coordination['decision']}")
+    return 0
+
+
+def command_heartbeat(project_root: Path, args: argparse.Namespace) -> int:
+    coordination = mutate_registry(
+        project_root,
+        lambda registry: heartbeat_coordination_owner(
+            registry,
+            args.coordination_id,
+            args.agent_id,
+            args.summary,
+            args.ttl_minutes,
+        ),
+    )
+    if args.json:
+        print_json(coordination)
+    else:
+        print(f"Refreshed owner lease for {coordination['id']} until {coordination['ownerLeaseUntil']}.")
+    return 0
+
+
+def command_takeover(project_root: Path, args: argparse.Namespace) -> int:
+    coordination = mutate_registry(
+        project_root,
+        lambda registry: take_over_coordination(
+            registry,
+            args.coordination_id,
+            args.agent_id,
+            args.reason,
+            force=args.force,
+            ttl_minutes=args.ttl_minutes,
+        ),
+    )
+    if args.json:
+        print_json(coordination)
+    else:
+        print(f"{args.agent_id} now owns {coordination['id']}; recovery work may continue.")
+    return 0
+
+
+def command_cancel_resume(project_root: Path, args: argparse.Namespace) -> int:
+    coordination = mutate_registry(
+        project_root,
+        lambda registry: cancel_resume_obligation(
+            registry,
+            args.coordination_id,
+            args.agent_id,
+            args.target_agent_id,
+            args.reason,
+        ),
+    )
+    if args.json:
+        print_json(coordination)
+    else:
+        print(f"Cancelled resume debt for {args.target_agent_id} in {coordination['id']}.")
     return 0
 
 
@@ -423,6 +495,7 @@ def parse_args() -> argparse.Namespace:
     open_parser.add_argument("--surface", action="append", default=[])
     open_parser.add_argument("--summary", default="")
     open_parser.add_argument("--target-branch", default="")
+    open_parser.add_argument("--owner-ttl-minutes", type=int, default=30)
     add_json_flag(open_parser)
 
     respond = subparsers.add_parser("respond", help="Record one agent position or readiness response.")
@@ -439,6 +512,31 @@ def parse_args() -> argparse.Namespace:
     resolve.add_argument("--decision", required=True)
     resolve.add_argument("--reason", required=True)
     add_json_flag(resolve)
+
+    heartbeat = subparsers.add_parser("heartbeat", help="Refresh an open coordination owner's recovery lease.")
+    heartbeat.add_argument("--coordination-id", required=True)
+    heartbeat.add_argument("--agent-id", required=True)
+    heartbeat.add_argument("--summary", default="")
+    heartbeat.add_argument("--ttl-minutes", type=int, default=30)
+    add_json_flag(heartbeat)
+
+    takeover = subparsers.add_parser("takeover", help="Adopt an open coordination whose owner stopped.")
+    takeover.add_argument("--coordination-id", required=True)
+    takeover.add_argument("--agent-id", required=True)
+    takeover.add_argument("--reason", required=True)
+    takeover.add_argument("--ttl-minutes", type=int, default=30)
+    takeover.add_argument("--force", action="store_true")
+    add_json_flag(takeover)
+
+    cancel_resume = subparsers.add_parser(
+        "cancel-resume",
+        help="Close one resume debt after the paused task was explicitly cancelled or archived.",
+    )
+    cancel_resume.add_argument("--coordination-id", required=True)
+    cancel_resume.add_argument("--agent-id", required=True, help="Current coordination owner.")
+    cancel_resume.add_argument("--target-agent-id", required=True)
+    cancel_resume.add_argument("--reason", required=True)
+    add_json_flag(cancel_resume)
 
     complete = subparsers.add_parser("complete", help="Mark an agent complete and close its claims.")
     complete.add_argument("--agent-id", required=True)
@@ -463,6 +561,9 @@ COMMANDS = {
     "open": command_open,
     "respond": command_respond,
     "resolve": command_resolve,
+    "heartbeat": command_heartbeat,
+    "takeover": command_takeover,
+    "cancel-resume": command_cancel_resume,
     "complete": command_complete,
     "prune": command_prune,
 }

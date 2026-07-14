@@ -27,6 +27,7 @@ AGENT_STATES = {
     "stale",
 }
 COORDINATION_KINDS = {"conflict", "discussion", "merge"}
+COORDINATION_OWNER_TTL_MINUTES = 30
 MAX_RECENT_EVENTS = 50
 
 
@@ -108,7 +109,7 @@ def legacy_registry_path(project_root: Path) -> Path:
 def default_registry(project_root: Path) -> dict:
     project_id, common_dir = project_identity(project_root)
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "revision": 0,
         "project": {
             "id": project_id,
@@ -128,10 +129,39 @@ def ensure_registry_shape(registry: dict, project_root: Path) -> dict:
     baseline = default_registry(project_root)
     for key, value in baseline.items():
         registry.setdefault(key, deepcopy(value))
+    registry["schemaVersion"] = max(2, int(registry.get("schemaVersion") or 1))
     registry.setdefault("agents", [])
     registry.setdefault("claims", [])
     registry.setdefault("coordinations", [])
     registry.setdefault("recentEvents", [])
+    for coordination in registry["coordinations"]:
+        coordination.setdefault("pausedAgentIds", [])
+        coordination.setdefault("resumedAgentIds", [])
+        coordination.setdefault("cancelledResumeAgents", [])
+        coordination.setdefault("ownerHistory", [])
+        if coordination.get("state") == "open":
+            if not coordination.get("ownerLeaseUntil"):
+                lease_base = (
+                    parse_utc(coordination.get("updatedAt"))
+                    or parse_utc(coordination.get("createdAt"))
+                    or datetime.now(timezone.utc) - timedelta(minutes=COORDINATION_OWNER_TTL_MINUTES + 1)
+                )
+                coordination["ownerLeaseUntil"] = (
+                    lease_base + timedelta(minutes=COORDINATION_OWNER_TTL_MINUTES)
+                ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            coordination.setdefault("resumePendingAgentIds", [])
+            coordination.setdefault("recoveryState", "active")
+            continue
+        paused_agent_ids = [
+            item.get("id")
+            for item in registry["agents"]
+            if item.get("state") == "paused" and item.get("coordinationId") == coordination.get("id")
+        ]
+        coordination.setdefault("resumePendingAgentIds", paused_agent_ids)
+        coordination.setdefault(
+            "recoveryState",
+            "resume-pending" if coordination["resumePendingAgentIds"] else "closed",
+        )
     return registry
 
 
@@ -228,16 +258,24 @@ class RegistryLock:
                     handle.write(f"{os.getpid()} {time.time()}\n")
                 self.acquired = True
                 return self
-            except FileExistsError:
+            except (FileExistsError, PermissionError) as exc:
                 try:
                     age = time.time() - self.path.stat().st_mtime
                     if age > self.stale_seconds:
-                        self.path.unlink(missing_ok=True)
-                        continue
+                        try:
+                            self.path.unlink(missing_ok=True)
+                            continue
+                        except PermissionError:
+                            pass
                 except FileNotFoundError:
                     continue
+                except PermissionError:
+                    if time.monotonic() >= deadline:
+                        raise TimeoutError(f"Could not inspect coordination registry lock: {self.path}") from exc
+                    time.sleep(0.02)
+                    continue
                 if time.monotonic() >= deadline:
-                    raise TimeoutError(f"Could not acquire coordination registry lock: {self.path}")
+                    raise TimeoutError(f"Could not acquire coordination registry lock: {self.path}") from exc
                 time.sleep(0.02)
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
@@ -527,6 +565,24 @@ def activate_claim(registry: dict, claim_id: str, force: bool = False) -> dict:
 
 def complete_agent(registry: dict, agent_id: str, summary: str = "") -> dict:
     agent = find_agent(registry, agent_id)
+    if agent.get("state") == "paused":
+        raise CoordinationConflict("Paused agents must resume or be explicitly cancelled before completion.")
+    owned_open = [
+        item
+        for item in registry.get("coordinations", [])
+        if item.get("ownerAgentId") == agent_id and item.get("state") == "open"
+    ]
+    resume_debts = [
+        item
+        for item in registry.get("coordinations", [])
+        if item.get("ownerAgentId") == agent_id and item.get("resumePendingAgentIds")
+    ]
+    if owned_open or resume_debts:
+        coordination_ids = [item.get("id", "") for item in [*owned_open, *resume_debts]]
+        raise CoordinationConflict(
+            "Agent still owns open coordination or unresolved resume debt: "
+            + ", ".join(dict.fromkeys(coordination_ids))
+        )
     agent.update(
         {
             "state": "completed",
@@ -552,9 +608,17 @@ def prune_registry(registry: dict) -> dict:
         for item in registry.get("claims", [])
         if item.get("status") in ACTIVE_CLAIM_STATUSES | {"yielded", "blocked"}
     ]
-    resolved = [item for item in registry.get("coordinations", []) if item.get("state") == "resolved"][:20]
-    open_items = [item for item in registry.get("coordinations", []) if item.get("state") != "resolved"]
-    registry["coordinations"] = open_items + resolved
+    live_items = [
+        item
+        for item in registry.get("coordinations", [])
+        if item.get("state") != "resolved" or item.get("resumePendingAgentIds")
+    ]
+    settled = [
+        item
+        for item in registry.get("coordinations", [])
+        if item.get("state") == "resolved" and not item.get("resumePendingAgentIds")
+    ][:20]
+    registry["coordinations"] = live_items + settled
     registry["agents"] = [
         item
         for item in registry.get("agents", [])
@@ -574,6 +638,7 @@ def open_coordination(
     surfaces: list[str] | None = None,
     summary: str = "",
     target_branch: str = "",
+    owner_ttl_minutes: int = COORDINATION_OWNER_TTL_MINUTES,
 ) -> dict:
     if kind not in COORDINATION_KINDS:
         raise ValueError(f"Unsupported coordination kind: {kind}")
@@ -595,6 +660,13 @@ def open_coordination(
         "responses": [],
         "decision": "",
         "decisionReason": "",
+        "ownerLeaseUntil": future_utc(owner_ttl_minutes),
+        "recoveryState": "active",
+        "pausedAgentIds": [],
+        "resumePendingAgentIds": [],
+        "resumedAgentIds": [],
+        "cancelledResumeAgents": [],
+        "ownerHistory": [],
         "createdAt": now,
         "updatedAt": now,
     }
@@ -641,8 +713,95 @@ def respond_coordination(
     else:
         response.update(payload)
     coordination["updatedAt"] = utc_now()
+    if coordination.get("ownerAgentId") == agent_id:
+        coordination["ownerLeaseUntil"] = future_utc(COORDINATION_OWNER_TTL_MINUTES)
+        coordination["recoveryState"] = "active"
     add_event(registry, "coordination-response", agent_id, summary, coordination_id)
     return response
+
+
+def heartbeat_coordination_owner(
+    registry: dict,
+    coordination_id: str,
+    agent_id: str,
+    summary: str = "",
+    ttl_minutes: int = COORDINATION_OWNER_TTL_MINUTES,
+) -> dict:
+    coordination = find_coordination(registry, coordination_id)
+    if coordination.get("state") != "open":
+        raise CoordinationConflict(f"Coordination is not open: {coordination_id}")
+    if coordination.get("ownerAgentId") != agent_id:
+        raise CoordinationConflict(f"Only the coordination owner can heartbeat {coordination_id}.")
+    find_agent(registry, agent_id)
+    coordination["ownerLeaseUntil"] = future_utc(ttl_minutes)
+    coordination["recoveryState"] = "active"
+    coordination["updatedAt"] = utc_now()
+    if summary:
+        coordination["summary"] = summary
+    add_event(registry, "coordination-heartbeat", agent_id, summary or "Owner lease refreshed", coordination_id)
+    return coordination
+
+
+def take_over_coordination(
+    registry: dict,
+    coordination_id: str,
+    new_owner_agent_id: str,
+    reason: str,
+    *,
+    force: bool = False,
+    ttl_minutes: int = COORDINATION_OWNER_TTL_MINUTES,
+) -> dict:
+    coordination = find_coordination(registry, coordination_id)
+    if coordination.get("state") != "open":
+        raise CoordinationConflict(f"Only open coordination can be taken over: {coordination_id}")
+    new_owner = find_agent(registry, new_owner_agent_id)
+    previous_owner_id = str(coordination.get("ownerAgentId") or "")
+    if previous_owner_id == new_owner_agent_id:
+        return heartbeat_coordination_owner(
+            registry,
+            coordination_id,
+            new_owner_agent_id,
+            reason,
+            ttl_minutes,
+        )
+
+    previous_owner = next(
+        (item for item in registry.get("agents", []) if item.get("id") == previous_owner_id),
+        None,
+    )
+    lease_until = parse_utc(coordination.get("ownerLeaseUntil"))
+    owner_unavailable = (
+        previous_owner is None
+        or previous_owner.get("state") in {"completed", "stale"}
+        or coordination.get("recoveryState") == "owner-stale"
+        or (lease_until is not None and lease_until < datetime.now(timezone.utc))
+    )
+    if not owner_unavailable and not force:
+        raise CoordinationConflict(
+            f"Coordination owner is still active; explicit force is required to take over {coordination_id}."
+        )
+
+    now = utc_now()
+    coordination.setdefault("ownerHistory", []).append(
+        {
+            "agentId": previous_owner_id,
+            "replacedAt": now,
+            "reason": reason,
+            "forced": bool(force and not owner_unavailable),
+        }
+    )
+    coordination["ownerAgentId"] = new_owner_agent_id
+    coordination["participants"] = list(
+        dict.fromkeys([*coordination.get("participants", []), new_owner_agent_id])
+    )
+    coordination["ownerLeaseUntil"] = future_utc(ttl_minutes)
+    coordination["recoveryState"] = "active"
+    coordination["recoveredAt"] = now
+    coordination["updatedAt"] = now
+    new_owner["leaseUntil"] = future_utc(max(ttl_minutes, COORDINATION_OWNER_TTL_MINUTES))
+    new_owner["updatedAt"] = now
+    add_event(registry, "coordination-taken-over", new_owner_agent_id, reason, coordination_id)
+    return coordination
 
 
 def resolve_coordination(
@@ -659,6 +818,14 @@ def resolve_coordination(
         if coordination.get("decision") == decision:
             return coordination
         raise CoordinationConflict(f"Coordination already has a different decision: {coordination_id}")
+    paused_agent_ids = [
+        item.get("id")
+        for item in registry.get("agents", [])
+        if item.get("state") == "paused" and item.get("coordinationId") == coordination_id
+    ]
+    resume_pending = list(
+        dict.fromkeys([*coordination.get("resumePendingAgentIds", []), *paused_agent_ids])
+    )
     coordination.update(
         {
             "state": "resolved",
@@ -667,8 +834,12 @@ def resolve_coordination(
             "resolvedBy": agent_id,
             "updatedAt": utc_now(),
             "resolvedAt": utc_now(),
+            "resumePendingAgentIds": resume_pending,
+            "recoveryState": "resume-pending" if resume_pending else "closed",
         }
     )
+    if not resume_pending:
+        coordination["closedAt"] = utc_now()
     add_event(registry, "coordination-resolved", agent_id, decision, coordination_id)
     return coordination
 
@@ -690,7 +861,11 @@ def mark_coordination_synced(registry: dict, coordination_id: str, lane_id: str)
 
 def pause_agent(registry: dict, agent_id: str, coordination_id: str, reason: str) -> dict:
     agent = find_agent(registry, agent_id)
-    find_coordination(registry, coordination_id)
+    coordination = find_coordination(registry, coordination_id)
+    if coordination.get("state") != "open":
+        raise CoordinationConflict(f"Cannot pause an agent for resolved coordination: {coordination_id}")
+    if agent_id not in coordination.get("participants", []):
+        raise CoordinationConflict(f"Agent is not a participant in {coordination_id}: {agent_id}")
     agent.update(
         {
             "state": "paused",
@@ -704,12 +879,22 @@ def pause_agent(registry: dict, agent_id: str, coordination_id: str, reason: str
             claim["status"] = "yielded"
             claim["coordinationId"] = coordination_id
             claim["updatedAt"] = utc_now()
+    coordination["pausedAgentIds"] = list(
+        dict.fromkeys([*coordination.get("pausedAgentIds", []), agent_id])
+    )
+    coordination["ownerLeaseUntil"] = future_utc(COORDINATION_OWNER_TTL_MINUTES)
+    coordination["updatedAt"] = utc_now()
     add_event(registry, "agent-paused", agent_id, reason, coordination_id)
     return agent
 
 
 def resume_agent(registry: dict, agent_id: str, coordination_id: str) -> dict:
     agent = find_agent(registry, agent_id)
+    coordination = find_coordination(registry, coordination_id)
+    if coordination.get("state") != "resolved":
+        raise CoordinationConflict(f"Cannot resume before coordination is resolved: {coordination_id}")
+    if agent_id not in coordination.get("resumePendingAgentIds", []):
+        raise CoordinationConflict(f"Agent has no resume obligation in {coordination_id}: {agent_id}")
     yielded = [
         claim
         for claim in registry.get("claims", [])
@@ -742,8 +927,72 @@ def resume_agent(registry: dict, agent_id: str, coordination_id: str) -> dict:
             "leaseUntil": future_utc(240),
         }
     )
+    coordination["resumePendingAgentIds"] = [
+        item for item in coordination.get("resumePendingAgentIds", []) if item != agent_id
+    ]
+    coordination["resumedAgentIds"] = list(
+        dict.fromkeys([*coordination.get("resumedAgentIds", []), agent_id])
+    )
+    coordination["updatedAt"] = utc_now()
+    if coordination["resumePendingAgentIds"]:
+        coordination["recoveryState"] = "resume-pending"
+    else:
+        coordination["recoveryState"] = "closed"
+        coordination["closedAt"] = utc_now()
     add_event(registry, "agent-resumed", agent_id, "Resumed after conflict recheck", coordination_id)
     return agent
+
+
+def cancel_resume_obligation(
+    registry: dict,
+    coordination_id: str,
+    owner_agent_id: str,
+    target_agent_id: str,
+    reason: str,
+) -> dict:
+    coordination = find_coordination(registry, coordination_id)
+    if coordination.get("ownerAgentId") != owner_agent_id:
+        raise CoordinationConflict(f"Only the coordination owner can cancel resume debt in {coordination_id}.")
+    if coordination.get("state") != "resolved":
+        raise CoordinationConflict(f"Resolve coordination before cancelling resume debt: {coordination_id}")
+    if target_agent_id not in coordination.get("resumePendingAgentIds", []):
+        raise CoordinationConflict(f"Agent has no resume obligation in {coordination_id}: {target_agent_id}")
+
+    target = find_agent(registry, target_agent_id)
+    now = utc_now()
+    coordination["resumePendingAgentIds"] = [
+        item for item in coordination.get("resumePendingAgentIds", []) if item != target_agent_id
+    ]
+    coordination.setdefault("cancelledResumeAgents", []).append(
+        {"agentId": target_agent_id, "reason": reason, "cancelledAt": now}
+    )
+    coordination["updatedAt"] = now
+    target.update(
+        {
+            "state": "completed",
+            "coordinationId": "",
+            "currentAction": "",
+            "nextCheckpoint": "",
+            "blocker": reason,
+            "updatedAt": now,
+        }
+    )
+    for claim in registry.get("claims", []):
+        if (
+            claim.get("agentId") == target_agent_id
+            and claim.get("status") == "yielded"
+            and claim.get("coordinationId") == coordination_id
+        ):
+            claim["status"] = "released"
+            claim["releaseReason"] = reason
+            claim["updatedAt"] = now
+    if coordination["resumePendingAgentIds"]:
+        coordination["recoveryState"] = "resume-pending"
+    else:
+        coordination["recoveryState"] = "closed"
+        coordination["closedAt"] = now
+    add_event(registry, "resume-obligation-cancelled", owner_agent_id, reason, coordination_id)
+    return coordination
 
 
 def mark_stale_agents(registry: dict) -> int:
@@ -756,6 +1005,35 @@ def mark_stale_agents(registry: dict) -> int:
         if lease_until is not None and lease_until < now:
             agent["state"] = "stale"
             agent["updatedAt"] = utc_now()
+            changed += 1
+    return changed
+
+
+def mark_stale_coordination_owners(registry: dict) -> int:
+    now = datetime.now(timezone.utc)
+    changed = 0
+    agents = {item.get("id"): item for item in registry.get("agents", [])}
+    for coordination in registry.get("coordinations", []):
+        if coordination.get("state") != "open" or coordination.get("recoveryState") == "owner-stale":
+            continue
+        owner = agents.get(coordination.get("ownerAgentId"))
+        lease_until = parse_utc(coordination.get("ownerLeaseUntil"))
+        unavailable = (
+            owner is None
+            or owner.get("state") in {"completed", "stale"}
+            or (lease_until is not None and lease_until < now)
+        )
+        if unavailable:
+            coordination["recoveryState"] = "owner-stale"
+            coordination["ownerStaleAt"] = utc_now()
+            coordination["updatedAt"] = utc_now()
+            add_event(
+                registry,
+                "coordination-owner-stale",
+                str(coordination.get("ownerAgentId") or ""),
+                "Coordination requires takeover before work can continue",
+                str(coordination.get("id") or ""),
+            )
             changed += 1
     return changed
 

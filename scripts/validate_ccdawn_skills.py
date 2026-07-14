@@ -280,6 +280,9 @@ def validate_skill(
             "sync_project_memory.py --coordination-id",
             "send_message_to_thread",
             "read_thread",
+            "resumePendingAgentIds",
+            "`takeover`",
+            "`heartbeat`",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
@@ -291,6 +294,9 @@ def validate_skill(
             "coordination registry",
             "--coordination-id",
             "并行 worker 不直接同步 tracked memory",
+            "resumePendingAgentIds",
+            "takeover",
+            "cancel-resume",
         ]:
             if marker not in text:
                 errors.append(f"{label}: live coordination/memory bridge missing marker '{marker}'")

@@ -16,9 +16,13 @@ sys.path.insert(0, str(SCRIPT_DIR))
 
 from coordination_model import (  # noqa: E402
     CoordinationConflict,
+    cancel_resume_obligation,
+    complete_agent,
     coordination_root,
     create_claim,
+    ensure_registry_shape,
     load_registry,
+    mark_stale_coordination_owners,
     mutate_registry,
     open_coordination,
     pause_agent,
@@ -30,6 +34,7 @@ from coordination_model import (  # noqa: E402
     respond_coordination,
     resume_agent,
     slugify,
+    take_over_coordination,
     update_agent,
 )
 
@@ -120,6 +125,17 @@ class AgentCoordinationTests(unittest.TestCase):
                 lambda value: create_claim(value, "agent-a", "ui", ["web/src"], "Conflict repair"),
                 codex_home=codex_home,
             )
+            mutate_registry(
+                project,
+                lambda value: resolve_coordination(
+                    value,
+                    coordination_id,
+                    "agent-a",
+                    "Conflict repair verified",
+                    "Resume after the repair claim is released",
+                ),
+                codex_home=codex_home,
+            )
 
             with self.assertRaises(CoordinationConflict):
                 mutate_registry(
@@ -144,8 +160,11 @@ class AgentCoordinationTests(unittest.TestCase):
             registry = load_registry(project, codex_home=codex_home)
             agent_b = next(item for item in registry["agents"] if item["id"] == "agent-b")
             claim_b = next(item for item in registry["claims"] if item["agentId"] == "agent-b")
+            coordination = registry["coordinations"][0]
             self.assertEqual("active", agent_b["state"])
             self.assertEqual("active", claim_b["status"])
+            self.assertEqual([], coordination["resumePendingAgentIds"])
+            self.assertEqual("closed", coordination["recoveryState"])
 
     def test_join_or_update_cannot_bypass_paused_resume_check(self) -> None:
         registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}
@@ -165,6 +184,180 @@ class AgentCoordinationTests(unittest.TestCase):
             register_agent(registry, "agent-a", "Agent A", state="active")
         with self.assertRaises(CoordinationConflict):
             update_agent(registry, "agent-a", state="active")
+
+    def test_resume_requires_resolved_coordination(self) -> None:
+        registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}
+        register_agent(registry, "agent-a", "Agent A")
+        register_agent(registry, "agent-b", "Agent B")
+        coordination = open_coordination(
+            registry,
+            kind="conflict",
+            owner_agent_id="agent-a",
+            participants=["agent-b"],
+            topic="Shared file conflict",
+        )
+        pause_agent(registry, "agent-b", coordination["id"], "Wait for owner repair")
+
+        with self.assertRaisesRegex(CoordinationConflict, "before coordination is resolved"):
+            resume_agent(registry, "agent-b", coordination["id"])
+
+    def test_owner_cannot_complete_until_resume_debt_is_cleared(self) -> None:
+        registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}
+        register_agent(registry, "agent-a", "Agent A")
+        register_agent(registry, "agent-b", "Agent B")
+        coordination = open_coordination(
+            registry,
+            kind="conflict",
+            owner_agent_id="agent-a",
+            participants=["agent-b"],
+            topic="Shared file conflict",
+        )
+
+        with self.assertRaisesRegex(CoordinationConflict, "open coordination"):
+            complete_agent(registry, "agent-a")
+
+        pause_agent(registry, "agent-b", coordination["id"], "Wait for owner repair")
+        resolve_coordination(
+            registry,
+            coordination["id"],
+            "agent-a",
+            "Repair complete",
+            "Target may resume",
+        )
+        self.assertEqual(["agent-b"], coordination["resumePendingAgentIds"])
+
+        with self.assertRaisesRegex(CoordinationConflict, "resume debt"):
+            complete_agent(registry, "agent-a")
+
+        resume_agent(registry, "agent-b", coordination["id"])
+        completed = complete_agent(registry, "agent-a", "Conflict and resume handshake complete")
+        self.assertEqual("completed", completed["state"])
+
+    def test_stale_owner_coordination_can_be_taken_over(self) -> None:
+        registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}
+        register_agent(registry, "agent-a", "Agent A")
+        register_agent(registry, "agent-b", "Agent B")
+        coordination = open_coordination(
+            registry,
+            kind="conflict",
+            owner_agent_id="agent-a",
+            participants=["agent-a"],
+            topic="Owner stopped during conflict repair",
+        )
+
+        with self.assertRaisesRegex(CoordinationConflict, "explicit force"):
+            take_over_coordination(
+                registry,
+                coordination["id"],
+                "agent-b",
+                "Premature takeover",
+            )
+
+        coordination["ownerLeaseUntil"] = (
+            datetime.now(timezone.utc) - timedelta(minutes=1)
+        ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        self.assertEqual(1, mark_stale_coordination_owners(registry))
+        recovered = take_over_coordination(
+            registry,
+            coordination["id"],
+            "agent-b",
+            "Original owner stopped before resolving the conflict",
+        )
+
+        self.assertEqual("agent-b", recovered["ownerAgentId"])
+        self.assertIn("agent-b", recovered["participants"])
+        self.assertEqual("agent-a", recovered["ownerHistory"][0]["agentId"])
+        self.assertEqual("active", recovered["recoveryState"])
+
+    def test_explicit_cancellation_clears_resume_debt(self) -> None:
+        registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}
+        register_agent(registry, "agent-a", "Agent A")
+        register_agent(registry, "agent-b", "Agent B")
+        create_claim(registry, "agent-b", "ui", ["web/src"], "Frontend work")
+        coordination = open_coordination(
+            registry,
+            kind="conflict",
+            owner_agent_id="agent-a",
+            participants=["agent-b"],
+            topic="Cancel obsolete frontend task",
+        )
+        pause_agent(registry, "agent-b", coordination["id"], "Await decision")
+        resolve_coordination(registry, coordination["id"], "agent-a", "Cancel task", "User archived it")
+
+        cancel_resume_obligation(
+            registry,
+            coordination["id"],
+            "agent-a",
+            "agent-b",
+            "User explicitly cancelled and archived the task",
+        )
+
+        agent_b = next(item for item in registry["agents"] if item["id"] == "agent-b")
+        claim_b = next(item for item in registry["claims"] if item["agentId"] == "agent-b")
+        self.assertEqual("completed", agent_b["state"])
+        self.assertEqual("released", claim_b["status"])
+        self.assertEqual([], coordination["resumePendingAgentIds"])
+        self.assertEqual("closed", coordination["recoveryState"])
+
+    def test_legacy_registry_backfills_resume_debt(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / "project"
+            project.mkdir()
+            registry = {
+                "schemaVersion": 1,
+                "agents": [
+                    {
+                        "id": "agent-b",
+                        "state": "paused",
+                        "coordinationId": "coord-legacy",
+                    }
+                ],
+                "claims": [],
+                "coordinations": [
+                    {
+                        "id": "coord-legacy",
+                        "kind": "conflict",
+                        "state": "resolved",
+                        "ownerAgentId": "agent-a",
+                    }
+                ],
+                "recentEvents": [],
+            }
+
+            ensure_registry_shape(registry, project)
+
+            coordination = registry["coordinations"][0]
+            self.assertEqual(2, registry["schemaVersion"])
+            self.assertEqual(["agent-b"], coordination["resumePendingAgentIds"])
+            self.assertEqual("resume-pending", coordination["recoveryState"])
+
+    def test_legacy_open_coordination_uses_existing_timestamp_for_owner_lease(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / "project"
+            project.mkdir()
+            old_timestamp = (
+                datetime.now(timezone.utc) - timedelta(minutes=31)
+            ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            registry = {
+                "schemaVersion": 1,
+                "agents": [{"id": "agent-a", "state": "active"}],
+                "claims": [],
+                "coordinations": [
+                    {
+                        "id": "coord-legacy-open",
+                        "kind": "conflict",
+                        "state": "open",
+                        "ownerAgentId": "agent-a",
+                        "updatedAt": old_timestamp,
+                    }
+                ],
+                "recentEvents": [],
+            }
+
+            ensure_registry_shape(registry, project)
+
+            self.assertEqual(1, mark_stale_coordination_owners(registry))
+            self.assertEqual("owner-stale", registry["coordinations"][0]["recoveryState"])
 
     def test_reclaim_by_same_agent_is_idempotent(self) -> None:
         registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}

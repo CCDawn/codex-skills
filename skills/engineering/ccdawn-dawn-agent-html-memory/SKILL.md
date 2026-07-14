@@ -111,9 +111,11 @@ py -3 <skill-root>\scripts\agent_coordination.py <project-root> status
 py -3 <skill-root>\scripts\agent_coordination.py <project-root> join --agent <label> --agent-id <id> --task "<task>" --scope <scope>
 py -3 <skill-root>\scripts\agent_coordination.py <project-root> update --agent-id <id> --stage <stage> --last-checkpoint "<evidence>"
 py -3 <skill-root>\scripts\agent_coordination.py <project-root> claim --lane <lane> --scope <scope> --agent-id <id> --task "<task>"
+py -3 <skill-root>\scripts\agent_coordination.py <project-root> heartbeat --coordination-id <id> --agent-id <owner-id>
+py -3 <skill-root>\scripts\agent_coordination.py <project-root> takeover --coordination-id <id> --agent-id <new-owner-id> --reason "<reason>"
 ```
 
-`agent_work_guard.py` 保留为兼容入口。只认领最小稳定 scope；暂停会让出 claim，恢复必须重新检查。每次工具调用使用文件锁、revision 和原子替换，旧 `.docs/project-memory/agent-claims.json` 只迁移读取，不删除。
+`agent_work_guard.py` 是兼容入口。暂停让出 claim，`resolve` 形成 `resumePendingAgentIds`；owner 失活由 `takeover` 接管，恢复重查 scope，明确取消/归档才可 `cancel-resume`。open coordination 或恢复债务阻止 `complete`。registry 使用文件锁和原子替换；旧 `agent-claims.json` 只迁移读取。
 
 已解决的讨论、冲突或 merge 决策由协调者同步一次：
 
@@ -134,5 +136,3 @@ py -3 <skill-root>\scripts\sync_project_memory.py <project-root> --lane <lane> -
 4. 没有覆盖无关 lane、旧历史或用户并行改动。
 
 渲染或结构异常时读取 `references/troubleshooting.md`；只在用户要求调整 dashboard 视觉时读取 `references/html-design.md`。
-
-用户可见输出默认中文，正文末尾保留：`下一步建议: <一个具体动作>`。

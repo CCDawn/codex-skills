@@ -111,6 +111,8 @@ Rules:
 - Route creates worktrees or subagents for one-theme sequential work.
 - Route treats a sent pause request as proof that the other thread has paused, or starts conflicting writes before a `PAUSED` acknowledgement.
 - Route resolves a cross-thread conflict but finishes without actively sending and verifying the resume notification.
+- Route lets a coordination owner stop after pausing another Agent, or treats `resolve` as closure while `resumePendingAgentIds` still contains resume debt.
+- Route finds an expired/stale coordination owner but waits indefinitely instead of routing a registered Agent through explicit `takeover`.
 - Route starts multi-agent work without reading an existing live registry, or writes full transcripts and command logs as progress.
 - Route lets every Agent message every other Agent instead of one coordinator collecting positions and broadcasting the decision.
 - Route merges from stale branch messages without re-reading Git target/base/head/diff and current test evidence.
