@@ -70,14 +70,13 @@ TOKEN_BUDGETS = {
     "ccdawn-frontend-engineering": 1500,
     "ccdawn-goal-loop": 1100,
     "ccdawn-huawei-nslb-score-loop": 1200,
-    "ccdawn-planning": 1600,
+    "ccdawn-planning": 1850,
     "ccdawn-pr-review": 1500,
     "ccdawn-project-review": 1500,
     "ccdawn-research-rigor-review": 1600,
     "ccdawn-score-loop": 2200,
     "ccdawn-simplification-audit": 1000,
     "ccdawn-simplification-review": 1000,
-    "ccdawn-task-splitting": 1350,
     "ccdawn-thread-coordination": 1300,
     "ccdawn-ui-design": 1650,
     "ccdawn-ui-review": 1350,
@@ -588,17 +587,10 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: development cleanup safety contract missing marker '{marker}'")
 
-    if name == "ccdawn-task-splitting" and "实验 lane 不进入" not in text:
-        errors.append(f"{label}: missing experiment-lane bypass for SIMPLE/BDD_TDD classification")
-
     route_regressions = {
         "ccdawn-planning": {
-            "required": ["默认 `DIRECT_IMPLEMENTATION`", "`NO_SPLIT` 是 BRT/Planning 的内部结论"],
-            "forbidden": ["默认进入 `ccdawn-task-splitting`"],
-        },
-        "ccdawn-task-splitting": {
-            "required": ["只为已经确认需要拆分", "不能把它设为每条 Critical Path 的默认尾声"],
-            "forbidden": ["默认路由到 `ccdawn-completion-summary`"],
+            "required": ["默认 `DIRECT_IMPLEMENTATION`", "在当前方案内使用 `TASK_GRAPH`", "默认连续执行 Critical Path"],
+            "forbidden": ["ccdawn-task-splitting", "默认路由到 `ccdawn-completion-summary`"],
         },
         "ccdawn-completion-summary": {
             "required": ["普通 FAST_PATH 和有界 COMPACT_FLOW", "不单独加载本 skill"],

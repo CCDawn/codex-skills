@@ -9,11 +9,11 @@
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 27 Agent Skills for intent alignment, dynamic routing, multi-thread coordination, lightweight development, development cleanup, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 26 Agent Skills for intent alignment, dynamic routing, multi-thread coordination, lightweight development, development cleanup, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
-- Simple work stays simple. Planning, task splitting, and compact TDD are activated only when the risk justifies them.
+- Simple work stays simple. Durable plans, embedded task graphs, and compact TDD appear only when the risk justifies them.
 
 **English** | [简体中文](README.md)
 
@@ -98,7 +98,6 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 - [`ccdawn-design-system`](skills/engineering/ccdawn-design-system/SKILL.md)
 - [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md)
 - [`ccdawn-planning`](skills/engineering/ccdawn-planning/SKILL.md)
-- [`ccdawn-task-splitting`](skills/engineering/ccdawn-task-splitting/SKILL.md)
 - [`ccdawn-bdd-tdd-development`](skills/engineering/ccdawn-bdd-tdd-development/SKILL.md)
 - [`ccdawn-completion-summary`](skills/engineering/ccdawn-completion-summary/SKILL.md)
 - [`ccdawn-simplification-review`](skills/engineering/ccdawn-simplification-review/SKILL.md)

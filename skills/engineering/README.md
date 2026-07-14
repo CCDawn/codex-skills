@@ -11,7 +11,6 @@
 - **[ccdawn-development-cleanup](./ccdawn-development-cleanup/SKILL.md)** - Post-development residue, merged local branch, disposable worktree, and completed claim cleanup.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research only when external or in-project candidates can materially change a complex feature plan.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
-- **[ccdawn-task-splitting](./ccdawn-task-splitting/SKILL.md)** - Task decomposition from an accepted implementation plan.
 - **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Compact TDD for selected high-risk behavior, reusing RED evidence and avoiding per-task agent/reviewer chains.
 - **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Evidence-backed completion checks and stage summaries.
 - **[ccdawn-pr-review](./ccdawn-pr-review/SKILL.md)** - Explicit PR, branch, commit-range, or diff review against requirements, evidence, regression risk, and merge readiness.

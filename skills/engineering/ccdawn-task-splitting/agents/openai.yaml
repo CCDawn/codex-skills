@@ -1,4 +1,0 @@
-interface:
-  display_name: "CCDawn 任务拆分"
-  short_description: "只为确实存在独立依赖、owner、风险或验证边界的工作建立最小任务图。"
-  default_prompt: "使用 $ccdawn-task-splitting：仅在已经确认需要拆分时建立最小 Critical Path 和紧凑任务卡；误路由则返回 NO_SPLIT 并直接实施，不创建 ledger 或 summary 阶段。"

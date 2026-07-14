@@ -1,6 +1,6 @@
 ---
 name: ccdawn-planning
-description: "Use when aligned requirements need a persistent or reviewable implementation plan because real design choices, cross-boundary contracts, multiple owners, risky sequencing, migration, release, or cross-session handoff make an internal execution outline insufficient."
+description: "Use when aligned requirements need a persistent or reviewable implementation plan, including a compact task graph only when independent deliverables, owners, dependencies, risk gates, or verification contracts make splitting valuable."
 license: MIT
 ---
 
@@ -8,16 +8,16 @@ license: MIT
 
 ## 目标
 
-把已经对齐的需求整理成足以安全实施的最小方案。规划是风险工具，不是所有开发的固定阶段；能够在一个上下文中直接实现并验证的任务留给当前 owner。
+把已经对齐的需求整理成足以安全实施的最小方案。规划和任务图都是风险工具，不是所有开发的固定阶段；能够在一个上下文中直接实现并验证的任务留给当前 owner。
 
 ## BRT interface
 
 - Context Boundary: 已确认意图、相关代码/文档/测试、owning surface、保护边界、已有决策和会改变方案的外部证据。
-- Output Contract: 推荐实施路径、影响面、顺序、风险决策、验证策略和直接实施/实际拆分/阻塞路由。
+- Output Contract: 推荐实施路径、影响面、顺序、风险决策、验证策略，以及必要时同一方案内的最小任务图。
 - Allowed Action: 只读分析与方案编写；不修改业务代码，不扩大用户范围，不替专项 owner 执行。
 - Success Evidence: 方案能映射到具体文件、行为、依赖和验证，且下一执行者无需重新猜测关键取舍。
 - Stop Condition: 需求仍有高影响分叉、owning surface 不清、关键证据缺失、高风险动作未确认或方案不能安全实施。
-- Route Out: 当前 owner 直接实施、`ccdawn-task-splitting`、专项 owner、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 当前 owner 或专项 owner 直接实施、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -43,17 +43,17 @@ license: MIT
 4. 选择最小充分路径，说明影响文件、关键行为/数据流、实施顺序、保护边界和验证方式。
 5. 只有真实取舍才给 2-3 个方案；否则给一个推荐路径。
 6. 内部从 1-3 个最相关视角检查需求覆盖、实施可行性、验证和风险。没有 finding 不输出矩阵；发现缺口直接修订方案。
-7. 根据剩余工作决定直接实施、实际拆分或阻塞。
+7. 根据剩余工作选择 `DIRECT_IMPLEMENTATION`、`COMPACT_PLAN`、`TASK_GRAPH` 或 `BLOCKED`；不要再增加一个仅重复拆分判定的流程阶段。
 
 ## 路由判定
 
-默认 `DIRECT_IMPLEMENTATION`，满足以下条件即可由当前 owner 连续实施和验证：
+默认 `DIRECT_IMPLEMENTATION`；需要持久方案但无需真实拆分时使用 `COMPACT_PLAN`。满足以下条件即可由当前 owner 连续实施和验证：
 
 - 一个主题、一个主要 owner，能放入同一推理上下文；
 - 顺序可以在内部维护，不需要独立交付或逐项用户验收；
 - 风险和验证可以由同一执行契约覆盖。
 
-只有任一条件成立才路由 `SPLIT_REQUIRED`：
+只有任一条件成立才在当前方案内使用 `TASK_GRAPH`：
 
 - 存在多个独立交付物或 owner；
 - 有真实先后依赖，后续任务必须消费前一任务的 artifact；
@@ -61,7 +61,28 @@ license: MIT
 - 需要并行、分 PR、跨会话交接，或不同任务需要不同验证契约；
 - 用户明确要求拆分。
 
-多个文件、较长描述、同机制机械替换、需要测试或普通跨模块修改，本身不触发拆分。`NO_SPLIT` 是 BRT/Planning 的内部结论，不调用 `ccdawn-task-splitting` 来证明无需拆分。
+多个文件、较长描述、同机制机械替换、需要测试或普通跨模块修改，本身不触发拆分。`NO_SPLIT` 是 BRT/Planning 的内部结论，不需要独立 skill 来证明无需拆分。
+
+## TASK_GRAPH 模式
+
+任务图与实施方案一次完成：
+
+- 一个任务只对应一个独立交付物、owner、依赖 artifact、风险闸门或验证契约；测试、文档和配置并入所属功能任务。
+- 共享写入面、顺序依赖或共享验证保持串行；只有范围和证据真正独立才并行。
+- Critical Path 只保留完成目标必需的任务；可选优化进入 Deferred，不生成当前任务卡。
+- 每个任务自行选择 `SIMPLE` 或 `BDD_TDD`。只有确定性行为存在重大回归、状态、数据、权限、迁移或公共契约风险时才使用 `ccdawn-bdd-tdd-development`。
+- 实验 metric lane 路由 `ccdawn-score-loop`；metric 未提升不等于 TDD RED。
+- 默认连续执行 Critical Path，已有执行许可时不逐任务询问。
+
+紧凑任务卡只保留会被执行者消费的字段：
+
+```text
+Task N: <可观察产出>
+- Owner/Boundary:
+- Dependency:
+- Mode: SIMPLE / BDD_TDD
+- Verification/Stop:
+```
 
 ## 输出
 
@@ -75,10 +96,12 @@ license: MIT
 - 关键顺序/依赖:
 - 风险决策:
 - 验证与成功证据:
-- 路由: DIRECT_IMPLEMENTATION / SPLIT_REQUIRED / BLOCKED
+- 模式: DIRECT_IMPLEMENTATION / COMPACT_PLAN / TASK_GRAPH / BLOCKED
 - 路由原因:
-下一步建议: <直接实施，或进入实际拆分/阻塞处理>
+下一步建议: <由当前 owner 直接连续实施，或处理阻塞>
 ```
+
+`TASK_GRAPH` 时在紧凑方案后追加拆分理由、Critical Path、并行/串行边界和必要任务卡，不重复目标、风险或验证章节。
 
 只有跨会话、正式审阅或高风险方案才增加：备选路径、复用决策、假设、回滚、详细影响面和 ledger 增量。不要输出“无新增影响面”“无真实缺口”等占位式自审字段。
 

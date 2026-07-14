@@ -9,7 +9,7 @@
 
 **让 Codex 先理解你，再决定怎么做。**
 
-27 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
+26 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -144,10 +144,7 @@ sh ./install.sh
   只在复用候选会实质改变复杂功能的架构、依赖或实现范围时调研现有项目、库、标准、示例和项目内模块。
 
 - **`ccdawn-planning`**
-  只在真实设计分叉、高风险顺序或跨边界交接需要可复用方案时触发；默认方案完成后由当前 owner 直接实施。
-
-- **`ccdawn-task-splitting`**
-  只在已确认存在独立依赖、owner、风险或验证边界时建立最小任务图；普通 `NO_SPLIT` 不进入此阶段。
+  只在真实设计分叉、高风险顺序或跨边界交接需要可复用方案时触发；存在独立 owner、依赖或验证边界时在同一方案内生成最小任务图，否则由当前 owner 直接实施。
 
 - **`ccdawn-bdd-tdd-development`**
   仅对复杂、高回归风险子任务使用紧凑 TDD；复用已有 RED、运行窄验证，默认不派发逐任务子代理和 reviewer 链。
@@ -255,7 +252,6 @@ skills/
     ccdawn-frontend-engineering/
     ccdawn-feature-reuse-research/
     ccdawn-planning/
-    ccdawn-task-splitting/
     ccdawn-bdd-tdd-development/
     ccdawn-completion-summary/
     ccdawn-pr-review/
