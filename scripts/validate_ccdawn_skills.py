@@ -54,28 +54,79 @@ DIRECT_WRITE_OWNERS = {
 
 TOKEN_BUDGETS = {
     "ccdawn-ai-research-loop": 2200,
-    "ccdawn-bdd-tdd-development": 1800,
-    "ccdawn-brt": 4500,
+    "ccdawn-bdd-tdd-development": 1350,
+    "ccdawn-brt": 2500,
     "ccdawn-bug-review": 1200,
     "ccdawn-competition-research-lifecycle": 2500,
     "ccdawn-completion-summary": 2400,
     "ccdawn-creative-toolbox": 1400,
-    "ccdawn-dawn-agent-html-memory": 2250,
+    "ccdawn-dawn-agent-html-memory": 1400,
     "ccdawn-development-cleanup": 1900,
-    "ccdawn-evaluation": 2200,
+    "ccdawn-evaluation": 1000,
     "ccdawn-feature-reuse-research": 2100,
     "ccdawn-goal-loop": 1100,
     "ccdawn-huawei-nslb-score-loop": 1200,
     "ccdawn-planning": 1600,
-    "ccdawn-pr-review": 2600,
-    "ccdawn-project-review": 2900,
+    "ccdawn-pr-review": 1500,
+    "ccdawn-project-review": 1500,
     "ccdawn-research-rigor-review": 1600,
     "ccdawn-score-loop": 2200,
     "ccdawn-simplification-audit": 1000,
     "ccdawn-simplification-review": 1000,
     "ccdawn-task-splitting": 1350,
-    "ccdawn-thread-coordination": 1700,
+    "ccdawn-thread-coordination": 1300,
     "ccdawn-ui-design": 1650,
+}
+
+BRT_REFERENCE_BUDGETS = {
+    "routing-practice.md": 2200,
+    "runtime.md": 1800,
+    "output-forms.md": 900,
+}
+
+BRT_REFERENCE_REQUIRED_MARKERS = {
+    "routing-practice.md": [
+        "未出现的 skill 不能成为 owner",
+        "不完成一个就停下来询问",
+        "多个 `SAFE_DIRECT` 项只推荐一个",
+    ],
+    "runtime.md": [
+        "完成一个 task 不构成用户闸门",
+        "当前项通过后自动进入下一个已授权项",
+    ],
+    "output-forms.md": [
+        "已有执行许可时连续推进 `SAFE_DIRECT`",
+        "只有自然闸门才提供 2-3 个具体选项",
+    ],
+}
+
+BRT_PROFILE_BUDGETS = {
+    "alignment": (["SKILL.md", "references/output-forms.md"], 3400),
+    "routing": (["SKILL.md", "references/routing-practice.md"], 4700),
+    "long-task": (["SKILL.md", "references/runtime.md"], 4300),
+    "maximum": (
+        [
+            "SKILL.md",
+            "references/output-forms.md",
+            "references/routing-practice.md",
+            "references/runtime.md",
+        ],
+        7000,
+    ),
+}
+
+HOT_ROUTE_EXTERNAL_CANDIDATES = {
+    "agent-browser",
+    "api-and-interface-design",
+    "browser-testing-with-devtools",
+    "codebase-recon",
+    "context-engineering",
+    "doubt-driven-development",
+    "incremental-implementation",
+    "performance-optimization",
+    "security-and-hardening",
+    "spec-driven-development",
+    "webapp-testing",
 }
 
 
@@ -287,6 +338,25 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
 
+    compact_review_contracts = {
+        "ccdawn-evaluation": [
+            "无需向用户输出“复用检查”",
+            "没有 finding 不展示矩阵",
+            "连续执行当前契约内的 `SAFE_DIRECT` 项",
+        ],
+        "ccdawn-project-review": [
+            "不逐项询问",
+            "不默认生成项目地图、矩阵、ledger",
+        ],
+        "ccdawn-pr-review": [
+            "findings 优先",
+            "只输出有 finding 或真实证据缺口的视角",
+        ],
+    }
+    for marker in compact_review_contracts.get(name, []):
+        if marker not in text:
+            errors.append(f"{label}: compact review contract missing marker '{marker}'")
+
     if name == "ccdawn-dawn-agent-html-memory":
         for marker in [
             "agent_coordination.py",
@@ -388,6 +458,46 @@ def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str])
     missing_routes = [name for name in skill_names if name != "ccdawn-brt" and name not in brt_text]
     if missing_routes:
         errors.append(f"ccdawn-brt: missing package owner routes {missing_routes}")
+
+    for reference_name, budget in BRT_REFERENCE_BUDGETS.items():
+        reference_path = brt_root / "references" / reference_name
+        if not reference_path.exists():
+            errors.append(f"ccdawn-brt/references/{reference_name}: missing")
+            continue
+        estimated = estimated_instruction_tokens(read_text(reference_path))
+        if estimated > budget:
+            errors.append(
+                f"ccdawn-brt/references/{reference_name}: about {estimated} tokens exceeds {budget}"
+            )
+        for marker in BRT_REFERENCE_REQUIRED_MARKERS.get(reference_name, []):
+            if marker not in read_text(reference_path):
+                errors.append(
+                    f"ccdawn-brt/references/{reference_name}: missing route regression marker '{marker}'"
+                )
+
+    for profile_name, (relative_paths, budget) in BRT_PROFILE_BUDGETS.items():
+        estimated = 0
+        missing_profile_files = []
+        for relative_path in relative_paths:
+            profile_path = brt_root / relative_path
+            if not profile_path.exists():
+                missing_profile_files.append(relative_path)
+                continue
+            estimated += estimated_instruction_tokens(read_text(profile_path))
+        if missing_profile_files:
+            errors.append(f"ccdawn-brt profile {profile_name}: missing {missing_profile_files}")
+        elif estimated > budget:
+            errors.append(f"ccdawn-brt profile {profile_name}: about {estimated} tokens exceeds {budget}")
+
+    hot_route_text = read_text(brt_root / "references" / "routing-practice.md")
+    leaked_candidates = sorted(
+        candidate for candidate in HOT_ROUTE_EXTERNAL_CANDIDATES if f"`{candidate}`" in hot_route_text
+    )
+    if leaked_candidates:
+        errors.append(
+            "ccdawn-brt routing-practice: external install candidates belong in "
+            f"github-skill-candidates.md, found {leaked_candidates}"
+        )
 
     huawei_root = repo_root / "skills" / "competition" / "ccdawn-huawei-nslb-score-loop"
     for markdown_path in sorted(huawei_root.rglob("*.md")):

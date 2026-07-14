@@ -8,187 +8,60 @@ license: MIT
 
 ## 目标
 
-对整个项目或一个明确子系统做只读、证据化审查，找出最影响后续完成率和误改率的结构性问题。
-
-本 skill 不是 PR review，也不是直接修 bug。它回答：
-
-- 这个项目当前健康吗；
-- 哪些模块最值得先看、先测、先修；
-- 哪些风险会影响后续开发、迁移、发布或接手；
-- 下一步应该路由到哪个更具体的 CCDawn skill。
+对整仓或明确子系统做只读、证据化审查，找出最影响完成率、误改率和用户价值的问题。PR/diff 使用 `ccdawn-pr-review`，具体 bug 使用 `ccdawn-bug-review`。
 
 ## BRT interface
 
-- Context Boundary: 本次审查范围、实际读取的目录/入口/测试/配置/日志/git 信号/memory，以及明确排除范围。
-- Output Contract: 项目健康结论、证据化 findings、行动队列、可选 Ordered Fix Queue、下一步路由。
-- Allowed Action: 默认只读审查；不编辑文件、不移动分支、不改 index；用户要求边审边改时先回 `ccdawn-brt` 建立 Execution Contract。
-- Success Evidence: findings 均有位置/命令/文件证据，行动队列能路由到具体 skill 或阶段。
-- Stop Condition: 审查范围不明、需要写代码、发现 PR/diff 对象、发现具体 bug 需转调试、或用户目标变成实施。
-- Route Out: `ccdawn-simplification-audit`、`ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-pr-review`、`ccdawn-completion-summary`、`ccdawn-brt` 或 BLOCKED。
+- Context Boundary: 审查范围、实际读取的入口/模块/测试/配置/git/运行证据和排除范围。
+- Output Contract: 项目健康结论、风险排序 findings、可连续执行的修复顺序和 Route Out。
+- Allowed Action: 默认只读；不编辑文件、移动分支或修改 index。用户要求修复时由 BRT 建立执行契约。
+- Success Evidence: finding 绑定文件/命令/运行证据、影响、最小动作和验证条件。
+- Stop Condition: 范围不明、对象变成 PR/具体 bug、关键证据缺失、需要写入或高风险决策。
+- Route Out: `ccdawn-simplification-audit`、`ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
 - 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
-- 用户可见内容默认中文，完成只报状态、产出、证据和剩余风险；代码、命令、路径、错误原文、API/协议、skill 名和枚举保留原样；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
+- 用户可见内容默认中文；保留技术字面量；只报结论、证据、风险和产出；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
-## 进入条件
+## 深度与证据
 
-使用前确认：
+- `QUICK`：目录、README、配置、测试入口和近期 git 信号。
+- `STANDARD`：默认；增加关键链路、依赖、CI、测试质量和边界。
+- `DEEP`：接手、重构或高风险发布前；增加热点历史、状态/数据/权限/迁移风险。
 
-- 用户目标是审项目、审代码库、审架构、看技术债、看测试缺口、接手摸底、重构前盘点或判断项目健康；
-- 当前工作区是可读取的项目目录；
-- 审查范围已知：整个 repo、某个 package、某个模块、某条业务链路，未知时先用 `ccdawn-brt` 对齐；
-- 默认只读，不编辑代码、不移动分支、不改 index。
+不要为了全面扫描全仓。先确认事实源和高信号入口，再沿用户目标钻取 owning modules。按需检查：架构边界与事实源、修改热点、真实行为测试、配置/数据/权限、发布回滚、文档与接续成本。
 
-如果用户要审的是 PR/diff/分支，使用 `ccdawn-pr-review`。如果用户报告具体 bug、失败测试或异常行为，使用 `ccdawn-bug-review`。
+## Findings
 
-## 审查深度
+严重度：`P0` 数据/安全/核心不可用；`P1` 高风险缺陷或关键契约/测试缺口；`P2` 明显增加误改和维护成本；`P3` 非阻塞改进。
 
-先按项目大小和用户目标选择深度：
+每条必须包含：位置或命令证据、具体观察、影响、最小有效动作、验证条件。不得把“项目复杂”“测试不足”“TODO 很多”直接当 finding。
 
-- QUICK：轻量摸底，适合“这个项目大概怎么样”“先看一眼”；只读目录、README、配置、测试入口、近期 git 信号。
-- STANDARD：默认审项目；结合目录、关键文件、git 历史、测试/CI、依赖和核心链路。
-- DEEP：重构、接手、发布前或高风险项目；增加热点文件、bug 磁铁、模块边界、测试有效性、数据/权限/迁移风险。
+Telemetry Gap 与已确认问题分开；WATCHLIST 必须写明升级、降级或关闭所需的日志、指标、测试或时间窗口。
 
-不要为了全面而扫描全仓。先找高信号入口，再钻关键模块。
+## 执行顺序
 
-## 证据采集
+多个 finding 按依赖、用户价值、误改风险和验证成本排序，而不是只推荐一个：
 
-按需要选择，保持只读：
+- `SAFE_DIRECT`：已有修复许可时依次执行并验证，不逐项询问。
+- `PLAN_THEN_EXECUTE`：存在设计分叉时先规划，再回到执行。
+- `DEFERRED`：只记录触发条件。
+- `BLOCKED`：停止并问一个不可约问题。
 
-- 项目入口：README、package/pyproject/Cargo/go.mod、workspace 配置、启动脚本、CI、测试命令。
-- 结构：目录分层、核心模块、跨层依赖、重复实现、废弃路径。
-- git 信号：近期高频修改文件、多人改动热点、反复修 bug 的文件、长期无人维护的关键文件。
-- 测试：测试入口、覆盖关键路径的测试、失败/跳过/脆弱测试、缺少回归锚点的高风险模块。
-- 运行与配置：环境变量、迁移、feature flag、部署脚本、数据路径、权限边界。
-- 文档与记忆：项目 memory、架构文档、决策记录、TODO/FIXME、已知风险。
+只有顺序会改变产品取舍、范围或高风险动作时才让用户选择。只读审查请求本轮停在报告；用户说“继续/开始修复/按顺序修”时从第一个非 Deferred/Blocked 项连续推进。
 
-常用只读命令示例：
+## 输出
 
 ```text
-git status --short
-git log --oneline --decorate -20
-git log --name-only --pretty=format: --since="90 days ago"
-rg -n "TODO|FIXME|HACK|deprecated|legacy|skip|only|flaky"
-rg --files
-```
-
-PowerShell 下不要依赖 Bash-only 语法；路径用 `-LiteralPath` 或明确数组。
-
-## 审查维度
-
-默认选 4-6 个最相关维度，不全量铺开：
-
-- 项目地图：主要模块、入口、数据流、外部依赖是否清楚。
-- 热点与风险模块：修改频繁、反复出 bug、多人交叉维护或高耦合文件。
-- 架构边界：分层是否清晰，是否存在循环依赖、跨层调用、重复抽象、单一事实源混乱。
-- 测试质量：关键路径是否有测试，测试是否验证真实行为，是否存在脆弱/跳过/只测 mock 的问题。
-- 可维护性：复杂度、命名、错误处理、配置分散、文档缺口是否阻碍后续 agent 接续。
-- 安全与数据：权限、密钥、日志泄漏、删除/迁移、隐私、外部输入风险。
-- 发布与运维：CI、部署、回滚、监控、迁移脚本、环境兼容风险。
-- 用户价值：哪些问题最可能影响用户可见行为或任务完成率。
-
-发现明确专项问题时路由：
-
-- 具体 bug 或失败测试 -> `ccdawn-bug-review`
-- PR/diff 合并前 -> `ccdawn-pr-review`
-- 复杂新增功能、模块替换、开源库/项目复用价值评估 -> `ccdawn-feature-reuse-research`
-- 需要方案 -> `ccdawn-planning`
-- 需要任务拆分 -> `ccdawn-task-splitting`
-- 完成状态/证据 -> `ccdawn-completion-summary`
-- 安全专项 -> 已安装 `security-and-hardening` 时使用；否则用 `Defense-in-Depth Validation` 或保留在本 skill 做证据化风险审查
-- 发布、CI 或合并前专项 -> 已安装 `gh-fix-ci` 时处理 CI；否则按对象路由到 `ccdawn-bug-review`、`ccdawn-pr-review` 或 `ccdawn-completion-summary`
-- 性能专项 -> 已安装 `performance-optimization` / `react-component-performance` 时使用；否则保留在本 skill 并要求运行时或浏览器测量证据
-
-## Findings 规则
-
-每条 finding 必须有证据，不输出空泛建议。
-
-严重度：
-
-- P0：会导致无法运行、数据丢失、安全事故、错误发布或核心链路不可用。
-- P1：高风险技术债、关键测试缺口、架构边界混乱、反复出 bug 的关键模块。
-- P2：可维护性、局部测试缺口、配置/文档/错误处理问题，会增加后续误改率。
-- P3：不阻塞但值得排期的清理、命名、文档或结构优化。
-
-每条 finding 包含：
-
-- 位置：文件、目录、命令输出或 git 信号；
-- 问题：具体观察；
-- 影响：为什么影响完成率、误改率、质量或风险；
-- 建议：下一步最小有效动作；
-- 路由：该回哪个 skill 或阶段。
-
-## 行动队列
-
-当 findings 指向多个后续动作时，先转成行动队列，再给下一步：
-
-- Immediate Guardrail：低风险保护动作，例如关闭 stale claim、阻止误合、补发布/权限/删除防线。
-- Primary Fix：证据最充分、最影响当前目标或用户可见链路的修复。
-- Telemetry Gap：现有证据不足以定性为 bug，需要补日志、指标、probe 或复测。
-- Deferred Refactor：维护性或结构性治理，当前目标不依赖时延后。
-
-`WATCHLIST` 必须有退出条件：哪些指标、日志、测试、运行证据或时间窗口能证明关闭、降级或升级。Telemetry Gap 不要和确认型 P1 混在同一严重度里。
-
-当行动队列里存在多个可连续修复项，再生成 Ordered Fix Queue：
-
-- `Execution Order` 按依赖、改动范围、验证难度、误改风险和用户价值排序，不等同于 `Severity Rank`。
-- 每项标记 `SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED`。
-- `SAFE_DIRECT` 可在用户说“继续/开始修复/按顺序修”后直接执行并验证。
-- `PLAN_THEN_EXECUTE` 先进入 `ccdawn-planning` 或对应 owner；不要和低风险清理混做。
-- `DEFERRED` 只记录触发条件；不在当前队列里顺手修。
-
-## 输出契约
-
-```text
-项目审查:
-- 范围: 整仓 / 子系统 / 模块...
-- 深度: QUICK / STANDARD / DEEP
-- 结论: HEALTHY / WATCHLIST / NEEDS_ATTENTION / HIGH_RISK / BLOCKED
-- Context Boundary: 本次实际读取的目录、入口、测试、配置、日志、git 信号或 memory...
-- Allowed Action: 只读审查；需要写代码时回 BRT 建立 Execution Contract
-- 关键证据: ...
-
-项目地图:
-- 入口:
-- 核心模块:
-- 测试/CI:
-- 数据/配置/外部依赖:
-
+项目审查: HEALTHY / WATCHLIST / NEEDS_ATTENTION / HIGH_RISK / BLOCKED
+范围与关键证据: ...
 Findings:
-- P0/P1/P2/P3: [位置] 问题；影响；建议；路由
-
-风险热区:
-- 模块/文件: 证据...；为什么优先...
-
-测试与验证:
-- 已有证据:
-- 缺口:
-- 建议补强:
-- Success Evidence: findings 均有位置/命令/文件证据，行动队列能路由到具体 skill 或阶段
-- Stop Condition: 审查范围不明 / 需要写代码 / 发现 PR/diff 对象 / 发现具体 bug 需转调试
-
-行动队列:
-- Immediate Guardrail: 证据...；动作...；路由...
-- Primary Fix: 证据...；动作...；路由...
-- Telemetry Gap: 证据缺口...；补证方式...；退出 WATCHLIST 条件...
-- Deferred Refactor: 延后原因...；触发条件...
-
-修复队列（仅多个可连续修复项时）:
-- 1. ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]；为什么排在这里...；Success Evidence...
-
-下一步:
-默认路由：<从 BRT interface 的 Route Out 选择一个>，原因...
-执行规则：若有多个可连续修复项，输出 Ordered Fix Queue 并在用户说“继续/开始修复/按顺序修”后从第 1 项推进；若只有一个明确后续 owner，直接路由；只有审查范围、修复顺序或高风险动作需要用户取舍时，才列出选项。
-
-Route Out: <沿用 BRT interface>
+- P0/P1/P2/P3 [位置] 问题；影响；最小动作；验证条件
+执行顺序（仅多个后续动作时）:
+1. <动作> [SAFE_DIRECT/PLAN_THEN_EXECUTE/DEFERRED/BLOCKED]
+证据缺口与剩余风险: ...
+下一步建议: <一个具体动作>
 ```
 
-## 质量门槛
-
-- 不编辑文件；如果用户要求边审边改，先用 `ccdawn-brt` 重新对齐并建立 Execution Contract。
-- 不把“项目很复杂”“测试不足”“架构混乱”当 finding，必须落到证据和影响。
-- 不用单一指标下结论；热点文件必须结合职责、测试、历史、风险一起解释。
-- 不把所有 TODO 都当技术债；只报告影响任务完成、误改风险、用户行为或发布风险的项。
-- 不建议大重构，除非已说明触发条件、收益、替代路径和验证方式。
-- 不和 `ccdawn-pr-review` 抢职责；有具体 diff 时交给 PR review。
+没有 finding 时明确说明未发现结构性问题，并列出未覆盖证据边界。不默认生成项目地图、矩阵、ledger 或完整专项路由清单。
