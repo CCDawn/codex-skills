@@ -171,10 +171,10 @@ sh ./install.sh
   CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。
 
 - **`ccdawn-dawn-agent-html-memory`**  
-  用不入 Git 的 live registry 保存 Agent 状态，用 `.docs/project-memory/` 持久化已确认决策、blocker 和合并结果；HTML 总览显示脱敏的 Active Agents。
+  按用户或项目选择维护跨会话决策、blocker 和正式 handoff；不接管当前执行循环，也不逐 task 同步或渲染。
 
 - **`ccdawn-goal-loop`**  
-  这是一个目标执行 skill，用来把一个目标整理成带有证据、限制条件、允许范围、下一步判断规则和阻塞停止报告的可执行合同。
+  只处理用户明确要求的开放式持续迭代策略；普通有限任务和“继续完成”仍由当前 owner 连续执行。
 
 ### 研究流程
 

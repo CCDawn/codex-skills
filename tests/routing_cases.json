@@ -13,6 +13,7 @@
   {"id":"high-risk-tdd","prompt":"新增这个已经定义清楚的跨模块状态契约，先写失败行为测试作为 RED，再最小实现和验证","primary":"ccdawn-bdd-tdd-development","support":[],"forbidden_primary":["ccdawn-bug-review","ccdawn-score-loop"]},
   {"id":"formal-closeout","prompt":"汇总跨三个会话的完成证据、Deferred 风险和 PR 发布准备状态，形成正式交接","primary":"ccdawn-completion-summary","support":[],"forbidden_primary":["ccdawn-development-cleanup","ccdawn-planning"]},
   {"id":"persistent-goal","prompt":"建立一个可持续迭代的目标契约，每轮根据成功证据选择下一步并设置停止条件","primary":"ccdawn-goal-loop","support":[],"forbidden_primary":["ccdawn-planning","ccdawn-score-loop"]},
+  {"id":"finite-continuation","prompt":"继续完成刚才已经规划好的三个实现项，全部验证后再汇报","primary":"ccdawn-brt","support":[],"forbidden_primary":["ccdawn-goal-loop","ccdawn-completion-summary"]},
   {"id":"thread-conflict","prompt":"两个 Codex 会话修改同一文件，协调暂停、讨论合并顺序，并在冲突解除后恢复对方","primary":"ccdawn-thread-coordination","support":[],"forbidden_primary":["ccdawn-dawn-agent-html-memory","ccdawn-planning"]},
   {"id":"project-memory","prompt":"初始化并同步 .docs/project-memory，让不同会话可恢复决策、blocker 和进度","primary":"ccdawn-dawn-agent-html-memory","support":[],"forbidden_primary":["ccdawn-thread-coordination","ccdawn-completion-summary"]},
   {"id":"development-cleanup","prompt":"功能已经验证并合并，清理可证明无用的临时文件、旧本地分支、worktree 和 claim","primary":"ccdawn-development-cleanup","support":[],"forbidden_primary":["ccdawn-completion-summary","ccdawn-simplification-audit"]},

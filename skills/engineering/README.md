@@ -6,7 +6,7 @@
 - **[ccdawn-ui-review](./ccdawn-ui-review/SKILL.md)** - Findings-first review of existing UI flows, visual hierarchy, states, responsive behavior, accessibility, and runtime evidence.
 - **[ccdawn-design-system](./ccdawn-design-system/SKILL.md)** - Cross-consumer design token, theme, component API, variant, and Figma-to-code governance with staged migration.
 - **[ccdawn-frontend-engineering](./ccdawn-frontend-engineering/SKILL.md)** - Production frontend implementation owner for aligned UI contracts, interaction states, responsive behavior, accessibility, and runtime evidence.
-- **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Live local Agent registry plus durable cross-session project memory and a redacted collaboration dashboard.
+- **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Opt-in durable cross-session decisions and handoffs; it does not own the active execution loop.
 - **[ccdawn-thread-coordination](./ccdawn-thread-coordination/SKILL.md)** - Same-project Agent progress, conflict, discussion, pause/resume, and fast-merge coordination.
 - **[ccdawn-development-cleanup](./ccdawn-development-cleanup/SKILL.md)** - Cleanup only for known residue, merged local branches, disposable worktrees, completed claims, or explicit cleanup requests.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research only when external or in-project candidates can materially change a complex feature plan.
@@ -19,4 +19,4 @@
 - **[ccdawn-simplification-audit](./ccdawn-simplification-audit/SKILL.md)** - On-demand repository audit for dependency bloat, dead flexibility, duplicate paths, and removable abstractions.
 - **[ccdawn-bug-review](./ccdawn-bug-review/SKILL.md)** - End-to-end bug owner for root-cause diagnosis, bounded repair, optional internal test anchors, and verification.
 - **[ccdawn-evaluation](./ccdawn-evaluation/SKILL.md)** - CCDawn evaluation adapter used only after checking more specific review, debug, planning, verification, feedback, or goal skills.
-- **[ccdawn-goal-loop](./ccdawn-goal-loop/SKILL.md)** - Explicit persistent goal contract with bounded iteration, evidence checks, and stop conditions.
+- **[ccdawn-goal-loop](./ccdawn-goal-loop/SKILL.md)** - Explicit open-ended iteration policy, not a wrapper for finite implementation or ordinary continuation.

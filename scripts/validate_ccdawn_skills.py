@@ -573,9 +573,15 @@ def validate_skill(
             "resumePendingAgentIds",
             "takeover",
             "cancel-resume",
+            "Memory 不接管执行循环",
         ]:
             if marker not in text:
                 errors.append(f"{label}: live coordination/memory bridge missing marker '{marker}'")
+
+    if name == "ccdawn-goal-loop":
+        for marker in ["用户明确要求持续/反复迭代", "Goal Loop 是控制策略，不是状态存储", "不在每轮询问是否继续"]:
+            if marker not in text:
+                errors.append(f"{label}: goal-loop ownership boundary missing marker '{marker}'")
 
     if name == "ccdawn-development-cleanup":
         for marker in [

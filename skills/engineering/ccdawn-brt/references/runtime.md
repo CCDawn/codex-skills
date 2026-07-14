@@ -15,7 +15,7 @@ Deferred/Risks: 未决项及触发条件
 Next Action: 下一可执行动作
 ```
 
-状态只在 handoff、恢复、blocker、风险决策或证据可能丢失时更新。不要保存完整对话、命令日志、内部推理或每个小步骤。
+这是当前任务的对话内临时状态，不自动写文件、Memory 或 dashboard。只在 handoff、恢复、blocker、风险决策或证据可能丢失时更新；不要保存完整对话、命令日志、内部推理或每个小步骤。确需跨会话持久化时，把最小 durable delta 交给 Project Memory，不复制两份账本。
 
 ## 持续推进
 
