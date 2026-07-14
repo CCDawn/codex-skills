@@ -589,6 +589,7 @@ def validate_skill(
             "read_thread",
             "resumePendingAgentIds",
             "`takeover`",
+            "不要随后调用 registry `respond --status RESUMED`",
             "`heartbeat`",
         ]:
             if marker not in text:
