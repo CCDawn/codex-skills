@@ -546,15 +546,17 @@ def validate_skill(
         "ccdawn-evaluation": [
             "无需向用户输出“复用检查”",
             "没有 finding 不展示矩阵",
-            "连续执行当前契约内的 `SAFE_DIRECT` 项",
+            "最多给 3 个建议",
+            "评价 skill 本身不再复制执行流程",
         ],
         "ccdawn-project-review": [
             "不逐项询问",
             "不默认生成项目地图、矩阵、ledger",
+            "证据足以回答审查目标时停止",
         ],
         "ccdawn-pr-review": [
             "findings 优先",
-            "只输出有 finding 或真实证据缺口的视角",
+            "由本次变更引入、暴露或会阻塞集成",
         ],
     }
     for marker in compact_review_contracts.get(name, []):
