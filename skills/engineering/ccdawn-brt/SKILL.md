@@ -49,8 +49,9 @@ BRT 是每句输入的默认适配层：理解真实意图、选择最具体 own
 - AI/ML 研究：`ccdawn-ai-research-loop`；单条 metric lane：`ccdawn-score-loop`；重要 claim：`ccdawn-research-rigor-review`。
 - 多会话冲突/合并：`ccdawn-thread-coordination`；真实开发残留：`ccdawn-development-cleanup`。
 - 真实设计分叉：`ccdawn-planning`；无专项 owner 的评价：`ccdawn-evaluation`。
+- GitHub、浏览器、Figma、OpenAI 文档、图片和办公文件等工具型任务，按本轮可用能力读取 `references/capability-routing.md`，不另造通用 CCDawn 包装层。
 
-完整场景仅在确实无法仲裁时读取 `references/routing-practice.md`。先以本轮 Available skills 为准；未安装候选不能成为 owner，外部候选资料只在安装/调研请求中读取 `references/github-skill-candidates.md`。
+完整工作流场景仅在无法仲裁时读取 `references/routing-practice.md`；工具/制品任务才读取 `references/capability-routing.md`。先以本轮 Available skills 为准；未安装候选不能成为 owner，外部候选资料只在安装/调研请求中读取 `references/github-skill-candidates.md`。
 
 一句话含多个独立交付物、owner 或验证边界时才建立 `Primary / Secondary / Deferred`；“实现并验证”仍是一个任务。默认顺序完成同一主题，只有独立只读 lane 才考虑并行。
 

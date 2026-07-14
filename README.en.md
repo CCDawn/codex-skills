@@ -60,10 +60,11 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 | --- | --- |
 | The request is incomplete | Inspect available evidence, then discuss only decisions that change the result |
 | Many skills exist but routing is manual | BRT selects the most specific owner and can combine multiple intents |
+| Installed GitHub, browser, Figma, or artifact tools are ignored | BRT routes to currently available capabilities while CCDawn retains intent and acceptance ownership |
 | Small changes trigger heavyweight process | Scale workflow weight per subtask and prefer direct implementation plus verification |
 | Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
 | Multiple Codex threads develop in one project | Share compact progress and coordinate scopes, discussion, pause/resume, and merge order |
-| Finished features leave temporary files and stale branches | Run a silent post-verification check and remove only attributable residue and absorbed local Git resources |
+| Finished features leave temporary files and stale branches | Clean only known attributable residue or resources covered by an explicit cleanup request |
 | Research experiments get treated like software tests | Separate research, score loops, rigor review, and deterministic software TDD |
 
 ## Featured Skills

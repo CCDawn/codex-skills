@@ -85,6 +85,7 @@ TOKEN_BUDGETS = {
 
 BRT_REFERENCE_BUDGETS = {
     "routing-practice.md": 2200,
+    "capability-routing.md": 1500,
     "runtime.md": 1800,
     "output-forms.md": 900,
 }
@@ -98,6 +99,11 @@ BRT_REFERENCE_REQUIRED_MARKERS = {
     "runtime.md": [
         "完成一个 task 不构成用户闸门",
         "当前项通过后自动进入下一个已授权项",
+    ],
+    "capability-routing.md": [
+        "Preferred owner（可用时）",
+        "同一动作只设一个 primary",
+        "Preferred owner 不可用时",
     ],
     "output-forms.md": [
         "已有执行许可时连续推进 `SAFE_DIRECT`",
@@ -383,7 +389,6 @@ def validate_package_routing_cases(
         errors.append(f"tests/routing_cases.json: missing positive cases for {missing_primary}")
     if composite_count < 2:
         errors.append("tests/routing_cases.json: expected at least two composite routing cases")
-
     missing_negative = sorted(skill_names - forbidden_coverage)
     if missing_negative:
         errors.append(
@@ -391,6 +396,47 @@ def validate_package_routing_cases(
             f"{missing_negative}"
         )
 
+
+def validate_capability_routing_cases(
+    repo_root: Path,
+    skill_names: set[str],
+    errors: list[str],
+) -> None:
+    cases_path = repo_root / "tests" / "capability_routing_cases.json"
+    if not cases_path.exists():
+        errors.append("tests/capability_routing_cases.json: missing")
+        return
+    try:
+        cases = json.loads(read_text(cases_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"tests/capability_routing_cases.json: invalid JSON: {exc}")
+        return
+
+    routing_text = read_text(
+        repo_root / "skills" / "engineering" / "ccdawn-brt" / "references" / "capability-routing.md"
+    )
+    seen_ids: set[str] = set()
+    for index, case in enumerate(cases if isinstance(cases, list) else []):
+        label = f"tests/capability_routing_cases.json[{index}]"
+        if not isinstance(case, dict):
+            errors.append(f"{label}: expected an object")
+            continue
+        case_id = case.get("id", "")
+        prompt = case.get("prompt", "")
+        preferred = case.get("preferred", "")
+        fallback = case.get("fallback", "")
+        if not case_id or case_id in seen_ids:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen_ids.add(case_id)
+        if not prompt or not contains_cjk(prompt):
+            errors.append(f"{label}: prompt must be Chinese-first")
+        if not preferred or f"`{preferred}`" not in routing_text:
+            errors.append(f"{label}: preferred owner '{preferred}' missing from capability routing")
+        if fallback not in skill_names:
+            errors.append(f"{label}: fallback must be a packaged skill, found '{fallback}'")
+
+    if not isinstance(cases, list) or len(cases) < 10:
+        errors.append("tests/capability_routing_cases.json: expected at least ten capability cases")
 
 def validate_skill(
     repo_root: Path,
@@ -768,6 +814,7 @@ def main() -> int:
     for skill_dir in skill_dirs:
         validate_skill(repo_root, skill_dir, errors, warnings)
     validate_catalog(repo_root, skill_dirs, errors)
+    validate_capability_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
 
     if errors:
         print("CCDawn skill package validation failed:")
