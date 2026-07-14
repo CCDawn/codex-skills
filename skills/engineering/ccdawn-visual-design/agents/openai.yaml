@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn 视觉设计"
+  short_description: "建立符合产品语境的品牌视觉方向和可实施界面语言"
+  default_prompt: "使用 $ccdawn-visual-design 用中文建立当前界面的视觉方向，并输出可实施的设计契约。"

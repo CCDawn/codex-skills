@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 在授权范围内修改共享 token、主题、组件、文档/Storybook、映射和必要测试；不顺带重新设计产品页面或改变无关业务行为。
 - Success Evidence: token/类型/组件测试、代表性消费者验证、主题和 variants 状态检查、浏览器截图或 Figma/code 映射证据，以及迁移兼容性结果。
 - Stop Condition: 品牌或产品方向未定、事实源所有权冲突、破坏性迁移缺少授权、消费者范围不可界定，或设计工具权限/环境阻止关键验证。
-- Route Out: 产品或视觉方向转 `ccdawn-ui-design`；页面实施转 `ccdawn-frontend-engineering`；系统审查转 `ccdawn-ui-review`；真实外部库决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
+- Route Out: 产品交互方向转 `ccdawn-ui-design`；品牌与视觉语言转 `ccdawn-visual-design`；页面实施转 `ccdawn-frontend-engineering`；系统审查转 `ccdawn-ui-review`；真实外部库决策转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；阻塞回 `ccdawn-brt`。
 
 ## 统一调用契约
 

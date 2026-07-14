@@ -2,6 +2,7 @@
 
 - **[ccdawn-brt](./ccdawn-brt/SKILL.md)** - Capability-aware entrypoint that trusts model reasoning and adds only the constraints, artifacts, and routes that prevent concrete errors.
 - **[ccdawn-ui-design](./ccdawn-ui-design/SKILL.md)** - UI/UX design, interaction-state, responsive, accessibility, and browser-based visual QA owner.
+- **[ccdawn-visual-design](./ccdawn-visual-design/SKILL.md)** - Context-aware brand expression, typography, color, composition, imagery, iconography, and motion direction.
 - **[ccdawn-ui-review](./ccdawn-ui-review/SKILL.md)** - Findings-first review of existing UI flows, visual hierarchy, states, responsive behavior, accessibility, and runtime evidence.
 - **[ccdawn-design-system](./ccdawn-design-system/SKILL.md)** - Cross-consumer design token, theme, component API, variant, and Figma-to-code governance with staged migration.
 - **[ccdawn-frontend-engineering](./ccdawn-frontend-engineering/SKILL.md)** - Production frontend implementation owner for aligned UI contracts, interaction states, responsive behavior, accessibility, and runtime evidence.

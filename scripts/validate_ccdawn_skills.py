@@ -81,6 +81,7 @@ TOKEN_BUDGETS = {
     "ccdawn-thread-coordination": 1300,
     "ccdawn-ui-design": 1650,
     "ccdawn-ui-review": 1350,
+    "ccdawn-visual-design": 1500,
 }
 
 BRT_REFERENCE_BUDGETS = {
@@ -325,6 +326,11 @@ def validate_skill(
         for marker in ["## 系统闸门", "## 事实源与契约", "## 渐进迁移", "多个消费者", "Figma/code"]:
             if marker not in text:
                 errors.append(f"{label}: design-system owner missing marker '{marker}'")
+
+    if name == "ccdawn-visual-design":
+        for marker in ["## 语境判断", "## 视觉契约", "产品类型", "一个有依据的推荐方向", "reduced-motion"]:
+            if marker not in text:
+                errors.append(f"{label}: visual-design owner missing marker '{marker}'")
 
     if name == "ccdawn-score-loop":
         for marker in ["## 实验 owner 独占", "不是 TDD RED", "smallestDecisiveEvaluation", "## 研究回传契约"]:

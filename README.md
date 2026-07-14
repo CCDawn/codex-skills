@@ -9,7 +9,7 @@
 
 **让 Codex 先理解你，再决定怎么做。**
 
-26 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
+27 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -76,6 +76,7 @@ sh ./install.sh
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
+- [`ccdawn-visual-design`](skills/engineering/ccdawn-visual-design/SKILL.md)：建立符合产品语境的品牌表达、视觉方向和可实施界面语言。
 - [`ccdawn-ui-review`](skills/engineering/ccdawn-ui-review/SKILL.md)：使用用户任务和浏览器证据审查已有界面，并输出按影响排序的 findings。
 - [`ccdawn-design-system`](skills/engineering/ccdawn-design-system/SKILL.md)：治理跨组件 token、主题、variants、共享组件和 Figma/code 一致性。
 - [`ccdawn-frontend-engineering`](skills/engineering/ccdawn-frontend-engineering/SKILL.md)：把已确定的界面契约实现为生产级前端代码并做运行时验证。
@@ -126,6 +127,9 @@ sh ./install.sh
 
 - **`ccdawn-ui-design`**
   UI/UX 专项 owner，负责信息层级、交互状态、响应式、无障碍和浏览器视觉验证；机械前端小改不会自动升级成设计流程。
+
+- **`ccdawn-visual-design`**
+  视觉方向 owner，根据产品、品牌和受众决定字体、色彩、构图、图像、图标和动效语言，避免脱离语境的模板化 UI。
 
 - **`ccdawn-ui-review`**
   已有界面审查 owner，以真实用户任务和浏览器证据检查体验、视觉层级、状态、响应式、无障碍和设计系统一致性。
@@ -245,6 +249,7 @@ skills/
     ccdawn-development-cleanup/
     ccdawn-brt/
     ccdawn-ui-design/
+    ccdawn-visual-design/
     ccdawn-ui-review/
     ccdawn-design-system/
     ccdawn-frontend-engineering/
