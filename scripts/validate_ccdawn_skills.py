@@ -135,6 +135,22 @@ HOT_ROUTE_EXTERNAL_CANDIDATES = {
     "webapp-testing",
 }
 
+UI_ROUTE_OWNERS = {
+    "ccdawn-ui-design",
+    "ccdawn-visual-design",
+    "ccdawn-frontend-engineering",
+    "ccdawn-design-system",
+    "ccdawn-ui-review",
+}
+
+UI_METADATA_FORBIDDEN_TERMS = {
+    "ccdawn-ui-design": ["实施或审查"],
+    "ccdawn-visual-design": ["审查当前界面", "实现当前前端"],
+    "ccdawn-frontend-engineering": ["审查当前界面", "建立当前界面的视觉方向"],
+    "ccdawn-design-system": ["审查当前界面", "建立当前界面的视觉方向"],
+    "ccdawn-ui-review": ["实现当前前端", "建立当前界面的视觉方向"],
+}
+
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
@@ -212,6 +228,87 @@ def validate_ccdawn_route_references(
             f"unresolved CCDawn route '{missing_name}' referenced by {locations}; "
             "package the skill or remove the route"
         )
+
+
+def validate_ui_routing_cases(
+    repo_root: Path,
+    skill_names: set[str],
+    errors: list[str],
+) -> None:
+    cases_path = repo_root / "tests" / "ui_routing_cases.json"
+    if not cases_path.exists():
+        errors.append("tests/ui_routing_cases.json: missing")
+        return
+
+    try:
+        cases = json.loads(read_text(cases_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"tests/ui_routing_cases.json: invalid JSON: {exc}")
+        return
+
+    if not isinstance(cases, list) or not cases:
+        errors.append("tests/ui_routing_cases.json: expected a non-empty list")
+        return
+
+    seen_ids: set[str] = set()
+    primary_coverage: set[str] = set()
+    forbidden_coverage: set[str] = set()
+    for index, case in enumerate(cases):
+        label = f"tests/ui_routing_cases.json[{index}]"
+        if not isinstance(case, dict):
+            errors.append(f"{label}: expected an object")
+            continue
+
+        case_id = case.get("id", "")
+        prompt = case.get("prompt", "")
+        primary = case.get("primary", "")
+        support = case.get("support", [])
+        forbidden = case.get("forbidden_primary", [])
+
+        if not case_id or case_id in seen_ids:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen_ids.add(case_id)
+        if not prompt or not contains_cjk(prompt):
+            errors.append(f"{label}: prompt must be Chinese-first")
+        if primary not in skill_names:
+            errors.append(f"{label}: unknown primary owner '{primary}'")
+        else:
+            primary_coverage.add(primary)
+        if not isinstance(support, list) or len(support) > 1:
+            errors.append(f"{label}: support must be a list with at most one owner")
+            support = []
+        if not isinstance(forbidden, list) or not forbidden:
+            errors.append(f"{label}: forbidden_primary must be a non-empty list")
+            forbidden = []
+        for owner in support + forbidden:
+            if owner not in skill_names:
+                errors.append(f"{label}: unknown referenced owner '{owner}'")
+        if primary in forbidden:
+            errors.append(f"{label}: primary owner cannot also be forbidden")
+        forbidden_coverage.update(forbidden)
+
+    missing_primary = sorted(UI_ROUTE_OWNERS - primary_coverage)
+    if missing_primary:
+        errors.append(f"tests/ui_routing_cases.json: missing positive cases for {missing_primary}")
+    missing_negative = sorted(UI_ROUTE_OWNERS - forbidden_coverage)
+    if missing_negative:
+        errors.append(f"tests/ui_routing_cases.json: missing negative cases for {missing_negative}")
+
+    routing_text = read_text(
+        repo_root / "skills" / "engineering" / "ccdawn-brt" / "references" / "routing-practice.md"
+    )
+    for owner in sorted(UI_ROUTE_OWNERS):
+        if f"`{owner}`" not in routing_text:
+            errors.append(f"ccdawn-brt routing-practice: missing UI route owner '{owner}'")
+
+        metadata_path = repo_root / "skills" / "engineering" / owner / "agents" / "openai.yaml"
+        metadata = read_text(metadata_path) if metadata_path.exists() else ""
+        for forbidden_term in UI_METADATA_FORBIDDEN_TERMS.get(owner, []):
+            if forbidden_term in metadata:
+                errors.append(
+                    f"{metadata_path.relative_to(repo_root)}: stale overlapping UI route term "
+                    f"'{forbidden_term}'"
+                )
 
 
 def validate_skill(
@@ -469,7 +566,7 @@ def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str])
                 if extra:
                     errors.append(f".claude-plugin/plugin.json: extra skills {extra}")
 
-    for readme_name in ["README.md", "README.zh-CN.md"]:
+    for readme_name in ["README.md", "README.zh-CN.md", "README.en.md"]:
         readme_path = repo_root / readme_name
         if not readme_path.exists():
             errors.append(f"{readme_name}: missing")
@@ -533,6 +630,7 @@ def validate_catalog(repo_root: Path, skill_dirs: list[Path], errors: list[str])
             )
 
     validate_ccdawn_route_references(repo_root, set(skill_names), errors)
+    validate_ui_routing_cases(repo_root, set(skill_names), errors)
 
 
 def main() -> int:

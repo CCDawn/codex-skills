@@ -9,7 +9,7 @@
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 23 Agent Skills for intent alignment, dynamic routing, multi-thread coordination, lightweight development, development cleanup, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 27 Agent Skills for intent alignment, dynamic routing, multi-thread coordination, lightweight development, development cleanup, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
@@ -74,6 +74,10 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md): evidence-driven diagnosis, bounded repair, and verification.
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md): risk-ranked PR and diff review with merge-readiness evidence.
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md): UI/UX direction, responsive behavior, accessibility, and browser visual QA.
+- [`ccdawn-visual-design`](skills/engineering/ccdawn-visual-design/SKILL.md): context-aware brand expression, typography, color, composition, imagery, and motion direction.
+- [`ccdawn-frontend-engineering`](skills/engineering/ccdawn-frontend-engineering/SKILL.md): production implementation of accepted UI contracts with runtime evidence.
+- [`ccdawn-ui-review`](skills/engineering/ccdawn-ui-review/SKILL.md): findings-first review of existing interfaces using user tasks and browser evidence.
+- [`ccdawn-design-system`](skills/engineering/ccdawn-design-system/SKILL.md): shared token, theme, component API, variant, and Figma-to-code governance.
 - [`ccdawn-ai-research-loop`](skills/research/ccdawn-ai-research-loop/SKILL.md): baseline reproduction, hypotheses, experiments, ablations, and research synthesis.
 - [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md): reuse research for complex feature decisions.
 
@@ -88,6 +92,10 @@ The repository installer targets `~/.codex/skills` by default and avoids install
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)
 - [`ccdawn-project-review`](skills/engineering/ccdawn-project-review/SKILL.md)
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)
+- [`ccdawn-visual-design`](skills/engineering/ccdawn-visual-design/SKILL.md)
+- [`ccdawn-frontend-engineering`](skills/engineering/ccdawn-frontend-engineering/SKILL.md)
+- [`ccdawn-ui-review`](skills/engineering/ccdawn-ui-review/SKILL.md)
+- [`ccdawn-design-system`](skills/engineering/ccdawn-design-system/SKILL.md)
 - [`ccdawn-feature-reuse-research`](skills/engineering/ccdawn-feature-reuse-research/SKILL.md)
 - [`ccdawn-planning`](skills/engineering/ccdawn-planning/SKILL.md)
 - [`ccdawn-task-splitting`](skills/engineering/ccdawn-task-splitting/SKILL.md)
