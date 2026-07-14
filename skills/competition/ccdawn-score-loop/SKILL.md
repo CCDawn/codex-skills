@@ -31,8 +31,8 @@ This is a generic template. A project-specific profile must define the metric, c
 
 - score regression、候选分数下降、假设被拒、online neutral/worse 都是实验 gate 结果，不是 TDD RED，也不代表代码 bug。
 - 实验使用 `BASELINE / CANDIDATE / DELTA / PROMOTE / REJECT / HOLD`，不要用 RED/GREEN 描述方向。
-- 只有发现预期行为明确的工程缺陷，例如 metric 计算、解析、数据 schema、seed、shape、NaN、打包或评测脚本错误，才临时路由到 `ccdawn-bdd-tdd-development`。
-- 临时工程修复必须写清确定性行为，修复并验证后返回原 baseline/lane；TDD GREEN 只能证明工具行为正确，不能证明实验候选应晋升。
+- 只有发现工程缺陷，例如 metric 计算、解析、数据 schema、seed、shape、NaN、打包或评测脚本错误，才临时路由到 `ccdawn-bug-review`；其内部可按风险使用测试锚点。
+- 临时工程修复必须写清确定性行为，修复并验证后返回原 baseline/lane；测试 GREEN 只能证明工具行为正确，不能证明实验候选应晋升。
 - 文件数量、跨模块、运行失败或分数回退本身都不能把整个实验升级成 BDD/TDD。
 
 ## 统一调用契约

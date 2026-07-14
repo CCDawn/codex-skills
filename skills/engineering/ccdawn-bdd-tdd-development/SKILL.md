@@ -1,6 +1,6 @@
 ---
 name: ccdawn-bdd-tdd-development
-description: Use when a selected CCDawn subtask has meaningful behavior, regression, state, data, security, migration, public-contract, or cross-module risk that needs a failing test before implementation; simple or mechanical work should stay with its current owner and use targeted verification.
+description: Use when an already-defined new behavior or high-risk implementation contract needs a failing test before implementation, or the user explicitly requests TDD; diagnosed bugs stay with ccdawn-bug-review, while simple or mechanical work uses targeted verification.
 license: MIT
 ---
 
@@ -8,11 +8,11 @@ license: MIT
 
 ## 目标
 
-只对已选中的高回归风险工程子任务使用最小 RED/GREEN 闭环，不生成仪式性文档、逐步旁白或代理审查链。
+只对已明确的新行为或高风险实现契约使用最小 RED/GREEN 闭环，不承担未知根因诊断，不生成仪式性文档、逐步旁白或代理审查链。
 
 ## BRT interface
 
-- Context Boundary: 当前行为、owned surface、保护边界、失败证据和验证命令。
+- Context Boundary: 已确定的预期行为、owned surface、保护边界、测试锚点和验证命令。
 - Output Contract: 最小实现、RED/GREEN 证据、相关验证和剩余风险。
 - Allowed Action: 只改证明当前行为所需的生产代码与测试，不扩 scope。
 - Success Evidence: RED 证明缺失/回归，GREEN 证明实现，相关回归检查通过。
@@ -27,6 +27,8 @@ license: MIT
 ## 模式闸门
 
 按子任务判断，不给整个请求贴 TDD 标签。机械替换、样式/文案、普通配置、生成代码、小适配，或已有验证足够时直接轻量实现。
+
+Bug、异常、失败测试、构建失败或性能症状仍需寻找根因时，Primary owner 是 `ccdawn-bug-review`；即使最终使用 RED/GREEN，也不二次加载本 skill。只有预期行为和 owning surface 已明确的新增/变更契约，或用户明确要求 TDD，才由本 skill 主责。
 
 分数下降、metric 未提升、candidate reject 或 online worse 是实验结果，不是 TDD RED，返回 `ccdawn-score-loop`。只有预期输入输出明确的 harness/parser/schema/seed/shape/NaN/打包 bug 留在这里。
 

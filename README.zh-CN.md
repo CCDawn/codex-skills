@@ -13,7 +13,7 @@
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
-- 简单任务直接实现和验证；只有真实风险存在时才升级到规划、拆分或紧凑 TDD。
+- 简单任务直接实现和验证；只有真实风险存在时才升级到规划、内嵌任务图或紧凑 TDD。
 
 [English](README.en.md) | **简体中文**
 
@@ -147,7 +147,7 @@ sh ./install.sh
   只在真实设计分叉、高风险顺序或跨边界交接需要可复用方案时触发；存在独立 owner、依赖或验证边界时在同一方案内生成最小任务图，否则由当前 owner 直接实施。
 
 - **`ccdawn-bdd-tdd-development`**
-  仅对复杂、高回归风险子任务使用紧凑 TDD；复用已有 RED、运行窄验证，默认不派发逐任务子代理和 reviewer 链。
+  仅对预期已明确的新行为或高风险实现契约使用紧凑 TDD；未知根因和 bug 修复仍由 Bug Review 全程持有。
 
 - **`ccdawn-completion-summary`**
   只为跨阶段综合、恢复、正式交接、PR/发布前证据生成持久总结；普通实现由当前 owner 直接收口。
@@ -165,7 +165,7 @@ sh ./install.sh
   整仓或子系统精简审计 skill，用来形成证据化复杂度 findings 和按风险排序的精简队列。
 
 - **`ccdawn-bug-review`**
-  紧凑 bug owner，直接完成证据收集、根因定位、契约内最小修复和验证；只有深层来源才加载 `root-cause-tracing`。
+  紧凑 bug owner，直接完成证据收集、根因定位、最小修复和验证；必要 RED/GREEN 作为内部测试锚点，不再切换 TDD owner。
 
 - **`ccdawn-evaluation`**
   CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。

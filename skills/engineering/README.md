@@ -11,12 +11,12 @@
 - **[ccdawn-development-cleanup](./ccdawn-development-cleanup/SKILL.md)** - Post-development residue, merged local branch, disposable worktree, and completed claim cleanup.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research only when external or in-project candidates can materially change a complex feature plan.
 - **[ccdawn-planning](./ccdawn-planning/SKILL.md)** - Implementation planning after aligned requirements.
-- **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Compact TDD for selected high-risk behavior, reusing RED evidence and avoiding per-task agent/reviewer chains.
+- **[ccdawn-bdd-tdd-development](./ccdawn-bdd-tdd-development/SKILL.md)** - Compact TDD for already-defined new behavior or high-risk implementation contracts; it does not re-own diagnosed bugs.
 - **[ccdawn-completion-summary](./ccdawn-completion-summary/SKILL.md)** - Evidence-backed completion checks and stage summaries.
 - **[ccdawn-pr-review](./ccdawn-pr-review/SKILL.md)** - Explicit PR, branch, commit-range, or diff review against requirements, evidence, regression risk, and merge readiness.
 - **[ccdawn-project-review](./ccdawn-project-review/SKILL.md)** - Repository, architecture, technical debt, test gap, and project health review.
 - **[ccdawn-simplification-review](./ccdawn-simplification-review/SKILL.md)** - On-demand diff review focused on evidence-backed removal of unnecessary complexity.
 - **[ccdawn-simplification-audit](./ccdawn-simplification-audit/SKILL.md)** - On-demand repository audit for dependency bloat, dead flexibility, duplicate paths, and removable abstractions.
-- **[ccdawn-bug-review](./ccdawn-bug-review/SKILL.md)** - Compact bug owner for evidence-based root-cause diagnosis, bounded repair, and verification.
+- **[ccdawn-bug-review](./ccdawn-bug-review/SKILL.md)** - End-to-end bug owner for root-cause diagnosis, bounded repair, optional internal test anchors, and verification.
 - **[ccdawn-evaluation](./ccdawn-evaluation/SKILL.md)** - CCDawn evaluation adapter used only after checking more specific review, debug, planning, verification, feedback, or goal skills.
 - **[ccdawn-goal-loop](./ccdawn-goal-loop/SKILL.md)** - Explicit persistent goal contract with bounded iteration, evidence checks, and stop conditions.

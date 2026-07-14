@@ -476,12 +476,12 @@ def validate_skill(
                 errors.append(f"{label}: BRT missing core marker '{marker}'")
 
     if name == "ccdawn-bdd-tdd-development":
-        for marker in ["## 紧凑 TDD", "现有失败测试或稳定复现可直接作为 RED", "默认不派发子代理", "分数下降"]:
+        for marker in ["## 紧凑 TDD", "只有预期行为和 owning surface 已明确", "默认不派发子代理", "分数下降"]:
             if marker not in text:
                 errors.append(f"{label}: compact TDD profile missing marker '{marker}'")
 
     if name == "ccdawn-bug-review":
-        for marker in ["不要求展示固定阶段", "根因状态", "只有 `CONFIRMED`", "当前 owner 直接修复并验证"]:
+        for marker in ["不要求展示固定阶段", "根因状态", "只有 `CONFIRMED`", "Bug 修复不转交 TDD owner"]:
             if marker not in text:
                 errors.append(f"{label}: compact debugging owner missing marker '{marker}'")
 

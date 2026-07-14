@@ -24,7 +24,7 @@
 | 跨组件 token、主题、variants、共享组件 API 或 Figma/code 一致性 | `ccdawn-design-system` | COMPACT/FULL | 系统契约、渐进迁移与消费者证据 |
 | 复杂功能存在实质性的外部复用决策 | `ccdawn-feature-reuse-research` | COMPACT | 复用/借鉴/自建判断 |
 | 目标已对齐且需要真实设计选择、迁移、跨边界契约或独立任务图 | `ccdawn-planning` | COMPACT/FULL | 最小实施方案；必要时内含 TASK_GRAPH |
-| 确定性行为回归或高风险工程契约需要 RED | `ccdawn-bdd-tdd-development` | COMPACT | 紧凑 RED/GREEN 实现 |
+| 已明确的新行为/实现契约需要 RED，或用户明确要求 TDD | `ccdawn-bdd-tdd-development` | COMPACT | 紧凑 RED/GREEN 实现 |
 | AI/ML baseline、假设、消融、方向选择 | `ccdawn-ai-research-loop` | COMPACT/FULL | 研究闭环或下一实验 |
 | 单条 benchmark/score/baseline promotion lane | `ccdawn-score-loop` | COMPACT/FULL | candidate 评估与晋升结论 |
 | Huawei Algorithm Challenge 37 NSLB 项目 score lane | `ccdawn-huawei-nslb-score-loop` | COMPACT/FULL | 项目命令与 ledger 适配后的 score loop |
@@ -46,6 +46,7 @@
 - 单页面或单组件问题不升级为 design system；只有共享事实源、多个消费者或迁移契约成为主要问题时才进入该 owner。
 - UI design 决定任务、结构和交互；visual design 决定品牌与视觉表达。普通产品 UI 不因“更好看”自动加载两个 owner。
 - 具体 bug 交给 bug owner；整仓测试健康度和架构风险交给 project review。
+- Bug Review 持有从根因到修复的完整闭环；必要 RED/GREEN 是其内部测试锚点，不再二次加载 TDD skill。TDD 只主责已明确的新行为或实现契约。
 - planning 解决设计分叉，并仅在真实独立边界存在时内嵌 `TASK_GRAPH`；`NO_SPLIT` 不产生额外阶段。
 - 实验 metric 未提升不是 TDD RED；确定性 harness/parser/schema bug 才进入工程 TDD。
 - UI 文件的机械修改可留在 FAST_PATH；产品、交互或视觉结果未定时由 UI design 主责，结果已定且主要工作是生产实现时由 frontend engineering 主责。

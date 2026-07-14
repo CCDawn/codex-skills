@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 用户要求修复且边界清楚时可直接读取、复现、修改和验证；只要求审查时保持只读。
 - Success Evidence: 失败可复现或有等价证据，根因与修复存在因果联系，目标验证通过且未越界。
 - Stop Condition: 缺少必要对象/权限、根因仍不稳定且写入会扩大误改、需要破坏性动作、需求冲突或风险越过当前授权。
-- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-bdd-tdd-development`、`ccdawn-planning`、`ccdawn-development-cleanup`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-planning`、`ccdawn-development-cleanup`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -33,10 +33,16 @@ license: MIT
 5. 用户已授权修复且根因、边界、回滚和验证清楚时，直接做最小修复；不为流程形式停下确认。
 6. 运行能证明因果关系的窄验证，再按影响面决定是否扩展。区分实现失败、测试意图过期、环境失败和需求不一致。
 
+## Bug 测试锚点
+
+Bug 修复不转交 TDD owner。已有失败测试或稳定复现直接作为 RED；若回归风险显著且没有自动化证据，在当前 owner 内补一个最小行为测试，确认它因目标缺陷失败后修复并得到 GREEN。局部、可逆且现有验证足够时直接修复，不为形式制造 RED。
+
+测试只证明已确认的预期行为，不替代根因诊断。测试意图过期时标记 `TEST_ISSUE`，需求不一致时标记 `REQUIREMENT_MISMATCH`，不得为了 GREEN 固化旧约束。
+
 ## 流程重量
 
 - 简单、局部、可逆问题：当前 owner 直接修复并验证，不 planning、不拆分、不创建 worktree。
-- 确定性行为存在明显回归、状态/数据/权限/迁移或公共契约风险：使用 `ccdawn-bdd-tdd-development` 的紧凑测试锚点。
+- 确定性行为存在明显回归、状态/数据/权限/迁移或公共契约风险：由当前 Bug owner 使用紧凑测试锚点，不发生 owner 切换。
 - 真实设计分叉、跨系统迁移或修复边界无法在当前上下文稳定表达：进入 `ccdawn-planning`。
 - 多文件或复杂调用链本身不触发额外流程；能由一个根因修复统一解决就保持一个实现单元。
 
