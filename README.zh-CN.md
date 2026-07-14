@@ -282,7 +282,7 @@ scripts/
 py -3 scripts\install_codex_library.py
 ```
 
-安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`：只把已识别 Superpowers skill 的 `SKILL.md` 改名为 `SKILL.md.ccdawn-disabled`，不删除目录或内容。
+安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`：把已识别的 Superpowers 主流程、`writing-skills` 和社区强制工作流入口改名为 `SKILL.md.ccdawn-disabled`，不删除目录或内容。
 
 恢复这些入口：
 

@@ -7,6 +7,7 @@ from pathlib import Path
 
 SUPERPOWERS_ENTRYPOINTS = (
     "using-superpowers",
+    "using-skills-community",
     "brainstorming",
     "test-driven-development",
     "using-git-worktrees",
@@ -19,6 +20,7 @@ SUPERPOWERS_ENTRYPOINTS = (
     "requesting-code-review",
     "systematic-debugging",
     "verification-before-completion",
+    "writing-skills",
 )
 DISABLED_SKILL_FILENAME = "SKILL.md.ccdawn-disabled"
 
