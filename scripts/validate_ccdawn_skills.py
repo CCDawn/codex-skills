@@ -78,6 +78,7 @@ TOKEN_BUDGETS = {
     "ccdawn-task-splitting": 1350,
     "ccdawn-thread-coordination": 1300,
     "ccdawn-ui-design": 1650,
+    "ccdawn-ui-review": 1350,
 }
 
 BRT_REFERENCE_BUDGETS = {
@@ -307,6 +308,11 @@ def validate_skill(
         for marker in ["## 界面契约", "响应式边界", "浏览器验证", "现有设计系统"]:
             if marker not in text:
                 errors.append(f"{label}: UI owner missing marker '{marker}'")
+
+    if name == "ccdawn-ui-review":
+        for marker in ["findings 优先", "## 审查面", "真实用户任务", "浏览器能力", "ccdawn-frontend-engineering"]:
+            if marker not in text:
+                errors.append(f"{label}: UI review owner missing marker '{marker}'")
 
     if name == "ccdawn-frontend-engineering":
         for marker in ["## 生产实现", "关键状态", "响应式", "真实浏览器", "ccdawn-ui-design"]:

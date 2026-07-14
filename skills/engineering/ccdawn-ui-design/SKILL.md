@@ -1,6 +1,6 @@
 ---
 name: ccdawn-ui-design
-description: Use when a CCDawn task materially involves UI/UX direction, information hierarchy, interaction states, responsive behavior, accessibility, frontend visual review, or browser-based visual QA; do not use for backend work or mechanical frontend edits that introduce no design decision.
+description: Use when a CCDawn task needs a new or revised UI/UX direction, information architecture, interaction model, responsive behavior, accessibility decision, or implementable interface contract; do not use for review-only findings, production implementation of an accepted contract, backend work, or mechanical frontend edits.
 license: MIT
 ---
 
@@ -13,11 +13,11 @@ license: MIT
 ## BRT interface
 
 - Context Boundary: 用户目标、目标页面/组件、现有设计系统、相邻界面、实现技术栈和可运行环境。
-- Output Contract: 界面契约、设计建议、实现结果或按严重度排序的视觉审查 findings。
+- Output Contract: 可实施的界面契约、设计方向或必要的设计建议。
 - Allowed Action: 在 BRT 授权范围内检查或修改 UI owning surface；不顺带重做品牌、后端协议或无关页面。
 - Success Evidence: 浏览器截图、DOM/布局检查、目标视口验证、交互状态检查，或无法渲染时的明确限制。
 - Stop Condition: 目标 surface 不明、品牌/设计系统冲突、关键产品取舍未定、应用不可运行且代码证据不足，或修改将越过授权边界。
-- Route Out: 界面契约确定后的生产实现转 `ccdawn-frontend-engineering`；复杂可复用组件转 `ccdawn-feature-reuse-research`；验证后按候选转 `ccdawn-development-cleanup`；PR 正确性审查转 `ccdawn-pr-review`；阻塞则回 `ccdawn-brt`。
+- Route Out: 界面契约确定后的生产实现转 `ccdawn-frontend-engineering`；已有界面审查转 `ccdawn-ui-review`；复杂可复用组件转 `ccdawn-feature-reuse-research`；验证后的真实残留转 `ccdawn-development-cleanup`；PR 正确性审查转 `ccdawn-pr-review`；阻塞则回 `ccdawn-brt`。
 
 ## 统一调用契约
 
