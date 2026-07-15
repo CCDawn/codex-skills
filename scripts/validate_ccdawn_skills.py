@@ -739,6 +739,7 @@ def validate_skill(
             "禁止递归派发",
             "向用户询问是否创建",
             "不得因此停止当前可推进工作",
+            "非 owner 停止自身冲突写入",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
