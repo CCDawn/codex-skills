@@ -1,0 +1,44 @@
+[
+  {
+    "id": "mature-workflow-engine",
+    "prompt": "项目没有工作流基础，现在要增加可视化编排、持久化、回放和插件节点",
+    "research": true,
+    "signal": "mature-ecosystem-and-cross-module-subsystem",
+    "route_after": "original-owner-or-planning"
+  },
+  {
+    "id": "important-new-dependency",
+    "prompt": "实现多人协同编辑，可能需要引入 CRDT 依赖并改变同步架构，先评估成熟项目",
+    "research": true,
+    "signal": "important-dependency-and-architecture-impact",
+    "route_after": "original-owner-or-planning"
+  },
+  {
+    "id": "explicit-github-reuse",
+    "prompt": "先去 GitHub 和官方示例寻找可复用的解析器，再决定复用、适配还是自研",
+    "research": true,
+    "signal": "explicit-external-reuse-request",
+    "route_after": "original-owner-or-planning"
+  },
+  {
+    "id": "existing-local-form-pattern",
+    "prompt": "按照项目已有设置表单模式增加一个布尔字段，不新增依赖",
+    "research": false,
+    "signal": "stable-local-pattern",
+    "route_after": "original-owner"
+  },
+  {
+    "id": "small-bug-fix",
+    "prompt": "修复日期格式化函数的空值崩溃并运行现有测试",
+    "research": false,
+    "signal": "bounded-bug-fix",
+    "route_after": "original-owner"
+  },
+  {
+    "id": "explicit-from-scratch",
+    "prompt": "这是教学练习，请不要使用第三方项目或库，从零实现这个小型队列",
+    "research": false,
+    "signal": "user-excluded-external-reuse",
+    "route_after": "original-owner"
+  }
+]

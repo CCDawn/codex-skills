@@ -497,6 +497,44 @@ def validate_conditional_merge_cases(repo_root: Path, errors: list[str]) -> None
     if not isinstance(cases, list) or len(cases) < 5 or not has_positive or not has_negative:
         errors.append("tests/conditional_merge_cases.json: expected at least five positive/negative cases")
 
+
+def validate_feature_reuse_cases(repo_root: Path, errors: list[str]) -> None:
+    cases_path = repo_root / "tests" / "feature_reuse_cases.json"
+    if not cases_path.exists():
+        errors.append("tests/feature_reuse_cases.json: missing")
+        return
+    try:
+        cases = json.loads(read_text(cases_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"tests/feature_reuse_cases.json: invalid JSON: {exc}")
+        return
+
+    expected_fields = {"id", "prompt", "research", "signal", "route_after"}
+    seen_ids: set[str] = set()
+    has_positive = False
+    has_negative = False
+    for index, case in enumerate(cases if isinstance(cases, list) else []):
+        label = f"tests/feature_reuse_cases.json[{index}]"
+        if not isinstance(case, dict) or set(case) != expected_fields:
+            errors.append(f"{label}: expected fields {sorted(expected_fields)}")
+            continue
+        if not case["id"] or case["id"] in seen_ids:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen_ids.add(case["id"])
+        if not case["prompt"] or not contains_cjk(case["prompt"]):
+            errors.append(f"{label}: prompt must be Chinese-first")
+        if not isinstance(case["research"], bool):
+            errors.append(f"{label}: research must be boolean")
+        has_positive = has_positive or case["research"] is True
+        has_negative = has_negative or case["research"] is False
+        if not case["signal"] or case["route_after"] not in {
+            "original-owner",
+            "original-owner-or-planning",
+        }:
+            errors.append(f"{label}: invalid signal or route_after")
+    if not isinstance(cases, list) or len(cases) < 6 or not has_positive or not has_negative:
+        errors.append("tests/feature_reuse_cases.json: expected at least six positive/negative cases")
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -881,6 +919,7 @@ def main() -> int:
     validate_catalog(repo_root, skill_dirs, errors)
     validate_capability_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
     validate_conditional_merge_cases(repo_root, errors)
+    validate_feature_reuse_cases(repo_root, errors)
 
     if errors:
         print("CCDawn skill package validation failed:")
