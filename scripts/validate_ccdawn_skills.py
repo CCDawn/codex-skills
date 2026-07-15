@@ -40,6 +40,7 @@ BRT_CORE_MARKERS = [
     "DISPATCH_READ_ONLY",
     "DISPATCH_DISJOINT_WRITE",
     "COORDINATE_OVERLAP",
+    "Silent Conflict Triage",
 ]
 
 UNIFIED_CONTRACT_MARKERS = [
@@ -578,6 +579,35 @@ def validate_collaboration_dispatch_cases(repo_root: Path, errors: list[str]) ->
     if not isinstance(cases, list) or len(cases) < 6 or not (has_dispatch and has_none and has_create_prompt):
         errors.append(f"{label}: expected at least six cases covering dispatch, no dispatch, and create-thread prompt")
 
+
+def validate_conflict_triage_cases(repo_root: Path, errors: list[str]) -> None:
+    path = repo_root / "tests" / "conflict_triage_cases.json"
+    label = "tests/conflict_triage_cases.json"
+    try:
+        cases = json.loads(read_text(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{label}: cannot read valid JSON: {exc}")
+        return
+    allowed = {"SELF_NARROWED", "CONTINUE_NON_CONFLICTING", "WAIT_SILENTLY", "MESSAGE_REQUIRED", "REUSE_OPEN"}
+    seen: set[str] = set()
+    message_cases = 0
+    silent_cases = 0
+    for case in cases if isinstance(cases, list) else []:
+        if not isinstance(case, dict) or set(case) != {"id", "situation", "expected", "send_message"}:
+            errors.append(f"{label}: invalid case shape")
+            continue
+        if not case["id"] or case["id"] in seen:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen.add(case["id"])
+        if not contains_cjk(case["situation"]) or case["expected"] not in allowed:
+            errors.append(f"{label}: invalid situation or expected state")
+        if not isinstance(case["send_message"], bool):
+            errors.append(f"{label}: send_message must be boolean")
+        message_cases += case["send_message"] is True
+        silent_cases += case["send_message"] is False
+    if not isinstance(cases, list) or len(cases) < 6 or message_cases != 1 or silent_cases < 5:
+        errors.append(f"{label}: expected one message case and at least five silent cases")
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -743,6 +773,10 @@ def validate_skill(
             "thread/<agent-id>",
             "dispatch/<task-key>",
             "迟到结果先复核",
+            "Silent Conflict Triage",
+            "MESSAGE_REQUIRED",
+            "WAIT_SILENTLY",
+            "存在则复用，不重复发送",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
@@ -975,6 +1009,7 @@ def main() -> int:
     validate_conditional_merge_cases(repo_root, errors)
     validate_feature_reuse_cases(repo_root, errors)
     validate_collaboration_dispatch_cases(repo_root, errors)
+    validate_conflict_triage_cases(repo_root, errors)
 
     if errors:
         print("CCDawn skill package validation failed:")

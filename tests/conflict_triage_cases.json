@@ -1,0 +1,8 @@
+[
+  {"id":"broad-claim","situation":"对方 claim 覆盖整个前端，但当前只改独立文案文件。","expected":"SELF_NARROWED","send_message":false},
+  {"id":"non-conflicting-work","situation":"目标文件重叠，但当前还有不依赖该文件的任务可完成。","expected":"CONTINUE_NON_CONFLICTING","send_message":false},
+  {"id":"near-checkpoint","situation":"既有 owner 活跃且即将完成，当前任务可以短期等待。","expected":"WAIT_SILENTLY","send_message":false},
+  {"id":"read-only-overlap","situation":"两个 Agent 只读审查同一模块，没有写入和决策归属冲突。","expected":"SELF_NARROWED","send_message":false},
+  {"id":"critical-write-blocked","situation":"有效 owner 正在修改同一行为，当前关键路径必须写同一位置且无法绕开。","expected":"MESSAGE_REQUIRED","send_message":true},
+  {"id":"duplicate-open-coordination","situation":"相同参与者和重叠面已经存在 open coordination。","expected":"REUSE_OPEN","send_message":false}
+]
