@@ -1,0 +1,93 @@
+[
+  {
+    "id": "initial-actionable-finding",
+    "situation": "首次发现对方共享事件实现缺少幂等保护，证据会改变其实现和测试。",
+    "prior_state": "OPEN",
+    "expected": "SEND",
+    "message_type": "ADVICE_AVAILABLE"
+  },
+  {
+    "id": "aggregate-related-findings",
+    "situation": "同一轮审查已积累三个相互关联的遥测语义问题，并到达约定检查点。",
+    "prior_state": "BUFFERING",
+    "expected": "SEND",
+    "message_type": "ADVICE_AVAILABLE"
+  },
+  {
+    "id": "material-new-evidence",
+    "situation": "首次建议发出后，真实日志证明另一个独立回归会改变验证范围。",
+    "prior_state": "WAITING",
+    "expected": "SEND",
+    "message_type": "ADVICE_UPDATE"
+  },
+  {
+    "id": "correct-wrong-conclusion",
+    "situation": "新证据推翻此前缓存命中的判断，若不纠正会让对方错误放宽条件。",
+    "prior_state": "WAITING",
+    "expected": "SEND",
+    "message_type": "CORRECTION"
+  },
+  {
+    "id": "critical-path-evidence",
+    "situation": "只有对方掌握的改动后测试结果决定当前分支能否合并，关键路径已等待。",
+    "prior_state": "WAITING",
+    "expected": "SEND",
+    "message_type": "STATUS_REQUEST"
+  },
+  {
+    "id": "urgent-data-loss-risk",
+    "situation": "新证据表明对方即将执行会损坏数据的动作，必须立即更新建议，不能等待聚合。",
+    "prior_state": "WAITING",
+    "expected": "SEND",
+    "message_type": "ADVICE_UPDATE"
+  },
+  {
+    "id": "shared-contract-disagreement",
+    "situation": "双方对共享接口的兼容语义存在真实分歧，需要共同决定而非继续追加建议。",
+    "prior_state": "WAITING",
+    "expected": "DISCUSS",
+    "message_type": "DISCUSSION_REQUEST"
+  },
+  {
+    "id": "same-evidence-reworded",
+    "situation": "准备发送的内容只是把上一条证据换一种表述，没有改变影响或动作。",
+    "prior_state": "WAITING",
+    "expected": "SILENT",
+    "message_type": ""
+  },
+  {
+    "id": "repeat-safety-boundary",
+    "situation": "权限和范围没有变化，只想再次声明自己不会触碰运行时。",
+    "prior_state": "WAITING",
+    "expected": "SILENT",
+    "message_type": ""
+  },
+  {
+    "id": "nonblocking-status-chase",
+    "situation": "对方尚未回复，但当前工作不受阻，也没有新的证据或约定检查点。",
+    "prior_state": "WAITING",
+    "expected": "SILENT",
+    "message_type": ""
+  },
+  {
+    "id": "self-readable-information",
+    "situation": "需要的提交和测试状态可从当前仓库只读获取，不必向对方索要。",
+    "prior_state": "WAITING",
+    "expected": "SILENT",
+    "message_type": ""
+  },
+  {
+    "id": "premature-final-request",
+    "situation": "审查仍在继续且没有到达约定检查点，不应提前发送最终状态请求。",
+    "prior_state": "BUFFERING",
+    "expected": "SILENT",
+    "message_type": ""
+  },
+  {
+    "id": "recipient-accepted",
+    "situation": "对方已经回复接受建议并说明实施方式，当前没有新的实质证据。",
+    "prior_state": "WAITING",
+    "expected": "CLOSE",
+    "message_type": ""
+  }
+]

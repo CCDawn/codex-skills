@@ -612,6 +612,59 @@ def validate_conflict_triage_cases(repo_root: Path, errors: list[str]) -> None:
     if not {"DISCUSSION_REQUIRED", "PAUSE_REQUIRED"}.issubset(states):
         errors.append(f"{label}: must distinguish discussion from maximum-conflict pause")
 
+
+def validate_peer_advice_message_cases(repo_root: Path, errors: list[str]) -> None:
+    path = repo_root / "tests" / "peer_advice_message_cases.json"
+    label = "tests/peer_advice_message_cases.json"
+    try:
+        cases = json.loads(read_text(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{label}: cannot read valid JSON: {exc}")
+        return
+
+    allowed_expected = {"SEND", "DISCUSS", "SILENT", "CLOSE"}
+    allowed_types = {
+        "", "ADVICE_AVAILABLE", "ADVICE_UPDATE", "CORRECTION",
+        "STATUS_REQUEST", "DISCUSSION_REQUEST",
+    }
+    seen: set[str] = set()
+    expected_states: set[str] = set()
+    message_types: set[str] = set()
+    silent_cases = 0
+    for case in cases if isinstance(cases, list) else []:
+        required = {"id", "situation", "prior_state", "expected", "message_type"}
+        if not isinstance(case, dict) or set(case) != required:
+            errors.append(f"{label}: every case must use exactly {sorted(required)}")
+            continue
+        if not case["id"] or case["id"] in seen:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen.add(case["id"])
+        if not contains_cjk(case["situation"]) or not case["prior_state"]:
+            errors.append(f"{label}: situation must be Chinese-first and prior_state non-empty")
+        if case["expected"] not in allowed_expected or case["message_type"] not in allowed_types:
+            errors.append(f"{label}: invalid expected action or message type")
+        if case["expected"] in {"SILENT", "CLOSE"} and case["message_type"]:
+            errors.append(f"{label}: silent/close cases cannot send a message")
+        if case["expected"] in {"SEND", "DISCUSS"} and not case["message_type"]:
+            errors.append(f"{label}: send/discuss cases require a message type")
+        expected_states.add(case["expected"])
+        if case["message_type"]:
+            message_types.add(case["message_type"])
+        silent_cases += case["expected"] == "SILENT"
+
+    required_types = {
+        "ADVICE_AVAILABLE", "ADVICE_UPDATE", "CORRECTION",
+        "STATUS_REQUEST", "DISCUSSION_REQUEST",
+    }
+    if (
+        not isinstance(cases, list)
+        or len(cases) < 10
+        or silent_cases < 4
+        or not {"SEND", "DISCUSS", "SILENT", "CLOSE"}.issubset(expected_states)
+        or not required_types.issubset(message_types)
+    ):
+        errors.append(f"{label}: expected dynamic value, aggregation, correction, discussion, silence, and close coverage")
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -789,6 +842,12 @@ def validate_skill(
             "final 不索要回复",
             "PEER_CONTEXT_REVIEW",
             "ADVICE_AVAILABLE",
+            "ADVICE_UPDATE",
+            "CORRECTION",
+            "动态消息价值闸门",
+            "没有固定总数上限",
+            "自然 checkpoint",
+            "不定时轮询",
             "ACCEPT / ADAPT / DECLINE",
             "无 finding 不发消息",
         ]:
@@ -1024,6 +1083,7 @@ def main() -> int:
     validate_feature_reuse_cases(repo_root, errors)
     validate_collaboration_dispatch_cases(repo_root, errors)
     validate_conflict_triage_cases(repo_root, errors)
+    validate_peer_advice_message_cases(repo_root, errors)
 
     if errors:
         print("CCDawn skill package validation failed:")
