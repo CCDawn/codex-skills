@@ -781,7 +781,10 @@ def validate_skill(
             "PAUSE_REQUIRED",
             "WAIT_SILENTLY",
             "存在则复用，不重复发送",
-            "讨论默认优先于暂停",
+            "讨论优先于暂停",
+            "From Agent / From Task / To Agent / To Task / Reply To",
+            "ACK 回复 owner thread",
+            "final 不索要回复",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
