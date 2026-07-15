@@ -676,6 +676,8 @@ def validate_skill(
     if name == "ccdawn-thread-coordination":
         for marker in [
             "CONFLICT_PAUSE_REQUEST",
+            "`preflight`",
+            "`CLEAR/PEERS_NO_OVERLAP`",
             "`PAUSE_REQUEST` 不等于 `PAUSED`",
             "主动发送 `CONFLICT_RESOLVED`",
             "DISCUSSION_REQUEST",

@@ -26,7 +26,7 @@ license: MIT
 
 ## 接入与所有权
 
-用 `list_threads`/`read_thread` 核对真实 thread，再运行 registry `status` 和 `join`。只 claim 最小 scope；仅在 checkpoint、blocker、pause/resume、merge-ready 和完成时 `update`，不广播完整对话或日志。
+BRT 首次写入前调用只读 `preflight`；`CLEAR/PEERS_NO_OVERLAP` 返回原 owner，`OVERLAP` 才进入协调。随后用 `list_threads`/`read_thread` 核对 thread，运行 `status/join`。只 claim 最小 scope；仅在 checkpoint、blocker、pause/resume、merge-ready 和完成时 `update`。
 
 owner 顺序：用户指定 > 有效 claim/registry > 更早拥有模块的 Agent。仍有争议时冲突面只读并回 BRT。
 
@@ -55,9 +55,9 @@ pause 会产生 `resumePendingAgentIds` 恢复债务。`resolve` 不是闭环，
 
 hook/gate 失败先分为 `CHANGE_FAILURE / BASELINE_FAILURE / ENVIRONMENT_FAILURE / POLICY_FAILURE / UNKNOWN`。窄验证通过、diff 可审、失败已在干净 base 复现或证实与 diff 无关，且不涉及安全、secret、权限、迁移、发布合规或强制 gate，才标记 `MERGE_READY_CONDITIONAL`。
 
-- 环境修复只做一次 2-5 分钟的有界 probe；持续无输出或无新证据就停止，不让 owner 无限等待。
+- 环境修复只做一次 2-5 分钟 probe；无新证据就停止，不无限等待。
 - 优先跳过单个已证明无关的 hook（如 `SKIP=<hook-id>`）；`--no-verify` 仅在项目策略或用户明确允许时使用，并记录 hook、失败、base 证据和补验责任。
-- 条件提交不等于通过；integration owner 应用后补跑可用 gate/CI，失败回原 owner，成功才广播。
+- 条件提交不等于通过；integration owner 补跑 gate/CI，失败回原 owner，成功才广播。
 - 无法提交但 diff 已保留时，交给 integration owner 在干净 worktree 应用同一 patch；不得长期留作无人接管的 BLOCKED。
 
 已解决且会影响未来行动的决定，协调者才执行 `sync_project_memory.py --coordination-id <id>`；并行 worker 不写 tracked memory。

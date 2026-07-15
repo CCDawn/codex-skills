@@ -23,12 +23,14 @@ from coordination_model import (
     pause_agent,
     prune_registry,
     public_snapshot,
+    registry_path,
     register_agent,
     release_claim,
     resolve_coordination,
     respond_coordination,
     resume_agent,
     slugify,
+    scopes_overlap,
     take_over_coordination,
     update_agent,
 )
@@ -99,6 +101,73 @@ def command_status(project_root: Path, args: argparse.Namespace) -> int:
             f"resumePending={','.join(item.get('resumePendingAgentIds', [])) or '-'} topic={item.get('topic')}"
         )
     return 0
+
+
+def command_preflight(project_root: Path, args: argparse.Namespace) -> int:
+    path = registry_path(project_root)
+    if not path.exists():
+        payload = {"state": "CLEAR", "registryExists": False, "activePeers": [], "overlaps": []}
+        print_json(payload) if args.json else print("CLEAR: no coordination registry.")
+        return 0
+
+    registry = load_registry(project_root)
+    peers = [
+        item
+        for item in registry.get("agents", [])
+        if item.get("id") != args.agent_id and item.get("state") not in {"completed", "stale"}
+    ]
+    ignored_claims = {
+        item.get("id")
+        for item in registry.get("claims", [])
+        if args.agent_id and item.get("agentId") == args.agent_id
+    }
+    claim_overlaps = find_claim_conflicts(
+        registry,
+        None,
+        args.scope or [],
+        ignore_claim_ids=ignored_claims,
+    )
+    scope_overlaps = []
+    for peer in peers:
+        matches = sorted(
+            {
+                f"{requested} <-> {owned}"
+                for requested in args.scope or []
+                for owned in peer.get("scopes", [])
+                if scopes_overlap(requested, owned)
+            }
+        )
+        if matches:
+            scope_overlaps.append(
+                {"kind": "registered-scope", "agentId": peer.get("id"), "matches": matches}
+            )
+    overlaps = [
+        {
+            "kind": "claim",
+            "agentId": item.get("claim", {}).get("agentId"),
+            "claimId": item.get("claim", {}).get("id"),
+            "reasons": item.get("reasons", []),
+        }
+        for item in claim_overlaps
+    ] + scope_overlaps
+    state = "OVERLAP" if overlaps else ("PEERS_NO_OVERLAP" if peers else "CLEAR")
+    payload = {
+        "state": state,
+        "registryExists": True,
+        "activePeers": [
+            {
+                "id": item.get("id"),
+                "state": item.get("state"),
+                "branch": item.get("branch", ""),
+                "scopes": item.get("scopes", []),
+                "checkpoint": item.get("lastCheckpoint") or item.get("currentAction", ""),
+            }
+            for item in peers
+        ],
+        "overlaps": overlaps,
+    }
+    print_json(payload) if args.json else print(f"{state}: peers={len(peers)} overlaps={len(overlaps)}")
+    return 1 if overlaps else 0
 
 
 def command_join(project_root: Path, args: argparse.Namespace) -> int:
@@ -414,6 +483,11 @@ def parse_args() -> argparse.Namespace:
     status.add_argument("--include-expired", action="store_true", help="Compatibility flag; expired claims remain excluded.")
     add_json_flag(status)
 
+    preflight = subparsers.add_parser("preflight", help="Check active peers and scope overlap before writing.")
+    preflight.add_argument("--agent-id", default="")
+    preflight.add_argument("--scope", action="append", default=[])
+    add_json_flag(preflight)
+
     join = subparsers.add_parser("join", help="Register or refresh an agent in this project.")
     join.add_argument("--agent", required=True, help="Human-readable agent label.")
     join.add_argument("--agent-id", default=None)
@@ -556,6 +630,7 @@ def parse_args() -> argparse.Namespace:
 
 COMMANDS = {
     "status": command_status,
+    "preflight": command_preflight,
     "join": command_join,
     "update": command_update,
     "check": command_check,

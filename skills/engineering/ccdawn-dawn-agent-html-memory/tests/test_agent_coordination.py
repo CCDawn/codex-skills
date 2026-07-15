@@ -68,6 +68,73 @@ def run_coordination(
 
 
 class AgentCoordinationTests(unittest.TestCase):
+    def test_cli_preflight_is_silent_without_registry_and_routes_only_overlap(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / "project"
+            codex_home = Path(temp) / "codex-home"
+            project.mkdir()
+            clear = json.loads(
+                run_coordination(
+                    project,
+                    codex_home,
+                    "preflight",
+                    "--agent-id",
+                    "agent-a",
+                    "--scope",
+                    "core/api",
+                    "--json",
+                ).stdout
+            )
+            self.assertEqual("CLEAR", clear["state"])
+            self.assertFalse(clear["registryExists"])
+            self.assertFalse(coordination_root(project, codex_home=codex_home).exists())
+
+            for agent_id, scope in (("agent-a", "core/api"), ("agent-b", "web/src")):
+                run_coordination(
+                    project,
+                    codex_home,
+                    "join",
+                    "--agent",
+                    agent_id,
+                    "--agent-id",
+                    agent_id,
+                    "--task",
+                    "parallel work",
+                    "--scope",
+                    scope,
+                    "--json",
+                )
+            no_overlap = json.loads(
+                run_coordination(
+                    project,
+                    codex_home,
+                    "preflight",
+                    "--agent-id",
+                    "agent-a",
+                    "--scope",
+                    "core/api",
+                    "--json",
+                ).stdout
+            )
+            self.assertEqual("PEERS_NO_OVERLAP", no_overlap["state"])
+            self.assertEqual("agent-b", no_overlap["activePeers"][0]["id"])
+
+            overlap_result = run_coordination(
+                project,
+                codex_home,
+                "preflight",
+                "--agent-id",
+                "agent-a",
+                "--scope",
+                "web/src/components",
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, overlap_result.returncode)
+            overlap = json.loads(overlap_result.stdout)
+            self.assertEqual("OVERLAP", overlap["state"])
+            self.assertEqual("agent-b", overlap["overlaps"][0]["agentId"])
+
     def test_git_worktrees_share_one_coordination_root(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp) / "repo"
