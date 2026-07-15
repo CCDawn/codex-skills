@@ -465,6 +465,138 @@ class AgentCoordinationTests(unittest.TestCase):
             self.assertEqual([], closed["resumePendingAgentIds"])
             self.assertEqual("closed", closed["recoveryState"])
 
+    def test_cli_partial_resume_keeps_remaining_debt_open(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / "project"
+            codex_home = Path(temp) / "codex-home"
+            project.mkdir()
+            for agent_id in ("agent-a", "agent-b", "agent-c"):
+                run_coordination(
+                    project,
+                    codex_home,
+                    "join",
+                    "--agent",
+                    agent_id,
+                    "--agent-id",
+                    agent_id,
+                    "--thread-id",
+                    f"thread-{agent_id}",
+                    "--task",
+                    "shared coordination",
+                    "--json",
+                )
+
+            coordination = json.loads(
+                run_coordination(
+                    project,
+                    codex_home,
+                    "open",
+                    "--kind",
+                    "conflict",
+                    "--owner-agent-id",
+                    "agent-a",
+                    "--participant",
+                    "agent-b",
+                    "--participant",
+                    "agent-c",
+                    "--topic",
+                    "pause two participants",
+                    "--surface",
+                    "shared",
+                    "--json",
+                ).stdout
+            )
+            coordination_id = coordination["id"]
+            for agent_id in ("agent-b", "agent-c"):
+                run_coordination(
+                    project,
+                    codex_home,
+                    "pause",
+                    "--agent-id",
+                    agent_id,
+                    "--coordination-id",
+                    coordination_id,
+                    "--reason",
+                    "yield shared scope",
+                    "--json",
+                )
+
+            registry = json.loads(run_coordination(project, codex_home, "status", "--json").stdout)
+            current = next(item for item in registry["coordinations"] if item["id"] == coordination_id)
+            self.assertEqual(["agent-b", "agent-c"], current["resumePendingAgentIds"])
+            run_coordination(
+                project,
+                codex_home,
+                "resolve",
+                "--coordination-id",
+                coordination_id,
+                "--agent-id",
+                "agent-a",
+                "--decision",
+                "shared conflict resolved",
+                "--reason",
+                "both participants may resume",
+                "--json",
+            )
+            run_coordination(
+                project,
+                codex_home,
+                "resume",
+                "--agent-id",
+                "agent-b",
+                "--coordination-id",
+                coordination_id,
+                "--json",
+            )
+
+            partial = json.loads(run_coordination(project, codex_home, "status", "--json").stdout)
+            partial_coordination = next(
+                item for item in partial["coordinations"] if item["id"] == coordination_id
+            )
+            self.assertEqual(["agent-c"], partial_coordination["resumePendingAgentIds"])
+            self.assertEqual("resume-pending", partial_coordination["recoveryState"])
+            blocked_complete = run_coordination(
+                project,
+                codex_home,
+                "complete",
+                "--agent-id",
+                "agent-a",
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, blocked_complete.returncode)
+
+            run_coordination(
+                project,
+                codex_home,
+                "resume",
+                "--agent-id",
+                "agent-c",
+                "--coordination-id",
+                coordination_id,
+                "--json",
+            )
+            run_coordination(
+                project,
+                codex_home,
+                "complete",
+                "--agent-id",
+                "agent-a",
+                "--summary",
+                "all resume debts cleared",
+                "--json",
+            )
+            final = json.loads(run_coordination(project, codex_home, "status", "--json").stdout)
+            final_coordination = next(
+                item for item in final["coordinations"] if item["id"] == coordination_id
+            )
+            final_agents = {item["id"]: item for item in final["agents"]}
+            self.assertEqual([], final_coordination["resumePendingAgentIds"])
+            self.assertEqual("closed", final_coordination["recoveryState"])
+            self.assertEqual("active", final_agents["agent-b"]["state"])
+            self.assertEqual("active", final_agents["agent-c"]["state"])
+            self.assertEqual("completed", final_agents["agent-a"]["state"])
+
     def test_concurrent_agent_registration_keeps_every_agent(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp) / "project"
