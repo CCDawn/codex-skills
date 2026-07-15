@@ -288,6 +288,183 @@ class AgentCoordinationTests(unittest.TestCase):
             self.assertEqual([], closed["resumePendingAgentIds"])
             self.assertEqual("closed", closed["recoveryState"])
 
+    def test_cli_stale_owner_takeover_inherits_resume_debt(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "repo"
+            worktree_b = Path(temp) / "agent-b"
+            worktree_c = Path(temp) / "agent-c"
+            codex_home = Path(temp) / "codex-home"
+            root.mkdir()
+            run_git("init", "-b", "main", cwd=root)
+            run_git("config", "user.email", "test@example.com", cwd=root)
+            run_git("config", "user.name", "Test User", cwd=root)
+            (root / "shared.txt").write_text("base\n", encoding="utf-8")
+            run_git("add", "shared.txt", cwd=root)
+            run_git("commit", "-m", "init", cwd=root)
+            run_git("worktree", "add", "-b", "agent-b", str(worktree_b), cwd=root)
+            run_git("worktree", "add", "-b", "agent-c", str(worktree_c), cwd=root)
+
+            for project, agent_id in (
+                (root, "agent-a"),
+                (worktree_b, "agent-b"),
+                (worktree_c, "agent-c"),
+            ):
+                run_coordination(
+                    project,
+                    codex_home,
+                    "join",
+                    "--agent",
+                    agent_id,
+                    "--agent-id",
+                    agent_id,
+                    "--thread-id",
+                    f"thread-{agent_id}",
+                    "--task",
+                    "shared work",
+                    "--branch",
+                    "main" if agent_id == "agent-a" else agent_id,
+                    "--worktree",
+                    str(project),
+                    "--scope",
+                    "shared.txt",
+                    "--json",
+                )
+
+            run_coordination(
+                worktree_b,
+                codex_home,
+                "claim",
+                "--lane",
+                "shared-b",
+                "--scope",
+                "shared.txt",
+                "--agent-id",
+                "agent-b",
+                "--task",
+                "edit shared file",
+                "--json",
+            )
+            coordination = json.loads(
+                run_coordination(
+                    root,
+                    codex_home,
+                    "open",
+                    "--kind",
+                    "conflict",
+                    "--owner-agent-id",
+                    "agent-a",
+                    "--participant",
+                    "agent-b",
+                    "--topic",
+                    "owner may stop during conflict",
+                    "--surface",
+                    "shared.txt",
+                    "--json",
+                ).stdout
+            )
+            coordination_id = coordination["id"]
+            run_coordination(
+                worktree_b,
+                codex_home,
+                "pause",
+                "--agent-id",
+                "agent-b",
+                "--coordination-id",
+                coordination_id,
+                "--reason",
+                "yield for owner repair",
+                "--json",
+            )
+            run_coordination(
+                root,
+                codex_home,
+                "update",
+                "--agent-id",
+                "agent-a",
+                "--state",
+                "stale",
+                "--current-action",
+                "owner session stopped",
+                "--json",
+            )
+
+            status = json.loads(run_coordination(worktree_c, codex_home, "status", "--json").stdout)
+            stale = next(item for item in status["coordinations"] if item["id"] == coordination_id)
+            self.assertEqual("owner-stale", stale["recoveryState"])
+            taken_over = json.loads(
+                run_coordination(
+                    worktree_c,
+                    codex_home,
+                    "takeover",
+                    "--coordination-id",
+                    coordination_id,
+                    "--agent-id",
+                    "agent-c",
+                    "--reason",
+                    "agent-a stopped before conflict recovery",
+                    "--json",
+                ).stdout
+            )
+            self.assertEqual("agent-c", taken_over["ownerAgentId"])
+            self.assertEqual(["agent-b"], taken_over["resumePendingAgentIds"])
+
+            run_coordination(
+                worktree_c,
+                codex_home,
+                "resolve",
+                "--coordination-id",
+                coordination_id,
+                "--agent-id",
+                "agent-c",
+                "--decision",
+                "no conflicting write remains",
+                "--reason",
+                "takeover audit completed",
+                "--json",
+            )
+            early_complete = run_coordination(
+                worktree_c,
+                codex_home,
+                "complete",
+                "--agent-id",
+                "agent-c",
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, early_complete.returncode)
+            run_coordination(
+                worktree_b,
+                codex_home,
+                "resume",
+                "--agent-id",
+                "agent-b",
+                "--coordination-id",
+                coordination_id,
+                "--json",
+            )
+            run_coordination(
+                worktree_c,
+                codex_home,
+                "complete",
+                "--agent-id",
+                "agent-c",
+                "--summary",
+                "takeover and resume closed",
+                "--json",
+            )
+
+            registry = json.loads(
+                run_coordination(worktree_c, codex_home, "status", "--json").stdout
+            )
+            agents = {item["id"]: item for item in registry["agents"]}
+            closed = next(item for item in registry["coordinations"] if item["id"] == coordination_id)
+            self.assertEqual("completed", agents["agent-c"]["state"])
+            self.assertEqual("active", agents["agent-b"]["state"])
+            self.assertEqual("agent-c", closed["ownerAgentId"])
+            self.assertEqual("agent-a", closed["ownerHistory"][0]["agentId"])
+            self.assertEqual([], closed["resumePendingAgentIds"])
+            self.assertEqual("closed", closed["recoveryState"])
+
     def test_concurrent_agent_registration_keeps_every_agent(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp) / "project"

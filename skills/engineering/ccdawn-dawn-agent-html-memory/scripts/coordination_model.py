@@ -882,6 +882,9 @@ def pause_agent(registry: dict, agent_id: str, coordination_id: str, reason: str
     coordination["pausedAgentIds"] = list(
         dict.fromkeys([*coordination.get("pausedAgentIds", []), agent_id])
     )
+    coordination["resumePendingAgentIds"] = list(
+        dict.fromkeys([*coordination.get("resumePendingAgentIds", []), agent_id])
+    )
     coordination["ownerLeaseUntil"] = future_utc(COORDINATION_OWNER_TTL_MINUTES)
     coordination["updatedAt"] = utc_now()
     add_event(registry, "agent-paused", agent_id, reason, coordination_id)
