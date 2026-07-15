@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-23-2f81f7)](#完整-skill-目录)
+[![Skills](https://img.shields.io/badge/skills-26-2f81f7)](#完整-skill-目录)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
@@ -38,6 +38,8 @@ npx skills add CCDawn/codex-skills --list
 npx skills add CCDawn/codex-skills --skill '*' -g -a codex -y
 ```
 
+这会安装 skill 文件，但不会修改全局 `AGENTS.md`。需要“正常说需求即可自动进入 BRT”的默认激活能力时，使用下面的仓库安装器。
+
 需要 CCDawn 完整安装策略，包括安装演练、live copy 验证和可逆处理冲突入口时，使用仓库安装器：
 
 ```powershell
@@ -54,7 +56,7 @@ cd codex-skills
 sh ./install.sh
 ```
 
-默认只安装到 `~/.codex/skills/<ccdawn-skill-name>`，不会同时写入 `~/.agents/skills` 造成重复入口。高级选项见[安装细节](#安装细节)。
+默认只安装到 `~/.codex/skills/<ccdawn-skill-name>`，不会同时写入 `~/.agents/skills` 造成重复入口。仓库安装器还会在 `~/.codex/AGENTS.md` 中维护一段可逆的轻量 BRT 激活块，让用户无需输入 `/brt`；已有全局规则会被保留。高级选项见[安装细节](#安装细节)。
 
 ## 为什么使用 CCDawn
 
@@ -103,8 +105,9 @@ sh ./install.sh
 4. 先运行安装演练，再执行正式安装。
 5. 安装后验证 live skills 是否可用。
 6. 使用安装脚本默认可逆停用安装器识别的完整 Superpowers 自动发现入口集，保留原目录和内容，不要删除。
-7. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、冲突入口处理、验证是否通过、是否需要重启 Codex。
-8. 重点提醒我：最重要入口是 ccdawn-brt；用户正常说需求即可。意图明确时直接推进；意图不清且误解会返工时，BRT 要先说明当前理解和依据，一次集中讨论 2-4 个高影响问题并给出推荐，用户可回复“按推荐”完成对齐，然后自动路由。
+7. 允许安装器在 ~/.codex/AGENTS.md 中安装受管的 CCDawn BRT 激活块；必须保留用户已有规则，并确保可单独卸载。
+8. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、BRT 激活状态、冲突入口处理、验证是否通过、是否需要重启 Codex。
+9. 重点提醒我：最重要入口是 ccdawn-brt；用户正常说需求即可。意图明确时直接推进；意图不清且误解会返工时，BRT 要先说明当前理解和依据，一次集中讨论 2-4 个高影响问题并给出推荐，用户可回复“按推荐”完成对齐，然后自动路由。
 
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
@@ -277,7 +280,16 @@ scripts/
 py -3 scripts\install_codex_library.py
 ```
 
-安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`：把已识别的 Superpowers 主流程、`writing-skills` 和社区强制工作流入口改名为 `SKILL.md.ccdawn-disabled`，不删除目录或内容。
+安装器会先运行 CCDawn package validator，再把已发布 skill 复制成真实目录，检查目录名是否和 `SKILL.md` 的 `name` 字段一致，并在本机存在 Codex `quick_validate.py` 时校验 live skill。`install.ps1` 和 `install.sh` 默认使用 `--process-skill-conflicts disable`，并在 `~/.codex/AGENTS.md` 安装带边界标记的轻量 BRT 激活块。重复安装只更新受管区段，不覆盖已有规则。
+
+直接调用 Python 安装器时，BRT 激活默认为只报告状态；显式安装或移除：
+
+```powershell
+py -3 scripts\install_codex_library.py --agent codex --brt-activation install
+py -3 scripts\install_codex_library.py --agent codex --brt-activation remove
+```
+
+移除激活块不会删除 skills，也不会改动 `AGENTS.md` 中的其他内容。
 
 恢复这些入口：
 
@@ -285,7 +297,7 @@ py -3 scripts\install_codex_library.py
 py -3 scripts\install_codex_library.py --agent codex --process-skill-conflicts restore
 ```
 
-直接调用 Python 安装器时，默认只警告；要使用 BRT 的低噪声路由，显式加 `--process-skill-conflicts disable`。需要单独使用某个 Superpowers skill 时，可先恢复全部入口，再手动保留所需入口；恢复不会改变 CCDawn skills。
+直接调用 Python 安装器时，流程冲突和 BRT 激活默认都只警告；要获得与仓库快捷脚本相同的行为，显式加 `--process-skill-conflicts disable --brt-activation install`。需要单独使用某个 Superpowers skill 时，可先恢复全部入口，再手动保留所需入口；恢复不会改变 CCDawn skills。
 
 只演练安装计划，不改文件：
 
@@ -369,6 +381,14 @@ skills/
 
 - [贡献指南](CONTRIBUTING.md)
 - [MIT 许可证](LICENSE)
+
+安装后可运行一条低成本、只读的真实 Codex 路由回归：
+
+```powershell
+py -3 scripts\run_brt_routing_eval.py
+```
+
+默认只检查模糊需求是否先进入 BRT 对齐且不做全仓扫描；`--all` 才运行完整专项路由样本。
 
 ## 使用方式
 

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "ambiguous-project-optimization",
+    "prompt": "把这个项目优化一下，我还没想清楚主要是速度、结构还是界面。",
+    "smoke": true,
+    "expected_skill_reads": ["ccdawn-brt"],
+    "forbidden_skill_reads": ["ccdawn-project-review", "ccdawn-planning"],
+    "max_commands": 4,
+    "expected_final_any": ["理解", "建议", "推荐", "对齐"],
+    "forbidden_final_any": ["审查完成", "已经修改"],
+    "timeout_seconds": 120
+  },
+  {
+    "id": "explicit-working-tree-review",
+    "prompt": "只读审查当前工作树 diff，按严重程度列出回归风险和缺失验证，不修改代码。",
+    "smoke": false,
+    "expected_skill_reads": ["ccdawn-pr-review"],
+    "forbidden_skill_reads": ["ccdawn-project-review", "ccdawn-planning"],
+    "max_commands": 15,
+    "expected_final_any": ["发现", "问题", "风险", "未发现"],
+    "forbidden_final_any": ["已修改"],
+    "timeout_seconds": 240
+  },
+  {
+    "id": "explicit-project-review",
+    "prompt": "接手这个仓库，只读审查整体架构、技术债、测试体系和高风险模块，给出优先级。",
+    "smoke": false,
+    "expected_skill_reads": ["ccdawn-project-review"],
+    "forbidden_skill_reads": ["ccdawn-pr-review", "ccdawn-planning"],
+    "max_commands": 30,
+    "expected_final_any": ["风险", "优先", "发现", "结论"],
+    "forbidden_final_any": ["已修改"],
+    "timeout_seconds": 300
+  }
+]

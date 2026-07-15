@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-23-2f81f7)](#skill-catalog)
+[![Skills](https://img.shields.io/badge/skills-26-2f81f7)](#skill-catalog)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
@@ -38,6 +38,8 @@ npx skills add CCDawn/codex-skills --list
 npx skills add CCDawn/codex-skills --skill '*' -g -a codex -y
 ```
 
+This installs the skill files but does not modify global `AGENTS.md`. Use the repository installer below when you want BRT to activate automatically from ordinary requests.
+
 For CCDawn's full installation policy, including dry-run, live-copy validation, and reversible conflict handling:
 
 ```powershell
@@ -52,7 +54,16 @@ cd codex-skills
 sh ./install.sh
 ```
 
-The repository installer targets `~/.codex/skills` by default and avoids installing a duplicate copy into `~/.agents/skills`.
+The repository installer targets `~/.codex/skills` by default and avoids installing a duplicate copy into `~/.agents/skills`. It also maintains a reversible, bounded BRT activation block in `~/.codex/AGENTS.md`, preserving all existing user rules. This makes intent alignment automatic without requiring `/brt`.
+
+The wrapper scripts install the activation by default. Direct Python usage is conservative and reports its state unless explicitly requested:
+
+```powershell
+py -3 scripts\install_codex_library.py --agent codex --brt-activation install
+py -3 scripts\install_codex_library.py --agent codex --brt-activation remove
+```
+
+Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, read-only live routing smoke check.
 
 ## What Makes It Different
 

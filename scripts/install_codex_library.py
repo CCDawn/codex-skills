@@ -1,4 +1,5 @@
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -23,6 +24,17 @@ SUPERPOWERS_ENTRYPOINTS = (
     "writing-skills",
 )
 DISABLED_SKILL_FILENAME = "SKILL.md.ccdawn-disabled"
+BRT_ACTIVATION_START = "<!-- CCDawn BRT activation: start -->"
+BRT_ACTIVATION_END = "<!-- CCDawn BRT activation: end -->"
+BRT_ACTIVATION_BLOCK = f"""{BRT_ACTIVATION_START}
+## CCDawn BRT Default Routing
+
+- Apply this lightweight BRT gate before the first tool call or downstream skill choice on every user message; users do not need to invoke `/brt`.
+- Silently infer the desired result, scope, permission, and success evidence. Clear requests proceed directly with the minimum sufficient workflow.
+- If the user states uncertainty, presents materially different alternatives, or uses a broad goal whose plausible meanings change the owning surface, MUST NOT start a broad repository scan or select a downstream owner. Load `ccdawn-brt`, then give one compact alignment turn containing the current understanding, a recommended path, and grouped high-impact questions. Wait for calibration unless one narrow read-only probe can resolve the choice.
+- Select the most specific useful owner after alignment. Preserve existing execution permission across routing and do not stop after each task or stage without a natural gate.
+- Keep user-visible output Chinese-first unless the user requests another language; do not expose internal routing ledgers or process narration.
+{BRT_ACTIVATION_END}"""
 
 
 def copy_tree(src: Path, dst: Path) -> None:
@@ -76,8 +88,106 @@ def codex_skills_root(home: Path) -> Path:
     return home / ".codex" / "skills"
 
 
+def codex_agents_path(home: Path) -> Path:
+    return home / ".codex" / "AGENTS.md"
+
+
 def targets_codex(home: Path, roots: list[Path]) -> bool:
     return codex_skills_root(home) in roots
+
+
+def brt_activation_state(path: Path) -> str:
+    if not path.exists():
+        return "absent"
+    text = path.read_text(encoding="utf-8")
+    starts = text.count(BRT_ACTIVATION_START)
+    ends = text.count(BRT_ACTIVATION_END)
+    if starts == 0 and ends == 0:
+        return "absent"
+    if starts == 1 and ends == 1 and text.index(BRT_ACTIVATION_START) < text.index(BRT_ACTIVATION_END):
+        return "active"
+    return "conflict"
+
+
+def _read_preserving_newlines(path: Path) -> str:
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        return handle.read()
+
+
+def _write_preserving_newlines(path: Path, text: str, newline: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        handle.write(text.replace("\n", newline))
+
+
+def install_brt_activation(path: Path) -> bool:
+    state = brt_activation_state(path)
+    if state == "conflict":
+        raise SystemExit(f"Refusing to edit malformed CCDawn BRT activation markers in {path}.")
+
+    original = _read_preserving_newlines(path) if path.exists() else ""
+    newline = "\r\n" if "\r\n" in original else "\n"
+    normalized = original.replace("\r\n", "\n")
+    if state == "active":
+        pattern = re.compile(
+            re.escape(BRT_ACTIVATION_START) + r".*?" + re.escape(BRT_ACTIVATION_END),
+            re.DOTALL,
+        )
+        updated = pattern.sub(BRT_ACTIVATION_BLOCK, normalized, count=1)
+    else:
+        updated = (
+            f"{normalized}\n\n{BRT_ACTIVATION_BLOCK}\n"
+            if normalized
+            else f"{BRT_ACTIVATION_BLOCK}\n"
+        )
+
+    if updated == normalized:
+        return False
+    _write_preserving_newlines(path, updated, newline)
+    return True
+
+
+def remove_brt_activation(path: Path) -> bool:
+    state = brt_activation_state(path)
+    if state == "conflict":
+        raise SystemExit(f"Refusing to edit malformed CCDawn BRT activation markers in {path}.")
+    if state == "absent":
+        return False
+
+    original = _read_preserving_newlines(path)
+    newline = "\r\n" if "\r\n" in original else "\n"
+    normalized = original.replace("\r\n", "\n")
+    start = normalized.index(BRT_ACTIVATION_START)
+    end = normalized.index(BRT_ACTIVATION_END, start) + len(BRT_ACTIVATION_END)
+    prefix_start = start - 2 if start >= 2 and normalized[start - 2 : start] == "\n\n" else start
+    suffix_end = end + 1 if normalized[end : end + 1] == "\n" else end
+    updated = normalized[:prefix_start] + normalized[suffix_end:]
+    _write_preserving_newlines(path, updated, newline)
+    return True
+
+
+def manage_brt_activation(home: Path, action: str, dry_run: bool = False) -> None:
+    if action == "ignore":
+        return
+
+    path = codex_agents_path(home)
+    state = brt_activation_state(path)
+    if action == "warn":
+        print(f"CCDawn BRT global activation: {state} ({path})")
+        return
+    if state == "conflict":
+        raise SystemExit(f"Refusing to edit malformed CCDawn BRT activation markers in {path}.")
+
+    if dry_run:
+        verb = "install/update" if action == "install" else "remove"
+        print(f"Planned CCDawn BRT global activation: {verb} ({path}, current={state})")
+        return
+
+    changed = install_brt_activation(path) if action == "install" else remove_brt_activation(path)
+    result = "installed" if action == "install" else "removed"
+    if not changed:
+        result = "already active" if action == "install" else "already absent"
+    print(f"CCDawn BRT global activation: {result} ({path})")
 
 
 def process_skill_conflict_state(home: Path) -> list[tuple[str, str]]:
@@ -250,6 +360,15 @@ def parse_args() -> argparse.Namespace:
             "disable/restore renames only SKILL.md, preserving the original directory and content (default: warn)."
         ),
     )
+    parser.add_argument(
+        "--brt-activation",
+        choices=["warn", "install", "remove", "ignore"],
+        default="warn",
+        help=(
+            "Manage the reversible CCDawn BRT block in ~/.codex/AGENTS.md. "
+            "The Python installer defaults to warn; install.ps1/install.sh default to install."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -280,6 +399,10 @@ def main() -> int:
         print_install_plan(home, roots, selected_skill_names_list)
         if targets_codex(home, roots):
             manage_process_skill_conflicts(home, args.process_skill_conflicts, dry_run=True)
+            if args.brt_activation != "install" or "ccdawn-brt" in selected_skill_names:
+                manage_brt_activation(home, args.brt_activation, dry_run=True)
+            else:
+                print("Skipped BRT activation plan because ccdawn-brt is not selected.")
         print("Dry run only; no files changed.")
         return 0
 
@@ -300,6 +423,7 @@ def main() -> int:
         for path in validated_codex_skills:
             print(f"  {path}")
         manage_process_skill_conflicts(home, "warn")
+        manage_brt_activation(home, "warn")
         return 0
 
     installed_skills = []
@@ -318,6 +442,10 @@ def main() -> int:
     validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
     if targets_codex(home, roots):
         manage_process_skill_conflicts(home, args.process_skill_conflicts)
+        if args.brt_activation != "install" or "ccdawn-brt" in selected_skill_names:
+            manage_brt_activation(home, args.brt_activation)
+        else:
+            print("Skipped BRT activation because ccdawn-brt was not installed.")
 
     print(f"Repository: {repo_root}")
     print(f"Home: {home}")

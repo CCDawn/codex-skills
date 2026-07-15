@@ -27,6 +27,9 @@ jobs:
       - name: Test multi-agent coordination helpers
         run: python -m unittest discover -s skills/engineering/ccdawn-dawn-agent-html-memory/tests -p "test_*.py" -v
 
+      - name: Test package helpers
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
       - name: Validate CCDawn skills
         run: python scripts/validate_ccdawn_skills.py --warnings-as-errors
 

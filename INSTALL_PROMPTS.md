@@ -18,8 +18,9 @@
 4. 先运行安装演练，再执行正式安装。
 5. 安装后验证 live skills 是否可用。
 6. 使用安装脚本默认可逆停用安装器识别的完整 Superpowers 自动发现入口集；保留原目录和内容，不要删除。
-7. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、冲突入口处理、验证是否通过、是否需要重启 Codex。
-8. 重点提醒我：最重要入口是 ccdawn-brt；安装/选择它之后，用户正常说需求即可，BRT 会在 agent 内部自动完成意图对齐和下游 skill 路由。
+7. 允许安装器在 ~/.codex/AGENTS.md 中安装带边界标记的 CCDawn BRT 激活块；保留已有规则，并确保该区段可以单独移除。
+8. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、BRT 激活状态、冲突入口处理、验证是否通过、是否需要重启 Codex。
+9. 重点提醒我：最重要入口是 ccdawn-brt；安装后用户正常说需求即可，BRT 会在 agent 内部自动完成意图对齐和下游 skill 路由。
 
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
@@ -37,7 +38,7 @@ https://github.com/CCDawn/codex-skills.git
 - 只安装到当前用户的 Codex live skills 目录：~/.codex/skills。
 - 不要安装到 ~/.agents/skills、~/.claude/skills，除非我明确要求。
 - 不要修改任何用户项目代码。
-- 只允许创建/更新本地 codex-skills 仓库，以及写入 ~/.codex/skills 下的 skill 安装目录。
+- 只允许创建/更新本地 codex-skills 仓库、~/.codex/skills 下的安装目录，以及 ~/.codex/AGENTS.md 中带 CCDawn 边界标记的受管激活区段；不得改动该文件的其他规则。
 - 安装完成后明确告诉我：ccdawn-brt 是最重要入口；选择它之后用户正常说需求即可，其它 skill 通常由 BRT 自动路由。
 - 可逆停用安装器识别的完整 Superpowers 入口集，只允许把对应 `SKILL.md` 重命名为 `SKILL.md.ccdawn-disabled`，不得删除目录或内容。
 
@@ -47,12 +48,12 @@ https://github.com/CCDawn/codex-skills.git
 3. 进入仓库根目录。
 4. 先运行安装演练：
    - Windows 优先用：powershell -ExecutionPolicy Bypass -File .\install.ps1 -DryRun
-   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --dry-run --process-skill-conflicts disable
-   - macOS/Linux 用：python3 scripts/install_codex_library.py --dry-run --process-skill-conflicts disable
+   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --dry-run --process-skill-conflicts disable --brt-activation install
+   - macOS/Linux 用：python3 scripts/install_codex_library.py --dry-run --process-skill-conflicts disable --brt-activation install
 5. 正式安装到 Codex：
    - Windows 优先用：powershell -ExecutionPolicy Bypass -File .\install.ps1
-   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --agent codex --process-skill-conflicts disable
-   - macOS/Linux 用：python3 scripts/install_codex_library.py --agent codex --process-skill-conflicts disable
+   - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --agent codex --process-skill-conflicts disable --brt-activation install
+   - macOS/Linux 用：python3 scripts/install_codex_library.py --agent codex --process-skill-conflicts disable --brt-activation install
 6. 安装后验证：
    - Windows 优先用：powershell -ExecutionPolicy Bypass -File .\install.ps1 -VerifyOnly
    - 如果不适用，Windows 用：py -3 scripts\install_codex_library.py --verify-only
@@ -65,6 +66,7 @@ https://github.com/CCDawn/codex-skills.git
    - 已安装 skill 数量和关键 skill，例如 ccdawn-brt
    - 最重要入口：ccdawn-brt；选择它之后用户正常说需求即可，其它 skill 是下游能力，通常由 BRT 自动路由
    - 验证结果
+   - ~/.codex/AGENTS.md 中 BRT 受管激活区段的状态，以及 `--brt-activation remove` 卸载命令
    - 是否需要重启 Codex 或新开会话
    - 哪些 Superpowers 入口已被可逆停用，以及恢复命令
 

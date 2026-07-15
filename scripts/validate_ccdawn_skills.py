@@ -404,6 +404,91 @@ def validate_package_routing_cases(
         )
 
 
+def validate_live_routing_cases(
+    repo_root: Path,
+    skill_names: set[str],
+    errors: list[str],
+) -> None:
+    path = repo_root / "tests" / "live_routing_cases.json"
+    label = "tests/live_routing_cases.json"
+    try:
+        cases = json.loads(read_text(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{label}: cannot load: {exc}")
+        return
+    if not isinstance(cases, list) or len(cases) < 3:
+        errors.append(f"{label}: expected at least three live cases")
+        return
+
+    required = {
+        "id",
+        "prompt",
+        "smoke",
+        "expected_skill_reads",
+        "forbidden_skill_reads",
+        "max_commands",
+        "expected_final_any",
+        "timeout_seconds",
+    }
+    seen_ids: set[str] = set()
+    smoke_count = 0
+    for index, case in enumerate(cases):
+        case_label = f"{label}[{index}]"
+        if not isinstance(case, dict):
+            errors.append(f"{case_label}: expected an object")
+            continue
+        missing = sorted(required - set(case))
+        if missing:
+            errors.append(f"{case_label}: missing fields {missing}")
+            continue
+
+        case_id = case["id"]
+        if not isinstance(case_id, str) or not case_id or case_id in seen_ids:
+            errors.append(f"{case_label}: id must be a non-empty unique string")
+        seen_ids.add(case_id)
+        if not isinstance(case["prompt"], str) or not contains_cjk(case["prompt"]):
+            errors.append(f"{case_label}: prompt must be Chinese-first")
+        if not isinstance(case["smoke"], bool):
+            errors.append(f"{case_label}: smoke must be boolean")
+        elif case["smoke"]:
+            smoke_count += 1
+
+        expected = case["expected_skill_reads"]
+        forbidden = case["forbidden_skill_reads"]
+        if not isinstance(expected, list) or not expected:
+            errors.append(f"{case_label}: expected_skill_reads must be a non-empty list")
+            expected = []
+        if not isinstance(forbidden, list) or not forbidden:
+            errors.append(f"{case_label}: forbidden_skill_reads must be a non-empty list")
+            forbidden = []
+        for owner in expected + forbidden:
+            if not isinstance(owner, str) or owner not in skill_names:
+                errors.append(f"{case_label}: unknown skill read '{owner}'")
+        overlap = sorted(set(expected) & set(forbidden))
+        if overlap:
+            errors.append(f"{case_label}: expected and forbidden skill reads overlap: {overlap}")
+
+        max_commands = case["max_commands"]
+        if not isinstance(max_commands, int) or not 0 <= max_commands <= 50:
+            errors.append(f"{case_label}: max_commands must be an integer from 0 to 50")
+        expected_final = case["expected_final_any"]
+        if not isinstance(expected_final, list) or not expected_final or not all(
+            isinstance(term, str) and term for term in expected_final
+        ):
+            errors.append(f"{case_label}: expected_final_any must be a non-empty string list")
+        forbidden_final = case.get("forbidden_final_any", [])
+        if not isinstance(forbidden_final, list) or not all(
+            isinstance(term, str) and term for term in forbidden_final
+        ):
+            errors.append(f"{case_label}: forbidden_final_any must be a string list")
+        timeout_seconds = case["timeout_seconds"]
+        if not isinstance(timeout_seconds, int) or not 30 <= timeout_seconds <= 600:
+            errors.append(f"{case_label}: timeout_seconds must be an integer from 30 to 600")
+
+    if smoke_count != 1:
+        errors.append(f"{label}: expected exactly one low-cost smoke case, found {smoke_count}")
+
+
 def validate_capability_routing_cases(
     repo_root: Path,
     skill_names: set[str],
@@ -1079,6 +1164,7 @@ def main() -> int:
         validate_skill(repo_root, skill_dir, errors, warnings)
     validate_catalog(repo_root, skill_dirs, errors)
     validate_capability_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
+    validate_live_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
     validate_conditional_merge_cases(repo_root, errors)
     validate_feature_reuse_cases(repo_root, errors)
     validate_collaboration_dispatch_cases(repo_root, errors)

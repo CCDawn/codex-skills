@@ -9,6 +9,9 @@ param(
     [ValidateSet("warn", "disable", "restore", "ignore")]
     [string]$ProcessSkillConflicts = "disable",
 
+    [ValidateSet("warn", "install", "remove", "ignore")]
+    [string]$BrtActivation = "install",
+
     [switch]$List,
     [switch]$DryRun,
     [switch]$VerifyOnly
@@ -19,7 +22,12 @@ $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $PSCommandPath
 $installer = Join-Path $repo "scripts\install_codex_library.py"
 
-$installerArgs = @($installer, "--agent", $Agent, "--process-skill-conflicts", $ProcessSkillConflicts)
+$installerArgs = @(
+    $installer,
+    "--agent", $Agent,
+    "--process-skill-conflicts", $ProcessSkillConflicts,
+    "--brt-activation", $BrtActivation
+)
 if ($HomeDir) {
     $installerArgs += @("--home", $HomeDir)
 }
