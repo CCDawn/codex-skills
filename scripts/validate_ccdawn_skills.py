@@ -584,6 +584,8 @@ def validate_skill(
             "主动发送 `CONFLICT_RESOLVED`",
             "DISCUSSION_REQUEST",
             "MERGE_READY",
+            "MERGE_READY_CONDITIONAL",
+            "CHANGE_FAILURE / BASELINE_FAILURE / ENVIRONMENT_FAILURE / POLICY_FAILURE / UNKNOWN",
             "sync_project_memory.py --coordination-id",
             "send_message_to_thread",
             "read_thread",
@@ -610,6 +612,8 @@ def validate_skill(
         "ccdawn-pr-review": [
             "findings 优先",
             "由本次变更引入、暴露或会阻塞集成",
+            "READY_CONDITIONAL",
+            "只做一次限时环境 probe",
         ],
     }
     for marker in compact_review_contracts.get(name, []):

@@ -48,8 +48,11 @@ license: MIT
 
 - `READY`：无 P0/P1，需求与证据足够。
 - `READY_WITH_FIXES`：仅有非阻塞 P2/P3。
+- `READY_CONDITIONAL`：变更相关证据通过，但仓库 gate 因已在 base 复现的 `BASELINE_FAILURE` 或与 diff 无关的 `ENVIRONMENT_FAILURE` 不可运行；必须记录失败命令、base 复现、已通过证据和集成后补验责任。
 - `NEEDS_CHANGES`：存在 P0/P1、需求偏离或关键证据缺失。
 - `BLOCKED`：没有可审 diff，或审查目标/证据无法取得。
+
+gate 失败先分为 `CHANGE_FAILURE / BASELINE_FAILURE / ENVIRONMENT_FAILURE / POLICY_FAILURE / UNKNOWN`。只做一次限时环境 probe；无新信号就停止安装或重建环境。未在干净 base/等价事实源复现的失败不能称为 baseline。安全、secret、权限、数据迁移、发布合规及项目明确不可绕过的 gate 不允许条件通过。
 
 ## 输出
 
@@ -57,7 +60,7 @@ license: MIT
 Findings:
 - P0/P1/P2/P3 [文件:行] 问题；影响；建议；验证条件
 
-结论: READY / READY_WITH_FIXES / NEEDS_CHANGES / BLOCKED
+结论: READY / READY_WITH_FIXES / READY_CONDITIONAL / NEEDS_CHANGES / BLOCKED
 审阅范围与需求来源: ...
 验证证据/缺口: ...
 执行顺序（仅多个修复项时）: ...
