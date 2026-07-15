@@ -52,5 +52,14 @@
     "ask_create_thread": false,
     "claim_required": false,
     "owner_continues": true
+  },
+  {
+    "id": "peer-context-advice",
+    "prompt": "另一个 Agent 正在实现我依赖的共享事件接口，我发现其 diff 缺少幂等处理。",
+    "peer_state": "相关 Agent 活跃，存在有证据的具体改进建议",
+    "expected_route": "PEER_CONTEXT_REVIEW",
+    "ask_create_thread": false,
+    "claim_required": false,
+    "owner_continues": true
   }
 ]

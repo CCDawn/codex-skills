@@ -40,6 +40,7 @@ BRT_CORE_MARKERS = [
     "DISPATCH_READ_ONLY",
     "DISPATCH_DISJOINT_WRITE",
     "COORDINATE_OVERLAP",
+    "PEER_CONTEXT_REVIEW",
     "Silent Conflict Triage",
 ]
 
@@ -550,7 +551,7 @@ def validate_collaboration_dispatch_cases(repo_root: Path, errors: list[str]) ->
         errors.append(f"{label}: cannot read valid JSON: {exc}")
         return
 
-    routes = {"NONE", "DISCOVER", "DISPATCH_READ_ONLY", "DISPATCH_DISJOINT_WRITE", "COORDINATE_OVERLAP"}
+    routes = {"NONE", "DISCOVER", "PEER_CONTEXT_REVIEW", "DISPATCH_READ_ONLY", "DISPATCH_DISJOINT_WRITE", "COORDINATE_OVERLAP"}
     seen_ids: set[str] = set()
     has_dispatch = False
     has_none = False
@@ -750,6 +751,7 @@ def validate_skill(
                 errors.append(f"{label}: competition lifecycle ownership boundary missing marker '{marker}'")
 
     if name == "ccdawn-thread-coordination":
+        thread_contract_text = text + "\n" + read_text(skill_dir / "references" / "proactive-collaboration.md")
         for marker in [
             "CONFLICT_PAUSE_REQUEST",
             "`preflight`",
@@ -785,8 +787,12 @@ def validate_skill(
             "From Agent / From Task / To Agent / To Task / Reply To",
             "ACK 回复 owner thread",
             "final 不索要回复",
+            "PEER_CONTEXT_REVIEW",
+            "ADVICE_AVAILABLE",
+            "ACCEPT / ADAPT / DECLINE",
+            "无 finding 不发消息",
         ]:
-            if marker not in text:
+            if marker not in thread_contract_text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
 
     compact_review_contracts = {
