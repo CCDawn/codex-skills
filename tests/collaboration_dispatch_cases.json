@@ -5,7 +5,7 @@
     "peer_state": "相关且空闲，scope 为只读审查",
     "expected_route": "DISPATCH_READ_ONLY",
     "ask_create_thread": false,
-    "claim_required": false,
+    "claim_required": true,
     "owner_continues": true
   },
   {

@@ -740,6 +740,9 @@ def validate_skill(
             "向用户询问是否创建",
             "不得因此停止当前可推进工作",
             "非 owner 停止自身冲突写入",
+            "thread/<agent-id>",
+            "dispatch/<task-key>",
+            "迟到结果先复核",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
