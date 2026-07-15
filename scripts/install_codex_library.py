@@ -33,6 +33,7 @@ BRT_ACTIVATION_BLOCK = f"""{BRT_ACTIVATION_START}
 - Silently infer the desired result, scope, permission, and success evidence. Clear requests proceed directly with the minimum sufficient workflow.
 - If the user states uncertainty, presents materially different alternatives, or uses a broad goal whose plausible meanings change the owning surface, MUST NOT start a broad repository scan or select a downstream owner. Load `ccdawn-brt`, then give one compact alignment turn containing the current understanding, a recommended path, and grouped high-impact questions. Wait for calibration unless one narrow read-only probe can resolve the choice.
 - Select the most specific useful owner after alignment. Preserve existing execution permission across routing and do not stop after each task or stage without a natural gate.
+- Do not auto-load generic process frameworks such as `using-superpowers`, brainstorming, planning, strict TDD, worktrees, or subagent workflows unless the user explicitly requests them or a concrete task risk requires their unique method.
 - Keep user-visible output Chinese-first unless the user requests another language; do not expose internal routing ledgers or process narration.
 {BRT_ACTIVATION_END}"""
 
@@ -77,10 +78,12 @@ def destination_roots(home: Path, agent: str) -> list[Path]:
     roots = []
     if agent in {"claude", "all"}:
         roots.append(home / ".claude" / "skills")
-    if agent in {"codex", "codex-agents", "all"}:
+    if agent in {"codex", "codex-agents", "codex-grok", "all"}:
         roots.append(home / ".codex" / "skills")
     if agent in {"agents", "codex-agents", "all"}:
         roots.append(home / ".agents" / "skills")
+    if agent in {"grok", "codex-grok", "all"}:
+        roots.append(home / ".grok" / "skills")
     return roots
 
 
@@ -92,8 +95,20 @@ def codex_agents_path(home: Path) -> Path:
     return home / ".codex" / "AGENTS.md"
 
 
+def grok_skills_root(home: Path) -> Path:
+    return home / ".grok" / "skills"
+
+
+def grok_agents_path(home: Path) -> Path:
+    return home / ".grok" / "AGENTS.md"
+
+
 def targets_codex(home: Path, roots: list[Path]) -> bool:
     return codex_skills_root(home) in roots
+
+
+def targets_grok(home: Path, roots: list[Path]) -> bool:
+    return grok_skills_root(home) in roots
 
 
 def brt_activation_state(path: Path) -> str:
@@ -166,28 +181,48 @@ def remove_brt_activation(path: Path) -> bool:
     return True
 
 
-def manage_brt_activation(home: Path, action: str, dry_run: bool = False) -> None:
+def manage_brt_activation_path(
+    path: Path,
+    surface: str,
+    action: str,
+    dry_run: bool = False,
+) -> None:
     if action == "ignore":
         return
 
-    path = codex_agents_path(home)
     state = brt_activation_state(path)
     if action == "warn":
-        print(f"CCDawn BRT global activation: {state} ({path})")
+        print(f"CCDawn BRT {surface} activation: {state} ({path})")
         return
     if state == "conflict":
         raise SystemExit(f"Refusing to edit malformed CCDawn BRT activation markers in {path}.")
 
     if dry_run:
         verb = "install/update" if action == "install" else "remove"
-        print(f"Planned CCDawn BRT global activation: {verb} ({path}, current={state})")
+        print(f"Planned CCDawn BRT {surface} activation: {verb} ({path}, current={state})")
         return
 
     changed = install_brt_activation(path) if action == "install" else remove_brt_activation(path)
     result = "installed" if action == "install" else "removed"
     if not changed:
         result = "already active" if action == "install" else "already absent"
-    print(f"CCDawn BRT global activation: {result} ({path})")
+    print(f"CCDawn BRT {surface} activation: {result} ({path})")
+
+
+def manage_brt_activation(home: Path, action: str, dry_run: bool = False) -> None:
+    manage_brt_activation_path(codex_agents_path(home), "Codex", action, dry_run)
+
+
+def manage_selected_brt_activations(
+    home: Path,
+    roots: list[Path],
+    action: str,
+    dry_run: bool = False,
+) -> None:
+    if targets_codex(home, roots):
+        manage_brt_activation_path(codex_agents_path(home), "Codex", action, dry_run)
+    if targets_grok(home, roots):
+        manage_brt_activation_path(grok_agents_path(home), "Grok", action, dry_run)
 
 
 def process_skill_conflict_state(home: Path) -> list[tuple[str, str]]:
@@ -280,6 +315,20 @@ def validate_ccdawn_package(repo_root: Path) -> None:
         subprocess.run([sys.executable, str(validator), "--repo-root", str(repo_root)], check=True)
 
 
+def verify_installed_skill_copies(roots: list[Path], skill_names: list[str]) -> list[Path]:
+    installed = [root / name for root in roots for name in skill_names]
+    missing = [path for path in installed if not (path / "SKILL.md").exists()]
+    if missing:
+        print("Missing installed skill(s):")
+        for path in missing:
+            print(f"  {path}")
+        return []
+    for path in installed:
+        if read_skill_name(path) != path.name:
+            raise SystemExit(f"Installed skill name mismatch: {path}")
+    return installed
+
+
 def print_available_skills(available_skills: list[Path]) -> None:
     print("Available skills:")
     for skill_path in available_skills:
@@ -295,8 +344,9 @@ def print_install_plan(home: Path, roots: list[Path], skill_names: list[str]) ->
     print("  Skills:")
     for name in skill_names:
         print(f"    {name}")
-    validator = codex_validator_path(home)
-    print(f"  Codex validator: {validator if validator.exists() else 'not found'}")
+    if targets_codex(home, roots):
+        validator = codex_validator_path(home)
+        print(f"  Codex validator: {validator if validator.exists() else 'not found'}")
 
 
 def warn_duplicate_agents_copy(home: Path, selected_skill_names: set[str], roots: list[Path]) -> None:
@@ -312,8 +362,22 @@ def warn_duplicate_agents_copy(home: Path, selected_skill_names: set[str], roots
             print(f"  {agents_root / name}")
 
 
+def warn_grok_compat_copies(home: Path, selected_skill_names: set[str], roots: list[Path]) -> None:
+    if not targets_grok(home, roots):
+        return
+    claude_root = home / ".claude" / "skills"
+    duplicates = sorted(name for name in selected_skill_names if (claude_root / name / "SKILL.md").exists())
+    if not duplicates:
+        return
+    print("Note: Grok also discovers these Claude-compatible copies; native ~/.grok/skills copies are installed:")
+    for name in duplicates:
+        print(f"  {claude_root / name}")
+
+
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Install this local skill library into local Codex, optional .agents, and Claude skill directories.")
+    parser = argparse.ArgumentParser(
+        description="Install this local skill library into Codex, Grok, optional .agents, and Claude skill directories."
+    )
     parser.add_argument(
         "--list",
         action="store_true",
@@ -327,7 +391,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--verify-only",
         action="store_true",
-        help="Validate currently installed Codex skills without copying files.",
+        help="Validate currently installed skills for the selected agent without copying files.",
     )
     parser.add_argument(
         "--skip-package-validate",
@@ -337,13 +401,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--home",
         default=str(Path.home()),
-        help="Home directory containing .claude, .codex, and optional .agents (default: current user home).",
+        help="Home directory containing .claude, .codex, .grok, and optional .agents (default: current user home).",
     )
     parser.add_argument(
         "--agent",
-        choices=["claude", "codex", "agents", "codex-agents", "all"],
+        choices=["claude", "codex", "grok", "agents", "codex-agents", "codex-grok", "all"],
         default="codex",
-        help="Which local skill directories to populate (default: codex). Use codex-agents only when you explicitly need both copies.",
+        help=(
+            "Which local skill directories to populate (default: codex). "
+            "Use grok for ~/.grok/skills, codex-grok for both runtimes, or codex-agents only when both Codex catalogs are required."
+        ),
     )
     parser.add_argument(
         "--skill",
@@ -365,7 +432,7 @@ def parse_args() -> argparse.Namespace:
         choices=["warn", "install", "remove", "ignore"],
         default="warn",
         help=(
-            "Manage the reversible CCDawn BRT block in ~/.codex/AGENTS.md. "
+            "Manage reversible CCDawn BRT blocks in selected Codex/Grok AGENTS.md files. "
             "The Python installer defaults to warn; install.ps1/install.sh default to install."
         ),
     )
@@ -399,31 +466,30 @@ def main() -> int:
         print_install_plan(home, roots, selected_skill_names_list)
         if targets_codex(home, roots):
             manage_process_skill_conflicts(home, args.process_skill_conflicts, dry_run=True)
-            if args.brt_activation != "install" or "ccdawn-brt" in selected_skill_names:
-                manage_brt_activation(home, args.brt_activation, dry_run=True)
-            else:
-                print("Skipped BRT activation plan because ccdawn-brt is not selected.")
+        if args.brt_activation != "install" or "ccdawn-brt" in selected_skill_names:
+            manage_selected_brt_activations(home, roots, args.brt_activation, dry_run=True)
+        elif targets_codex(home, roots) or targets_grok(home, roots):
+            print("Skipped BRT activation plan because ccdawn-brt is not selected.")
         print("Dry run only; no files changed.")
         return 0
 
     if args.verify_only:
-        installed_codex_skills = [codex_skills_root(home) / name for name in selected_skill_names_list]
-        missing = [path for path in installed_codex_skills if not path.exists()]
-        if missing:
-            print("Missing installed Codex skill(s):")
-            for path in missing:
-                print(f"  {path}")
+        installed_skills = verify_installed_skill_copies(roots, selected_skill_names_list)
+        if not installed_skills:
             return 1
-        validator = codex_validator_path(home)
-        if not validator.exists():
-            print(f"Codex validator not found: {validator}")
-            return 1
-        validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
-        print("Validated live Codex skills:")
-        for path in validated_codex_skills:
+        print("Verified installed skills:")
+        for path in installed_skills:
             print(f"  {path}")
-        manage_process_skill_conflicts(home, "warn")
-        manage_brt_activation(home, "warn")
+        if targets_codex(home, roots):
+            validator = codex_validator_path(home)
+            if not validator.exists():
+                print(f"Codex validator not found: {validator}")
+                return 1
+            installed_codex_skills = [codex_skills_root(home) / name for name in selected_skill_names_list]
+            validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
+            print(f"Validated live Codex skills: {len(validated_codex_skills)}")
+            manage_process_skill_conflicts(home, "warn")
+        manage_selected_brt_activations(home, roots, "warn")
         return 0
 
     installed_skills = []
@@ -442,10 +508,10 @@ def main() -> int:
     validated_codex_skills = validate_installed_codex_skills(home, installed_codex_skills)
     if targets_codex(home, roots):
         manage_process_skill_conflicts(home, args.process_skill_conflicts)
-        if args.brt_activation != "install" or "ccdawn-brt" in selected_skill_names:
-            manage_brt_activation(home, args.brt_activation)
-        else:
-            print("Skipped BRT activation because ccdawn-brt was not installed.")
+    if args.brt_activation != "install" or "ccdawn-brt" in selected_skill_names:
+        manage_selected_brt_activations(home, roots, args.brt_activation)
+    elif targets_codex(home, roots) or targets_grok(home, roots):
+        print("Skipped BRT activation because ccdawn-brt was not installed.")
 
     print(f"Repository: {repo_root}")
     print(f"Home: {home}")
@@ -459,6 +525,7 @@ def main() -> int:
     elif installed_codex_skills:
         print("Codex validator not found; skipped live validation.")
     warn_duplicate_agents_copy(home, selected_skill_names, roots)
+    warn_grok_compat_copies(home, selected_skill_names, roots)
     print("Restart the client so it reloads the updated local skills.")
     return 0
 

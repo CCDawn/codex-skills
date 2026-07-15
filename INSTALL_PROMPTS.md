@@ -91,6 +91,17 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -VerifyOnly
 
 安装后重启 Codex 或新开会话，让客户端重新加载本地 skills。建议把 `ccdawn-brt` 作为主入口；之后用户正常说需求即可，BRT 会自动判断是否需要路由到其它 skill。
 
+Grok Build 使用原生目录和全局规则：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent grok -DryRun
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent grok
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent grok -VerifyOnly
+grok inspect --json
+```
+
+同时使用 Codex 与 Grok 时，将 `-Agent grok` 改为 `-Agent codex-grok`，不会额外写入 Claude 或 `.agents` catalog。已有 Grok 会话不会重新加载启动时的 skill catalog，需要新开会话。
+
 恢复被停用的 Superpowers 入口：
 
 ```powershell

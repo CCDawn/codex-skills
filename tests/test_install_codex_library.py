@@ -37,6 +37,7 @@ class BrtActivationTests(unittest.TestCase):
         self.assertIn("before the first tool call", block)
         self.assertIn("MUST NOT start a broad repository scan", block)
         self.assertIn("grouped high-impact questions", block)
+        self.assertIn("Do not auto-load generic process frameworks", block)
 
     def test_remove_deletes_only_managed_block(self) -> None:
         self.agents_path.parent.mkdir(parents=True)
@@ -76,6 +77,44 @@ class BrtActivationTests(unittest.TestCase):
             result = handle.read()
         self.assertIn("# Existing\r\n", result)
         self.assertNotIn("\n", result.replace("\r\n", ""))
+
+    def test_grok_target_uses_native_skill_root(self) -> None:
+        roots = INSTALLER.destination_roots(self.home, "grok")
+
+        self.assertEqual(roots, [self.home / ".grok" / "skills"])
+        self.assertTrue(INSTALLER.targets_grok(self.home, roots))
+        self.assertFalse(INSTALLER.targets_codex(self.home, roots))
+
+    def test_codex_grok_target_avoids_extra_catalogs(self) -> None:
+        roots = INSTALLER.destination_roots(self.home, "codex-grok")
+
+        self.assertEqual(
+            roots,
+            [self.home / ".codex" / "skills", self.home / ".grok" / "skills"],
+        )
+
+    def test_selected_activation_manages_codex_and_grok_rules(self) -> None:
+        roots = INSTALLER.destination_roots(self.home, "all")
+
+        INSTALLER.manage_selected_brt_activations(self.home, roots, "install")
+
+        self.assertEqual(INSTALLER.brt_activation_state(self.home / ".codex" / "AGENTS.md"), "active")
+        self.assertEqual(INSTALLER.brt_activation_state(self.home / ".grok" / "AGENTS.md"), "active")
+
+    def test_verify_installed_grok_skill_copy(self) -> None:
+        skill_dir = self.home / ".grok" / "skills" / "ccdawn-brt"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text(
+            "---\nname: ccdawn-brt\ndescription: test\n---\n\n# Test\n",
+            encoding="utf-8",
+        )
+
+        verified = INSTALLER.verify_installed_skill_copies(
+            [self.home / ".grok" / "skills"],
+            ["ccdawn-brt"],
+        )
+
+        self.assertEqual(verified, [skill_dir])
 
 
 if __name__ == "__main__":

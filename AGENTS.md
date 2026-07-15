@@ -8,6 +8,7 @@ This repository publishes local Codex skills. Treat slash-command behavior as a 
 - The folder name must match the `name` field in `SKILL.md`.
 - When the catalog changes, update `README.md`, `README.zh-CN.md`, the bucket `README.md`, and `.claude-plugin/plugin.json` in the same change.
 - The default install target is `~/.codex/skills/<ccdawn-skill-name>`.
+- The native Grok target is `~/.grok/skills/<ccdawn-skill-name>` with global activation in `~/.grok/AGENTS.md`.
 - Use `~/.agents/skills/<ccdawn-skill-name>` only when you explicitly need an extra local catalog copy.
 - Do not rely on symlinks or junctions as the default install shape.
 
@@ -34,3 +35,4 @@ This repository publishes local Codex skills. Treat slash-command behavior as a 
 3. Validate the installed live Codex copy when the local validator is available.
 4. Inspect the live installed files under `~/.codex/skills/`.
 5. Restart Codex and verify the slash-command entry from a fresh thread.
+6. For Grok changes, run `grok inspect --json` and verify a fresh session resolves CCDawn skills from `~/.grok/skills`.

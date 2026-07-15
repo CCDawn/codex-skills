@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("claude", "codex", "agents", "codex-agents", "all")]
+    [ValidateSet("claude", "codex", "grok", "agents", "codex-agents", "codex-grok", "all")]
     [string]$Agent = "codex",
 
     [string[]]$Skill,

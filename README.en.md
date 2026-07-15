@@ -9,7 +9,7 @@
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 26 Agent Skills for intent alignment, dynamic routing, multi-thread coordination, lightweight development, development cleanup, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 26 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, multi-thread coordination, lightweight development, cleanup, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
@@ -48,19 +48,28 @@ Set-Location codex-skills
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
+Install only for Grok Build, or keep Codex and Grok synchronized without extra catalogs:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent grok
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent codex-grok
+```
+
 ```bash
 git clone https://github.com/CCDawn/codex-skills.git
 cd codex-skills
 sh ./install.sh
 ```
 
-The repository installer targets `~/.codex/skills` by default and avoids installing a duplicate copy into `~/.agents/skills`. It also maintains a reversible, bounded BRT activation block in `~/.codex/AGENTS.md`, preserving all existing user rules. This makes intent alignment automatic without requiring `/brt`.
+The repository installer targets `~/.codex/skills` by default and avoids a duplicate `.agents` catalog. The `grok` target uses `~/.grok/skills`; `codex-grok` maintains only those two runtimes. A reversible BRT activation block is installed in each selected runtime's `AGENTS.md`, preserving existing rules.
 
 The wrapper scripts install the activation by default. Direct Python usage is conservative and reports its state unless explicitly requested:
 
 ```powershell
 py -3 scripts\install_codex_library.py --agent codex --brt-activation install
 py -3 scripts\install_codex_library.py --agent codex --brt-activation remove
+py -3 scripts\install_codex_library.py --agent grok --brt-activation install
+py -3 scripts\install_codex_library.py --agent grok --brt-activation remove
 ```
 
 Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, read-only live routing smoke check.

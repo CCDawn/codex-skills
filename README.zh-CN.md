@@ -9,7 +9,7 @@
 
 **让 Codex 先理解你，再决定怎么做。**
 
-26 个中文优先 Agent Skills，更适合中国宝宝的体质，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
+26 个中文优先 Agent Skills，支持 Codex 与 Grok Build，覆盖意图对齐、动态路由、多会话协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -48,6 +48,13 @@ Set-Location codex-skills
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
+只安装到 Grok Build，或同时维护 Codex 与 Grok：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent grok
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Agent codex-grok
+```
+
 macOS/Linux：
 
 ```bash
@@ -56,7 +63,7 @@ cd codex-skills
 sh ./install.sh
 ```
 
-默认只安装到 `~/.codex/skills/<ccdawn-skill-name>`，不会同时写入 `~/.agents/skills` 造成重复入口。仓库安装器还会在 `~/.codex/AGENTS.md` 中维护一段可逆的轻量 BRT 激活块，让用户无需输入 `/brt`；已有全局规则会被保留。高级选项见[安装细节](#安装细节)。
+默认只安装到 `~/.codex/skills/<ccdawn-skill-name>`，不会同时写入 `~/.agents/skills` 造成重复入口。选择 `grok` 时安装到 `~/.grok/skills`；选择 `codex-grok` 时只维护这两个运行时。安装器会在对应的 `AGENTS.md` 中维护可逆的轻量 BRT 激活块，让用户无需输入 `/brt`，并保留已有全局规则。高级选项见[安装细节](#安装细节)。
 
 ## 为什么使用 CCDawn
 
@@ -287,6 +294,8 @@ py -3 scripts\install_codex_library.py
 ```powershell
 py -3 scripts\install_codex_library.py --agent codex --brt-activation install
 py -3 scripts\install_codex_library.py --agent codex --brt-activation remove
+py -3 scripts\install_codex_library.py --agent grok --brt-activation install
+py -3 scripts\install_codex_library.py --agent grok --brt-activation remove
 ```
 
 移除激活块不会删除 skills，也不会改动 `AGENTS.md` 中的其他内容。
@@ -327,6 +336,8 @@ py -3 scripts\install_codex_library.py --skill ccdawn-brt --skill ccdawn-dawn-ag
 
 ```powershell
 py -3 scripts\install_codex_library.py --agent codex         # 默认 live Codex 目标
+py -3 scripts\install_codex_library.py --agent grok          # Grok Build 原生目标
+py -3 scripts\install_codex_library.py --agent codex-grok    # 只同步 Codex 与 Grok
 py -3 scripts\install_codex_library.py --agent agents        # 可选本地 catalog 副本
 py -3 scripts\install_codex_library.py --agent claude        # 可选 Claude 全局副本
 py -3 scripts\install_codex_library.py --agent codex-agents  # Codex 加 .agents
@@ -389,6 +400,8 @@ py -3 scripts\run_brt_routing_eval.py
 ```
 
 默认只检查模糊需求是否先进入 BRT 对齐且不做全仓扫描；`--all` 才运行完整专项路由样本。
+
+Grok Build 安装后可用 `grok inspect --json` 确认 `ccdawn-brt` 的 source 指向 `~/.grok/skills/ccdawn-brt/SKILL.md`，并在新 Grok 会话中加载 `~/.grok/AGENTS.md`。
 
 ## 使用方式
 
