@@ -439,6 +439,64 @@ def validate_capability_routing_cases(
     if not isinstance(cases, list) or len(cases) < 10:
         errors.append("tests/capability_routing_cases.json: expected at least ten capability cases")
 
+
+def validate_conditional_merge_cases(repo_root: Path, errors: list[str]) -> None:
+    cases_path = repo_root / "tests" / "conditional_merge_cases.json"
+    if not cases_path.exists():
+        errors.append("tests/conditional_merge_cases.json: missing")
+        return
+    try:
+        cases = json.loads(read_text(cases_path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"tests/conditional_merge_cases.json: invalid JSON: {exc}")
+        return
+
+    allowed = {
+        "CHANGE_FAILURE",
+        "BASELINE_FAILURE",
+        "ENVIRONMENT_FAILURE",
+        "POLICY_FAILURE",
+        "UNKNOWN",
+    }
+    seen_ids: set[str] = set()
+    has_positive = False
+    has_negative = False
+    for index, case in enumerate(cases if isinstance(cases, list) else []):
+        label = f"tests/conditional_merge_cases.json[{index}]"
+        if not isinstance(case, dict):
+            errors.append(f"{label}: expected an object")
+            continue
+        required = {
+            "id",
+            "prompt",
+            "classification",
+            "conditional",
+            "required_evidence",
+            "forbidden_bypass",
+        }
+        if set(case) != required:
+            errors.append(f"{label}: expected fields {sorted(required)}")
+            continue
+        case_id = case["id"]
+        if not case_id or case_id in seen_ids:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen_ids.add(case_id)
+        if not case["prompt"] or not contains_cjk(case["prompt"]):
+            errors.append(f"{label}: prompt must be Chinese-first")
+        if case["classification"] not in allowed:
+            errors.append(f"{label}: unsupported classification '{case['classification']}'")
+        if not isinstance(case["conditional"], bool):
+            errors.append(f"{label}: conditional must be boolean")
+        has_positive = has_positive or case["conditional"] is True
+        has_negative = has_negative or case["conditional"] is False
+        if not isinstance(case["required_evidence"], list) or not case["required_evidence"]:
+            errors.append(f"{label}: required_evidence must be a non-empty list")
+        if not isinstance(case["forbidden_bypass"], list):
+            errors.append(f"{label}: forbidden_bypass must be a list")
+
+    if not isinstance(cases, list) or len(cases) < 5 or not has_positive or not has_negative:
+        errors.append("tests/conditional_merge_cases.json: expected at least five positive/negative cases")
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -822,6 +880,7 @@ def main() -> int:
         validate_skill(repo_root, skill_dir, errors, warnings)
     validate_catalog(repo_root, skill_dirs, errors)
     validate_capability_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
+    validate_conditional_merge_cases(repo_root, errors)
 
     if errors:
         print("CCDawn skill package validation failed:")

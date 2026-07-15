@@ -1,0 +1,42 @@
+[
+  {
+    "id": "baseline-environment-fast-lane",
+    "prompt": "聚焦测试通过，pre-commit 的 .venv 故障已在干净 main 复现，且不涉及强制 gate；停止重建环境并条件合入",
+    "classification": "BASELINE_FAILURE",
+    "conditional": true,
+    "required_evidence": ["targeted-tests", "reviewable-diff", "clean-base-reproduction", "integration-revalidation"],
+    "forbidden_bypass": []
+  },
+  {
+    "id": "missing-base-evidence",
+    "prompt": "聚焦测试通过，但 pre-commit 失败且尚未在 main 或等价事实源复现",
+    "classification": "UNKNOWN",
+    "conditional": false,
+    "required_evidence": ["clean-base-reproduction"],
+    "forbidden_bypass": ["SKIP", "--no-verify"]
+  },
+  {
+    "id": "change-test-failure",
+    "prompt": "本次修改对应的聚焦测试失败，同时本地 pre-commit 环境也有问题",
+    "classification": "CHANGE_FAILURE",
+    "conditional": false,
+    "required_evidence": ["targeted-tests"],
+    "forbidden_bypass": ["SKIP", "--no-verify"]
+  },
+  {
+    "id": "security-gate-failure",
+    "prompt": "secret scanning 或权限检查失败，即使 main 也能复现该失败",
+    "classification": "POLICY_FAILURE",
+    "conditional": false,
+    "required_evidence": ["mandatory-gate-pass"],
+    "forbidden_bypass": ["SKIP", "--no-verify"]
+  },
+  {
+    "id": "environment-not-yet-bounded",
+    "prompt": "依赖安装刚开始且仍有稳定进度输出，尚未完成一次限时环境 probe",
+    "classification": "ENVIRONMENT_FAILURE",
+    "conditional": false,
+    "required_evidence": ["bounded-environment-probe"],
+    "forbidden_bypass": ["--no-verify"]
+  }
+]
