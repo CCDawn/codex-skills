@@ -1,6 +1,6 @@
 ---
 name: ccdawn-brt
-description: "Use when a user message needs Chinese-first intent inference, low-confidence collaborative clarification, routing, workflow weight control, skill choice, review/testing/planning/debugging/evaluation routing, multi-thread conflict coordination, continuation handling, execution permission inference, or protection from process over-escalation."
+description: "Use when a user message needs Chinese-first intent inference, low-confidence collaborative clarification, routing, workflow weight control, skill choice, review/testing/planning/debugging/evaluation routing, proactive multi-thread collaboration or conflict coordination, continuation handling, execution permission inference, or protection from process over-escalation."
 license: MIT
 ---
 
@@ -8,39 +8,39 @@ license: MIT
 
 ## 目标
 
-BRT 是每句输入的默认适配层：理解真实意图、选择最具体 owner、控制流程重量，并推进到可验证结果。用户无需输入 `/brt` 或主动要求对齐。
+BRT 是每句输入的默认适配层：理解意图、选择 owner、控制流程重量并推进到可验证结果。用户无需输入 `/brt` 或主动要求对齐。
 
-简单任务内部判断后直接完成；只有误解会改变行为、范围、风险或验收时，才展示对齐过程。约束用于防错，不用于替代模型推理。
+简单任务直接完成；只有误解会改变行为、范围、风险或验收时才展示对齐。约束用于防错，不替代模型推理。
 
 ## 决策核心
 
 ```text
-用户输入 -> 证据与意图 -> 置信度 -> Owner -> 最小充分方案 -> 流程重量 -> 行动
+用户输入 -> 证据与意图 -> 置信度 -> Owner -> 协作发现 -> 最小充分方案 -> 流程重量 -> 行动
 ```
 
-- 用户提到项目、代码、日志、测试或运行状态时，先读取会改变判断的本地证据。
+- 涉及项目、代码、日志、测试或运行状态时，先读会改变判断的本地证据。
 - “修复/添加/优化/删除/调整”提供执行许可；目标、写入面和验收清楚且无自然闸门时直接推进。
 - 执行许可随 `Route Contract.Allowed Action` 传给下游 owner；路由不会清空用户已经给出的授权。专项 skill 可以先诊断再实施，但不得仅因切换 owner 重复询问“是否修复/继续”。只有诊断发现范围扩大、新的高风险动作或真实取舍时才重新确认。
-- `HIGH`：直接行动；`MEDIUM`：声明少量低风险假设后行动；`LOW`：先 probe/讨论；`BLOCKED`：只问一个不可约问题。
-- 输出深度用 `SILENT / MICRO / ALIGN / FULL`，默认最短；不展示流程旁白、全量 skill 列表或内部账本。
+- `HIGH`：行动；`MEDIUM`：声明低风险假设后行动；`LOW`：probe/讨论；`BLOCKED`：只问不可约问题。
+- 输出深度用 `SILENT / MICRO / ALIGN / FULL`，默认最短；不展示流程旁白或内部账本。
 - 用户说“继续/确认/按推荐来”时承接当前路线，不重开需求发现，不在每个阶段或任务后询问是否继续。
 
 ## 讨论式意图收敛
 
-开发、规划或高影响审查前，内部锁定：可观察结果、owning surface、非目标、关键约束和成功证据。
+开发、规划或高影响审查前，内部锁定结果、owning surface、非目标、约束和证据。
 
 当多个合理解释会导致明显返工时使用 `One-Turn Alignment`：先说明当前理解、依据、准备采取的动作、非目标和验收，再请用户校准。低置信度不得带着未确认的高影响假设写入。
 
 - agent 先给推荐，不让用户从空白重写需求。
 - 一次集中提出 2-4 个彼此相关的高影响问题；每项给推荐答案、行为差异和错判影响。
-- 用户可回复“按推荐”或只纠正错误项；一轮信息足够就结束追问。
+- 用户可回复“按推荐”或纠错；信息足够即结束追问。
 - 自然闸门仅包括：意图变化、范围扩大、不可安全恢复的失败、高风险/破坏性/权限/迁移/发布动作、冲突或真实取舍。
 
-精确输出形态只有需要展示 `ALIGN/FULL` 或破坏性菜单时才读取 `references/output-forms.md`。
+展示 `ALIGN/FULL` 或破坏性菜单时才读 `references/output-forms.md`。
 
 ## Owner 与组合
 
-扫描最多 3 个信号匹配候选，选择能直接产生下一 artifact 和成功证据的最具体 owner。内部 `Route Contract` 仅含：`Owner / Mode / Next Output / Allowed Action / Success Evidence / Stop Condition`；其中 `Allowed Action` 必须区分 `READ / WRITE / REMOTE_WRITE / DESTRUCTIVE`，并继承用户已经明确给出的最高许可。
+扫描最多 3 个候选，选择能直接产生下一 artifact 和证据的最具体 owner。内部 `Route Contract` 仅含：`Owner / Mode / Next Output / Allowed Action / Success Evidence / Stop Condition`；`Allowed Action` 区分 `READ / WRITE / REMOTE_WRITE / DESTRUCTIVE` 并继承已有许可。
 
 常用路由：
 
@@ -55,6 +55,12 @@ BRT 是每句输入的默认适配层：理解真实意图、选择最具体 own
 完整工作流场景仅在无法仲裁时读取 `references/routing-practice.md`；工具/制品任务才读取 `references/capability-routing.md`。先以本轮 Available skills 为准；未安装候选不能成为 owner，外部候选资料只在安装/调研请求中读取 `references/github-skill-candidates.md`。
 
 一句话含多个独立交付物、owner 或验证边界时才建立 `Primary / Secondary / Deferred`；“实现并验证”仍是一个任务。默认顺序完成同一主题，只有独立只读 lane 才考虑并行。
+
+### Collaboration Discovery
+
+对齐并选定 owner 后，仅当独立 lane 的并行收益高于协调成本，才检查同项目会话。内部结果：`NONE / DISCOVER / DISPATCH_READ_ONLY / DISPATCH_DISJOINT_WRITE / COORDINATE_OVERLAP`。优先复用相关空闲会话；简单任务、关键路径、同文件或忙碌会话选 `NONE`。当前 owner 保留主线与集成，不等待非关键协作。
+
+需要派发或询问创建新会话时读取 `ccdawn-thread-coordination`；无机会不加载、不展示。
 
 ## 最小充分方案
 

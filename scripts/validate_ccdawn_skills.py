@@ -36,6 +36,10 @@ BRT_CORE_MARKERS = [
     "## 讨论式意图收敛",
     "低置信度不得带着未确认的高影响假设写入",
     "一次集中提出 2-4 个",
+    "Collaboration Discovery",
+    "DISPATCH_READ_ONLY",
+    "DISPATCH_DISJOINT_WRITE",
+    "COORDINATE_OVERLAP",
 ]
 
 UNIFIED_CONTRACT_MARKERS = [
@@ -535,6 +539,45 @@ def validate_feature_reuse_cases(repo_root: Path, errors: list[str]) -> None:
     if not isinstance(cases, list) or len(cases) < 6 or not has_positive or not has_negative:
         errors.append("tests/feature_reuse_cases.json: expected at least six positive/negative cases")
 
+
+def validate_collaboration_dispatch_cases(repo_root: Path, errors: list[str]) -> None:
+    path = repo_root / "tests" / "collaboration_dispatch_cases.json"
+    label = "tests/collaboration_dispatch_cases.json"
+    try:
+        cases = json.loads(read_text(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{label}: cannot read valid JSON: {exc}")
+        return
+
+    routes = {"NONE", "DISCOVER", "DISPATCH_READ_ONLY", "DISPATCH_DISJOINT_WRITE", "COORDINATE_OVERLAP"}
+    seen_ids: set[str] = set()
+    has_dispatch = False
+    has_none = False
+    has_create_prompt = False
+    for case in cases if isinstance(cases, list) else []:
+        required = {
+            "id", "prompt", "peer_state", "expected_route", "ask_create_thread",
+            "claim_required", "owner_continues",
+        }
+        if not isinstance(case, dict) or set(case) != required:
+            errors.append(f"{label}: every case must use exactly {sorted(required)}")
+            continue
+        if not case["id"] or case["id"] in seen_ids:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen_ids.add(case["id"])
+        if not contains_cjk(case["prompt"]) or not contains_cjk(case["peer_state"]):
+            errors.append(f"{label}: prompt and peer_state must be Chinese-first")
+        if case["expected_route"] not in routes:
+            errors.append(f"{label}: invalid expected_route '{case['expected_route']}'")
+        for field in ["ask_create_thread", "claim_required", "owner_continues"]:
+            if not isinstance(case[field], bool):
+                errors.append(f"{label}: {field} must be boolean")
+        has_dispatch = has_dispatch or case["expected_route"].startswith("DISPATCH_")
+        has_none = has_none or case["expected_route"] == "NONE"
+        has_create_prompt = has_create_prompt or case["ask_create_thread"] is True
+    if not isinstance(cases, list) or len(cases) < 6 or not (has_dispatch and has_none and has_create_prompt):
+        errors.append(f"{label}: expected at least six cases covering dispatch, no dispatch, and create-thread prompt")
+
 def validate_skill(
     repo_root: Path,
     skill_dir: Path,
@@ -691,6 +734,11 @@ def validate_skill(
             "`takeover`",
             "不要随后调用 registry `respond --status RESUMED`",
             "`heartbeat`",
+            "## 主动协作",
+            "Expected Output",
+            "禁止递归派发",
+            "向用户询问是否创建",
+            "不得因此停止当前可推进工作",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
@@ -922,6 +970,7 @@ def main() -> int:
     validate_capability_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
     validate_conditional_merge_cases(repo_root, errors)
     validate_feature_reuse_cases(repo_root, errors)
+    validate_collaboration_dispatch_cases(repo_root, errors)
 
     if errors:
         print("CCDawn skill package validation failed:")

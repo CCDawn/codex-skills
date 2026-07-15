@@ -1,6 +1,6 @@
 ---
 name: ccdawn-thread-coordination
-description: "Use when multiple Codex App threads or agents work in the same project and need shared progress awareness, ownership arbitration, conflict pause/resume, bounded discussion, merge coordination, status exchange, or handoff through native thread tools without heavyweight orchestration."
+description: "Use when multiple Codex App threads or agents work in the same project and need proactive collaboration discovery or bounded dispatch, shared progress awareness, ownership arbitration, conflict pause/resume, discussion, merge coordination, status exchange, or handoff through native thread tools without heavyweight orchestration."
 license: MIT
 ---
 
@@ -8,27 +8,35 @@ license: MIT
 
 ## 目标
 
-用 registry 和 thread 消息协调同项目 Agent 的 scope、checkpoint、冲突、讨论和合并。代码/Git 是实现事实源，registry 是协作事实源；单会话不触发，也不自动创建 worktree、子任务或轮询。
+用 registry 和 thread 消息协调同项目 Agent 的派发、scope、冲突和合并。代码/Git 是实现事实源，registry 是协作事实源；无高收益协作面不触发。
 
 ## BRT interface
 
-- Context Boundary: 项目、Agent/thread、branch/worktree、任务、scope、claim、coordination 和目标分支。
-- Output Contract: ownership、冲突/讨论/合并决定、消息状态、验证和恢复债务。
+- Context Boundary: 项目、Agent/thread、branch/worktree、scope、claim、coordination 和目标分支。
+- Output Contract: ownership、协调决定、消息状态、验证和恢复债务。
 - Allowed Action: 使用 `list_threads`、`read_thread`、`send_message_to_thread` 与 `agent_coordination.py`；创建/归档 thread 和远程 Git 仍需授权。
-- Success Evidence: registry revision、目标 thread 回执、Git/测试证据，以及 pause/resume 或 merge 闭环。
-- Stop Condition: thread 不明、owner 有争议、暂停未确认、状态漂移、工具不可用或高风险动作未授权。
+- Success Evidence: registry revision、thread 回执、Git/测试证据及协调闭环。
+- Stop Condition: thread 不明、owner 争议、暂停未确认、状态漂移或动作未授权。
 - Route Out: 原 owner、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-dawn-agent-html-memory`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
-- 只处理 BRT interface 范围；不匹配时回 `ccdawn-brt` 或更具体 owner，复合任务不吞其他 owner。
-- 用户可见内容默认中文；保留技术字面量；只报产出、证据与风险；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
+- 只处理 BRT interface；不匹配时回 `ccdawn-brt` 或具体 owner。
+- 用户可见内容默认中文；只报产出、证据和风险；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 接入与所有权
 
-BRT 首次写入前调用只读 `preflight`；`CLEAR/PEERS_NO_OVERLAP` 返回原 owner，`OVERLAP` 才进入协调。随后用 `list_threads`/`read_thread` 核对 thread，运行 `status/join`。只 claim 最小 scope；仅在 checkpoint、blocker、pause/resume、merge-ready 和完成时 `update`。
+BRT 首次写入前调用只读 `preflight`；`CLEAR/PEERS_NO_OVERLAP` 返回原 owner，`OVERLAP` 才协调。用 `list_threads`/`read_thread` 核对 thread，运行 `status/join`。只 claim 最小 scope；仅在 checkpoint、blocker、pause/resume、merge-ready 和完成时 `update`。
 
-owner 顺序：用户指定 > 有效 claim/registry > 更早拥有模块的 Agent。仍有争议时冲突面只读并回 BRT。
+owner 顺序：用户指定 > 有效 claim/registry > 更早 owner。争议面只读并回 BRT。
+
+## 主动协作
+
+用 registry 和 thread 工具发现已有会话；只向相关空闲 Agent 派发可独立验收的只读或不重叠写入 lane。消息给出 `Task / Why / Scope / Allowed Action / Expected Output / Verification / Dependency / Return Condition`；写入先 claim，禁止递归派发。
+
+owner 保留关键路径、集成和验证，继续不冲突工作。可选协作无回复、拒绝或超时即接回，不 BLOCKED。简单任务、同文件或忙碌 Agent 不派发。
+
+无合适会话且新会话有明确收益时，说明任务、边界和收益，向用户询问是否创建；未授权不得创建，也不得因此停止当前可推进工作。
 
 ## 冲突恢复
 
@@ -37,34 +45,31 @@ owner 顺序：用户指定 > 有效 claim/registry > 更早拥有模块的 Agen
 3. owner 只处理声明范围并验证，随后 `resolve`，主动发送 `CONFLICT_RESOLVED`。
 4. 对方重读 registry/Git/claim，执行 `resume` 重新检查重叠，再通过原生 thread 消息回复 `RESUMED`。`resume` 会关闭已清债的 coordination；不要随后调用 registry `respond --status RESUMED`。
 
-`send_message_to_thread` 不能强制中断系统命令；未收到 `PAUSED` 前 owner 不写冲突面。
+`send_message_to_thread` 不能中断系统命令；未收到 `PAUSED` 前不写冲突面。
 
-pause 会产生 `resumePendingAgentIds` 恢复债务。`resolve` 不是闭环，债务清零后 owner 才能 `complete`：
+pause 产生 `resumePendingAgentIds`；`resolve` 后债务清零才能 `complete`：
 
-- `open` 默认 30 分钟 owner 租约；跨 checkpoint 用 `heartbeat`，不高频轮询。
-- `status` 将过期/stale/completed owner 标为 `owner-stale`；注册 Agent 用 `takeover` 接管并继承修复与恢复义务。健康 owner 仅在用户明确改派时允许 force。
+- `open` 默认 30 分钟租约；跨 checkpoint 用 `heartbeat`，不高频轮询。
+- `status` 标记 `owner-stale`；注册 Agent 用 `takeover` 并继承恢复义务。健康 owner 仅由用户改派。
 - 任务明确取消/归档才可 `cancel-resume --confirmed-by-user`；无回复不等于取消，不得自行设置确认标记。
 
 ## 讨论与合并
 
-讨论采用 fan-out/fan-in：`DISCUSSION_REQUEST` 发同一问题，参与者各给一次 position，coordinator `resolve` 并广播；只持久化最终决定。
+讨论用 fan-out/fan-in：`DISCUSSION_REQUEST` 发同一问题，各给一次 position，coordinator `resolve` 并广播；只保留决定。
 
-合并时参与者返回 `MERGE_READY`（branch/base/head/dirty/scopes/dependency/tests/risks）。coordinator 用 Git 重验；无重叠可成组，共享 contract/文件按依赖串行。逐分支窄验证，集成后完整 gate；失败回 owner，成功广播。不自动 push、发布或清理 Git 资源。
+合并返回 `MERGE_READY`（branch/base/head/dirty/scopes/dependency/tests/risks）。coordinator 用 Git 重验；无重叠可成组，共享面串行。逐分支窄验证，集成后完整 gate；失败退回，成功广播。不自动 push、发布或清理。
 
 ### 条件合入快线
 
 hook/gate 失败先分为 `CHANGE_FAILURE / BASELINE_FAILURE / ENVIRONMENT_FAILURE / POLICY_FAILURE / UNKNOWN`。窄验证通过、diff 可审、失败已在干净 base 复现或证实与 diff 无关，且不涉及安全、secret、权限、迁移、发布合规或强制 gate，才标记 `MERGE_READY_CONDITIONAL`。
 
-- 环境修复只做一次 2-5 分钟 probe；无新证据就停止，不无限等待。
+- 环境修复只做一次 2-5 分钟 probe；无新证据即停止。
 - 优先跳过单个已证明无关的 hook（如 `SKIP=<hook-id>`）；`--no-verify` 仅在项目策略或用户明确允许时使用，并记录 hook、失败、base 证据和补验责任。
-- 条件提交不等于通过；integration owner 补跑 gate/CI，失败回原 owner，成功才广播。
-- 无法提交但 diff 已保留时，交给 integration owner 在干净 worktree 应用同一 patch；不得长期留作无人接管的 BLOCKED。
+- 条件提交不等于通过；integration owner 补跑 gate/CI 后才广播。
+- 无法提交但 diff 已保留时，交给 integration owner 应用；不得无人接管。
 
-已解决且会影响未来行动的决定，协调者才执行 `sync_project_memory.py --coordination-id <id>`；并行 worker 不写 tracked memory。
+影响未来行动的决定才执行 `sync_project_memory.py --coordination-id <id>`；并行 worker 不写 tracked memory。
 
 ## 完成
 
-- 未收到 `PAUSED`：BLOCKED；已修复但未发恢复消息：PARTIAL。
-- 消息送达未收到恢复：`DELIVERED_AWAITING_RESUME`。
-- `RESUMED` 或明确取消/归档后闭环；owner stale 且未接管保持 BLOCKED。
-- merge 需目标分支包含预期提交、验证通过且参与者已收到结果。
+未收到 `PAUSED` 为 BLOCKED；已修复未恢复为 PARTIAL；送达未恢复为 `DELIVERED_AWAITING_RESUME`。`RESUMED` 或取消后闭环；merge 需目标分支含预期提交且验证通过。

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "existing-agent-read-only-review",
+    "prompt": "实现权限模块，同时让已有审查会话独立检查迁移风险。",
+    "peer_state": "相关且空闲，scope 为只读审查",
+    "expected_route": "DISPATCH_READ_ONLY",
+    "ask_create_thread": false,
+    "claim_required": false,
+    "owner_continues": true
+  },
+  {
+    "id": "disjoint-frontend-backend",
+    "prompt": "后端接口已对齐，已有前端会话可独立实现不重叠页面。",
+    "peer_state": "相关且空闲，写入 scope 不重叠",
+    "expected_route": "DISPATCH_DISJOINT_WRITE",
+    "ask_create_thread": false,
+    "claim_required": true,
+    "owner_continues": true
+  },
+  {
+    "id": "overlapping-file",
+    "prompt": "另一个会话正在修改同一个路由文件，我也需要改这个文件。",
+    "peer_state": "写入 scope 重叠",
+    "expected_route": "COORDINATE_OVERLAP",
+    "ask_create_thread": false,
+    "claim_required": true,
+    "owner_continues": false
+  },
+  {
+    "id": "high-value-new-thread",
+    "prompt": "实现跨模块同步协议，同时可以独立开展兼容性调研。",
+    "peer_state": "无合适已有会话，独立调研可显著缩短关键决策",
+    "expected_route": "DISCOVER",
+    "ask_create_thread": true,
+    "claim_required": false,
+    "owner_continues": true
+  },
+  {
+    "id": "simple-local-fix",
+    "prompt": "修复按钮文字拼写并运行对应测试。",
+    "peer_state": "存在空闲会话但任务简单",
+    "expected_route": "NONE",
+    "ask_create_thread": false,
+    "claim_required": false,
+    "owner_continues": true
+  },
+  {
+    "id": "busy-peer",
+    "prompt": "实现一个普通设置项，另一个相关会话正处理更高优先级任务。",
+    "peer_state": "相关但忙碌",
+    "expected_route": "NONE",
+    "ask_create_thread": false,
+    "claim_required": false,
+    "owner_continues": true
+  }
+]
