@@ -58,7 +58,14 @@ BRT 是每句输入的默认适配层：理解真实意图、选择最具体 own
 
 ## 最小充分方案
 
-按第一个足以满足意图的层级停止：`NO_BUILD -> PROJECT_REUSE -> STANDARD_NATIVE -> INSTALLED_DEPENDENCY -> MINIMAL_BUILD`。只有外部候选会实质改变架构、依赖或成本时才使用 `ccdawn-feature-reuse-research`。
+按第一个足以满足意图的层级停止：`NO_BUILD -> PROJECT_REUSE -> STANDARD_NATIVE -> INSTALLED_DEPENDENCY -> MINIMAL_BUILD`。先做最窄本地复用检查；满足下列强信号之一，且外部候选可能实质改变实现路径、依赖、成本或风险时，才在规划/实现前使用 `ccdawn-feature-reuse-research`：
+
+- 属于已有成熟引擎、协议、标准或生态的复杂能力，如编辑器、解析器、工作流、权限、搜索、可视化、导入导出或 AI 子系统；
+- 预计需要新增重要依赖、建立跨模块子系统，或项目内没有稳定模式；
+- 用户明确要求寻找、复用或借鉴 GitHub、官方示例、论文或现有项目；
+- 自研成本明显较高，短时 QUICK 搜索足以避免重复造轮子。
+
+文件多、任务名称新颖或“可能存在库”本身不是触发条件。普通 CRUD、样式、小型 bug、机械改动和已有本地模式直接实施，不搜索外部项目。复用结论稳定且实现边界清楚时回原 owner 继续，不强制进入 Planning。
 
 自动精简默认 `AUTO`：简单任务 `LITE`，非平凡实现 `FULL`，用户目标就是删减时 `ULTRA`。不得删除用户要求、信任边界、安全、数据保护、无障碍、兼容或迁移约束。
 

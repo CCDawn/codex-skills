@@ -8,6 +8,8 @@
   {"id":"evaluate-project","prompt":"评价整个项目目前的架构质量、维护风险和优先改进方向","primary":"ccdawn-project-review","support":[],"forbidden_primary":["ccdawn-evaluation","ccdawn-pr-review"]},
   {"id":"generic-evaluation","prompt":"评价这个 skill 的实际效果、冗余和高 ROI 优化点","primary":"ccdawn-evaluation","support":[],"forbidden_primary":["ccdawn-project-review","ccdawn-creative-toolbox"]},
   {"id":"reuse-research","prompt":"这个复杂编辑器功能先去 GitHub 和项目内寻找可复用模块，再判断复用、借鉴还是自建","primary":"ccdawn-feature-reuse-research","support":[],"forbidden_primary":["ccdawn-planning","ccdawn-frontend-engineering"]},
+  {"id":"reuse-mature-engine","prompt":"项目内没有工作流引擎，现在要增加可视化编排、持久化和回放；先调查 GitHub、官方方案和成熟库是否可复用","primary":"ccdawn-feature-reuse-research","support":[],"forbidden_primary":["ccdawn-planning","ccdawn-frontend-engineering"]},
+  {"id":"routine-local-pattern","prompt":"按照项目已有设置表单模式增加一个布尔字段并验证，不新增依赖","primary":"ccdawn-frontend-engineering","support":[],"forbidden_primary":["ccdawn-feature-reuse-research","ccdawn-planning"]},
   {"id":"implementation-plan","prompt":"需求已经确认，本地方案也明确，但涉及 API 迁移和回滚，请制定可评审的实施方案","primary":"ccdawn-planning","support":[],"forbidden_primary":["ccdawn-goal-loop","ccdawn-feature-reuse-research"]},
   {"id":"planning-task-graph","prompt":"方案已确认，三个独立 owner 有依赖产物和不同验收条件，请在实施方案里生成可执行任务图","primary":"ccdawn-planning","support":[],"forbidden_primary":["ccdawn-bdd-tdd-development","ccdawn-completion-summary"]},
   {"id":"high-risk-tdd","prompt":"新增这个已经定义清楚的跨模块状态契约，先写失败行为测试作为 RED，再最小实现和验证","primary":"ccdawn-bdd-tdd-development","support":[],"forbidden_primary":["ccdawn-bug-review","ccdawn-score-loop"]},

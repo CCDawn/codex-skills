@@ -19,7 +19,7 @@ license: MIT
 - Allowed Action: 只读搜索和只读本地代码/文档检查；不安装依赖、不运行外部代码、不复制外部代码、不扩大用户未确认范围。
 - Success Evidence: 当前项目复用点已查，候选有链接或本地证据，许可证/集成风险已判断，复用决策能作为 `ccdawn-planning` 输入。
 - Stop Condition: 无法搜索、许可证不明、需求不清、复用会改变用户未确认范围、需要安装/试跑/复制外部代码。
-- Route Out: `ccdawn-planning`、继续复用研究、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 原开发 owner、`ccdawn-planning`、继续复用研究、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -34,6 +34,8 @@ license: MIT
 - 功能复杂度足以影响方案选择，且外部生态可能已有成熟实现；
 - 搜索结果会改变实现路径、依赖选择、风险、成本或验证方式；
 - 允许联网搜索。若当前不能联网，说明限制，并用本地已有依赖、文档和代码做降级研究。
+
+至少需要一个强信号：成熟领域引擎/协议/标准、重要新依赖、跨模块子系统、项目内无稳定模式、用户明确要求外部复用，或 QUICK 搜索可显著避免高成本自研。文件数量和“网上可能有项目”不算强信号。
 
 不使用本 skill：
 
@@ -59,6 +61,8 @@ license: MIT
 3. 活跃、许可证清晰、测试充分的成熟库；
 4. 可参考的开源项目设计；
 5. 自研。
+
+默认先 `QUICK`：检查项目内复用点，再查看 2-4 个最相关的官方来源、成熟库或 GitHub 项目；决策已稳定就停止，不为凑候选扩大搜索。只有许可证、架构适配或关键能力仍无法判断时才进入 `DEEP`。
 
 ## 候选筛选
 
@@ -100,8 +104,6 @@ license: MIT
 复用研究:
 - 目标功能:
 - 搜索范围:
-- Context Boundary: 用户目标、当前项目可复用点、网络/本地搜索范围、排除范围...
-- Allowed Action: 只读搜索和本地检查；不安装、不运行、不复制外部代码
 - 当前项目已有复用点:
 - 结论: REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE / BLOCKED
 - 推荐原因:
@@ -125,14 +127,10 @@ license: MIT
 - Verification Strategy:
 - Rejected Alternatives:
 - Planning Handoff: 进入 ccdawn-planning 时必须携带的复用决策、依赖边界、验证策略和 rejected alternatives
-- Success Evidence: 当前项目复用点已查、候选有链接/本地证据、许可证/集成风险已判断
-- Stop Condition: 无法搜索 / 许可证不明 / 需求不清 / 复用会改变用户未确认范围
 
 下一步:
 默认路由：<从 BRT interface 的 Route Out 选择一个>，原因...
-执行规则：决策为 REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE 且无自然闸门时，直接进入 `ccdawn-planning`；只有需要继续搜索、改变依赖/架构边界、放弃推荐决策或需求不清时，才列出用户选项。
-
-Route Out: <沿用 BRT interface>
+执行规则：决策为 REUSE / ADAPT / REFERENCE_ONLY / BUILD_IN_HOUSE，且实现边界已清楚、无真实设计分叉时，携带决策回原开发 owner 直接实施；只有依赖/架构仍有取舍、迁移或高风险边界时才进入 `ccdawn-planning`。只有需要继续搜索、改变用户已确认边界或需求不清时，才列出用户选项。
 ```
 
 ## 质量门槛
@@ -143,5 +141,5 @@ Route Out: <沿用 BRT interface>
 - 未检查当前项目已有模块时，不能推荐外部依赖。
 - 不安装、不运行、不复制外部代码；需要试用库时，先进入 `ccdawn-planning` 建立执行契约。
 - 如果搜索会花费大量时间，先做 QUICK 研究，再建议是否继续 DEEP 研究。
-- 进入 `ccdawn-planning` 前，必须把 `复用决策` 作为方案输入。
+- 进入原开发 owner 或 `ccdawn-planning` 前，必须把 `复用决策` 作为输入，不重复研究。
 - 如果复用决策会引入新依赖、改变架构边界或扩大用户可见结果，先用协作校准说明推荐、排除项和取舍，再进入 planning。
