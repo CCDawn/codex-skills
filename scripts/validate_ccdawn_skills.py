@@ -588,7 +588,7 @@ def validate_conflict_triage_cases(repo_root: Path, errors: list[str]) -> None:
     except (OSError, json.JSONDecodeError) as exc:
         errors.append(f"{label}: cannot read valid JSON: {exc}")
         return
-    allowed = {"SELF_NARROWED", "CONTINUE_NON_CONFLICTING", "WAIT_SILENTLY", "MESSAGE_REQUIRED", "REUSE_OPEN"}
+    allowed = {"SELF_NARROWED", "CONTINUE_NON_CONFLICTING", "WAIT_SILENTLY", "DISCUSSION_REQUIRED", "PAUSE_REQUIRED", "REUSE_OPEN"}
     seen: set[str] = set()
     message_cases = 0
     silent_cases = 0
@@ -605,8 +605,11 @@ def validate_conflict_triage_cases(repo_root: Path, errors: list[str]) -> None:
             errors.append(f"{label}: send_message must be boolean")
         message_cases += case["send_message"] is True
         silent_cases += case["send_message"] is False
-    if not isinstance(cases, list) or len(cases) < 6 or message_cases != 1 or silent_cases < 5:
-        errors.append(f"{label}: expected one message case and at least five silent cases")
+    states = {case.get("expected") for case in cases if isinstance(case, dict)} if isinstance(cases, list) else set()
+    if not isinstance(cases, list) or len(cases) < 7 or message_cases != 2 or silent_cases < 5:
+        errors.append(f"{label}: expected discussion/pause message cases and at least five silent cases")
+    if not {"DISCUSSION_REQUIRED", "PAUSE_REQUIRED"}.issubset(states):
+        errors.append(f"{label}: must distinguish discussion from maximum-conflict pause")
 
 def validate_skill(
     repo_root: Path,
@@ -774,9 +777,11 @@ def validate_skill(
             "dispatch/<task-key>",
             "迟到结果先复核",
             "Silent Conflict Triage",
-            "MESSAGE_REQUIRED",
+            "DISCUSSION_REQUIRED",
+            "PAUSE_REQUIRED",
             "WAIT_SILENTLY",
             "存在则复用，不重复发送",
+            "讨论默认优先于暂停",
         ]:
             if marker not in text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
