@@ -367,6 +367,7 @@ def command_cancel_resume(project_root: Path, args: argparse.Namespace) -> int:
             args.agent_id,
             args.target_agent_id,
             args.reason,
+            confirmed_by_user=args.confirmed_by_user,
         ),
     )
     if args.json:
@@ -536,6 +537,11 @@ def parse_args() -> argparse.Namespace:
     cancel_resume.add_argument("--agent-id", required=True, help="Current coordination owner.")
     cancel_resume.add_argument("--target-agent-id", required=True)
     cancel_resume.add_argument("--reason", required=True)
+    cancel_resume.add_argument(
+        "--confirmed-by-user",
+        action="store_true",
+        help="Confirm that the user explicitly cancelled or archived the paused task.",
+    )
     add_json_flag(cancel_resume)
 
     complete = subparsers.add_parser("complete", help="Mark an agent complete and close its claims.")

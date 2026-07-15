@@ -43,7 +43,7 @@ pause 会产生 `resumePendingAgentIds` 恢复债务。`resolve` 不是闭环，
 
 - `open` 默认 30 分钟 owner 租约；跨 checkpoint 用 `heartbeat`，不高频轮询。
 - `status` 将过期/stale/completed owner 标为 `owner-stale`；注册 Agent 用 `takeover` 接管并继承修复与恢复义务。健康 owner 仅在用户明确改派时允许 force。
-- 任务明确取消/归档才可 `cancel-resume`；无回复不等于取消。
+- 任务明确取消/归档才可 `cancel-resume --confirmed-by-user`；无回复不等于取消，不得自行设置确认标记。
 
 ## 讨论与合并
 

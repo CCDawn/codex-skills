@@ -952,7 +952,13 @@ def cancel_resume_obligation(
     owner_agent_id: str,
     target_agent_id: str,
     reason: str,
+    *,
+    confirmed_by_user: bool = False,
 ) -> dict:
+    if not confirmed_by_user:
+        raise CoordinationConflict(
+            "Cancelling resume debt requires explicit user cancellation or archival confirmation."
+        )
     coordination = find_coordination(registry, coordination_id)
     if coordination.get("ownerAgentId") != owner_agent_id:
         raise CoordinationConflict(f"Only the coordination owner can cancel resume debt in {coordination_id}.")
@@ -967,7 +973,12 @@ def cancel_resume_obligation(
         item for item in coordination.get("resumePendingAgentIds", []) if item != target_agent_id
     ]
     coordination.setdefault("cancelledResumeAgents", []).append(
-        {"agentId": target_agent_id, "reason": reason, "cancelledAt": now}
+        {
+            "agentId": target_agent_id,
+            "reason": reason,
+            "confirmedByUser": True,
+            "cancelledAt": now,
+        }
     )
     coordination["updatedAt"] = now
     target.update(

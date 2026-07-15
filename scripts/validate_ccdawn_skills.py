@@ -626,6 +626,7 @@ def validate_skill(
             "resumePendingAgentIds",
             "takeover",
             "cancel-resume",
+            "--confirmed-by-user",
             "Memory 不接管执行循环",
         ]:
             if marker not in text:

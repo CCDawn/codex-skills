@@ -677,6 +677,32 @@ class AgentCoordinationTests(unittest.TestCase):
                 "user archived only B task",
                 "--json",
             )
+            unauthorized_cancel = run_coordination(
+                project,
+                codex_home,
+                "cancel-resume",
+                "--coordination-id",
+                coordination_id,
+                "--agent-id",
+                "agent-a",
+                "--target-agent-id",
+                "agent-b",
+                "--reason",
+                "agent-b did not respond",
+                "--json",
+                check=False,
+            )
+            self.assertEqual(1, unauthorized_cancel.returncode)
+            before_cancel = json.loads(
+                run_coordination(project, codex_home, "status", "--json").stdout
+            )
+            before_coordination = next(
+                item for item in before_cancel["coordinations"] if item["id"] == coordination_id
+            )
+            self.assertEqual(
+                ["agent-b", "agent-c"], before_coordination["resumePendingAgentIds"]
+            )
+
             run_coordination(
                 project,
                 codex_home,
@@ -689,6 +715,7 @@ class AgentCoordinationTests(unittest.TestCase):
                 "agent-b",
                 "--reason",
                 "user explicitly cancelled and archived B task",
+                "--confirmed-by-user",
                 "--json",
             )
 
@@ -958,12 +985,22 @@ class AgentCoordinationTests(unittest.TestCase):
         pause_agent(registry, "agent-b", coordination["id"], "Await decision")
         resolve_coordination(registry, coordination["id"], "agent-a", "Cancel task", "User archived it")
 
+        with self.assertRaisesRegex(CoordinationConflict, "explicit user cancellation"):
+            cancel_resume_obligation(
+                registry,
+                coordination["id"],
+                "agent-a",
+                "agent-b",
+                "Agent did not respond",
+            )
+
         cancel_resume_obligation(
             registry,
             coordination["id"],
             "agent-a",
             "agent-b",
             "User explicitly cancelled and archived the task",
+            confirmed_by_user=True,
         )
 
         agent_b = next(item for item in registry["agents"] if item["id"] == "agent-b")
