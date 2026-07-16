@@ -31,7 +31,7 @@
 | 重要研究 claim、反直觉结果、baseline 晋升审查 | `ccdawn-research-rigor-review` | COMPACT | ACCEPT/QUALIFY/REJECT |
 | 竞赛/benchmark 全生命周期 | `ccdawn-competition-research-lifecycle` | FULL | 阶段契约与下游 owner |
 | 用户明确需要持久目标、反复迭代和 stop condition，且无专项 owner | `ccdawn-goal-loop` | COMPACT/FULL | 有界 goal contract 与下一轮证据 |
-| 需求已对齐，现有同项目 Agent 可组成最小团队并自动回收、本地集成多个独立交付物 | `ccdawn-multi-agent-orchestration` | COMPACT/FULL | 团队契约、集成结果与端到端验证 |
+| 需求已对齐，多个现有同项目会话可通过平级协商互助完成各自任务并共同集成 | `ccdawn-multi-agent-orchestration` | COMPACT/FULL | 协作 agreement、各自交付与集成验证 |
 | 多会话进度、冲突、暂停恢复、讨论或合并 | `ccdawn-thread-coordination` | COMPACT | registry 状态或协调闭环 |
 | 用户/项目明确要求 memory、dashboard、跨会话恢复 | `ccdawn-dawn-agent-html-memory` | FAST/COMPACT | 持久 delta 或恢复上下文 |
 | 已知存在临时产物、旧 branch/worktree/claim，或用户明确要求清理 | `ccdawn-development-cleanup` | FAST/COMPACT | CLEAN/DEFERRED/BLOCKED |
@@ -51,8 +51,8 @@
 - 具体 bug 交给 bug owner；整仓测试健康度和架构风险交给 project review。
 - Bug Review 持有从根因到修复的完整闭环；必要 RED/GREEN 是其内部测试锚点，不再二次加载 TDD skill。TDD 只主责已明确的新行为或实现契约。
 - planning 解决设计分叉，并仅在真实独立边界存在时内嵌 `TASK_GRAPH`；`NO_SPLIT` 不产生额外阶段。
-- BRT 负责对齐后的有界会话发现；自动组队、持续讨论和本地集成由 multi-agent orchestration 主责；单次建议、冲突或恢复只用 thread coordination。
-- orchestration 是跨成员集成 owner，不替代成员的 bug、UI、研究或测试专项 owner；没有两个正收益 lane 时回单 owner。
+- BRT 负责对齐后的有界会话发现；现有平级会话的持续协商和共同集成由 multi-agent orchestration 主责；单次建议、冲突或恢复只用 thread coordination。
+- orchestration 不创建子 Agent、不接管任何会话任务；每个 Agent 保留 bug、UI、研究或测试专项 owner，没有双向正收益时各自继续。
 - 实验 metric 未提升不是 TDD RED；确定性 harness/parser/schema bug 才进入工程 TDD。
 - UI 文件的机械修改可留在 FAST_PATH；产品、交互或视觉结果未定时由 UI design 主责，结果已定且主要工作是生产实现时由 frontend engineering 主责。
 - 普通完成由当前 owner 收口；正式跨阶段证据包才进入 completion summary。
@@ -77,7 +77,7 @@
 - 把发送 pause 当作已暂停，或 owner 在 `resumePendingAgentIds` 清零前结束。
 - 把未安装 skill 当作唯一 owner，或为普通任务搜索/安装新 skill。
 - 为同一子任务同时加载功能重叠的 review、TDD、debug 或 summary skill。
-- 未先完成意图对齐和候选价值判断就组队，或找到相关 thread 后仍只汇报“可协作”而不路由 orchestration。
+- 未先完成意图对齐和双向价值判断就建立协作，或把平级会话当作可派发 worker。
 - 完成后无真实残留仍加载 cleanup，或有残留却只输出泛化提醒。
 
 出现这些信号时回到 BRT 主文件，重新选择最具体 owner 和最低充分流程重量。

@@ -38,8 +38,9 @@ BRT_CORE_MARKERS = [
     "低置信度不得带着未确认的高影响假设写入",
     "一次集中提出 2-4 个",
     "Collaboration Discovery",
-    "DISPATCH_READ_ONLY",
-    "DISPATCH_DISJOINT_WRITE",
+    "PEER_READ_ONLY",
+    "PEER_DISJOINT_WRITE",
+    "PEER_COLLABORATION_READY",
     "COORDINATE_OVERLAP",
     "PEER_CONTEXT_REVIEW",
     "Silent Conflict Triage",
@@ -103,8 +104,8 @@ BRT_REFERENCE_BUDGETS = {
 BRT_REFERENCE_REQUIRED_MARKERS = {
     "collaboration-discovery.md": [
         "只读最多 3 个最相关候选",
-        "DISPATCH_DISJOINT_WRITE -> TEAM_READY",
-        "发现时不得发送消息",
+        "PEER_DISJOINT_WRITE -> PEER_COLLABORATION_READY",
+        "不得把现有会话视为可派发的 worker",
     ],
     "routing-practice.md": [
         "未出现的 skill 不能成为 owner",
@@ -637,18 +638,18 @@ def validate_feature_reuse_cases(repo_root: Path, errors: list[str]) -> None:
         errors.append("tests/feature_reuse_cases.json: expected at least six positive/negative cases")
 
 
-def validate_collaboration_dispatch_cases(repo_root: Path, errors: list[str]) -> None:
-    path = repo_root / "tests" / "collaboration_dispatch_cases.json"
-    label = "tests/collaboration_dispatch_cases.json"
+def validate_peer_collaboration_cases(repo_root: Path, errors: list[str]) -> None:
+    path = repo_root / "tests" / "peer_collaboration_cases.json"
+    label = "tests/peer_collaboration_cases.json"
     try:
         cases = json.loads(read_text(path))
     except (OSError, json.JSONDecodeError) as exc:
         errors.append(f"{label}: cannot read valid JSON: {exc}")
         return
 
-    routes = {"NONE", "DISCOVER", "PEER_CONTEXT_REVIEW", "DISPATCH_READ_ONLY", "DISPATCH_DISJOINT_WRITE", "COORDINATE_OVERLAP"}
+    routes = {"NONE", "DISCOVER", "PEER_CONTEXT_REVIEW", "PEER_READ_ONLY", "PEER_DISJOINT_WRITE", "COORDINATE_OVERLAP"}
     seen_ids: set[str] = set()
-    has_dispatch = False
+    has_peer_collaboration = False
     has_none = False
     has_create_prompt = False
     for case in cases if isinstance(cases, list) else []:
@@ -669,11 +670,13 @@ def validate_collaboration_dispatch_cases(repo_root: Path, errors: list[str]) ->
         for field in ["ask_create_thread", "claim_required", "owner_continues"]:
             if not isinstance(case[field], bool):
                 errors.append(f"{label}: {field} must be boolean")
-        has_dispatch = has_dispatch or case["expected_route"].startswith("DISPATCH_")
+        if case["expected_route"].startswith("PEER_") and case["owner_continues"] is not True:
+            errors.append(f"{label}: peer collaboration must preserve each agent's original task progress")
+        has_peer_collaboration = has_peer_collaboration or case["expected_route"].startswith("PEER_")
         has_none = has_none or case["expected_route"] == "NONE"
         has_create_prompt = has_create_prompt or case["ask_create_thread"] is True
-    if not isinstance(cases, list) or len(cases) < 6 or not (has_dispatch and has_none and has_create_prompt):
-        errors.append(f"{label}: expected at least six cases covering dispatch, no dispatch, and create-thread prompt")
+    if not isinstance(cases, list) or len(cases) < 6 or not (has_peer_collaboration and has_none and has_create_prompt):
+        errors.append(f"{label}: expected at least six cases covering peer collaboration, no collaboration, and create-thread prompt")
 
 
 def validate_conflict_triage_cases(repo_root: Path, errors: list[str]) -> None:
@@ -918,23 +921,23 @@ def validate_skill(
             "不要随后调用 registry `respond --status RESUMED`",
             "`heartbeat`",
             "## 主动协作",
-            "Expected Output",
-            "禁止递归派发",
-            "向用户询问是否创建",
-            "不得因此停止当前可推进工作",
+            "Expected Evidence",
+            "双方保留各自 owner",
+            "询问是否创建",
+            "不停止当前工作",
             "非 owner 停止自身冲突写入",
             "thread/<agent-id>",
-            "dispatch/<task-key>",
-            "不要拆成两个 claim",
-            "迟到 ACK/结果不能恢复原派发",
+            "collaboration/<topic-key>",
+            "不要拆成多个 claim",
+            "迟到回复不能恢复旧 agreement",
             "Silent Conflict Triage",
             "DISCUSSION_REQUIRED",
             "PAUSE_REQUIRED",
             "WAIT_SILENTLY",
             "存在则复用，不重复发送",
             "讨论优先于暂停",
-            "From Agent / From Task / To Agent / To Task / Reply To",
-            "ACK 回复 owner thread",
+            "From Agent / Own Task / To Agent / Own Task / Reply To",
+            "ACK 回复其 thread",
             "final 不索要回复",
             "PEER_CONTEXT_REVIEW",
             "ADVICE_AVAILABLE",
@@ -954,23 +957,32 @@ def validate_skill(
         orchestration_text = text + "\n" + read_text(skill_dir / "references" / "team-protocol.md")
         for marker in [
             "## 进入闸门",
-            "## 编排循环",
-            "TEAM_READY",
-            "TEAM_INVITE",
-            "ACCEPTED",
-            "禁止成员递归派发",
-            "一次 registry claim 原子占用",
-            "事件驱动协作",
+            "## 平级协作循环",
+            "PEER_COLLABORATION_READY",
+            "COLLABORATION_PROPOSAL",
+            "PEER_ACCEPT / PEER_ADAPT / PEER_DECLINE",
+            "没有主从、派发或隐式任务转移",
+            "registry claim 原子占用",
+            "用信息价值降低熵",
             "MERGE_READY",
             "integration queue",
-            "自动本地集成",
+            "协同集成而非收编结果",
             "resumePendingAgentIds",
             "不得在未授权时 push",
             "集成验证",
-            "单次建议、状态交换或冲突处理路由 `ccdawn-thread-coordination`",
+            "一次建议、状态交换或单一冲突只用 `ccdawn-thread-coordination`",
         ]:
             if marker not in orchestration_text:
                 errors.append(f"{label}: multi-agent orchestration contract missing marker '{marker}'")
+        for forbidden in [
+            "TEAM_INVITE",
+            "TEAM_READY",
+            "成员加入 roster",
+            "创建 subagent",
+            "派发已授权工作",
+        ]:
+            if forbidden in orchestration_text:
+                errors.append(f"{label}: peer collaboration must not restore hierarchical marker '{forbidden}'")
 
     compact_review_contracts = {
         "ccdawn-evaluation": [
@@ -1200,7 +1212,7 @@ def main() -> int:
     validate_live_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
     validate_conditional_merge_cases(repo_root, errors)
     validate_feature_reuse_cases(repo_root, errors)
-    validate_collaboration_dispatch_cases(repo_root, errors)
+    validate_peer_collaboration_cases(repo_root, errors)
     validate_conflict_triage_cases(repo_root, errors)
     validate_peer_advice_message_cases(repo_root, errors)
 

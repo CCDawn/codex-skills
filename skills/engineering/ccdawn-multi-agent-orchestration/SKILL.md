@@ -1,84 +1,71 @@
 ---
 name: ccdawn-multi-agent-orchestration
-description: "Use when aligned project work has multiple valuable same-project Codex threads/agents or genuinely independent lanes and needs automatic team formation, bounded dispatch, evidence-driven discussion, progress recovery, dependency-aware local integration, and end-to-end verification; do not use for simple work, one-off peer advice, or a single overlap/conflict that ccdawn-thread-coordination can resolve."
+description: "Use when two or more existing, independent Codex App threads in the same project can help each other finish their own tasks through peer negotiation, shared-contract alignment, dependency exchange, conflict reduction, or coordinated local integration; do not use to create or command subagents, transfer ownership, or add ceremony to unrelated work."
 license: MIT
 ---
 
-# CCDawn Multi-Agent Orchestration
+# CCDawn Peer-Agent Collaboration
 
 ## 目标
 
-把已对齐需求交给最小有效 Agent 团队，持续回收关键证据并完成本地集成。当前 Agent 是 coordinator 和集成 owner；专项 Agent 负责边界清晰的交付物。
+让同项目的平级会话 Agent 各自完成原任务，同时通过最少必要协商减少重复劳动、修改冲突、过期结论和集成返工。编排对象是协作过程，不是其他 Agent。
 
 ## BRT interface
 
-- Context Boundary: 已对齐意图、同项目候选 thread、任务边界、依赖、branch/worktree、验证和本地集成目标。
-- Output Contract: team roster、成员契约、讨论决定、集成结果、验证证据和未决风险。
-- Allowed Action: 读取/发送 thread 消息、使用现有 registry、派发已授权工作并在允许范围内本地集成；新建用户会话、远程 Git、发布和破坏性动作需单独授权。
-- Success Evidence: 成员回执、可追踪提交或 artifact、目标分支包含已选结果、集成验证通过且协调债务清零。
-- Stop Condition: 意图未对齐、没有正收益团队、owner/scope 不清、集成目标不明、高风险取舍、恢复债务或权限不足。
-- Route Out: 专项任务 owner、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-brt` 或 BLOCKED。
+- Context Boundary: 已对齐意图、现有独立 thread、各自任务/scope/branch、共享契约、依赖、冲突和集成目标。
+- Output Contract: peer agreement、责任边界、共享决定、依赖交付、集成证据和各自任务状态。
+- Allowed Action: 读取/发送 thread 消息、使用现有 registry、协商和执行已授权的本地集成；不得替对方改任务状态，新建会话、远程 Git、发布和破坏性动作需授权。
+- Success Evidence: 每个 Agent 的原任务保持 owner、共享边界无矛盾、重复工作被消除、目标分支验证通过且恢复债务清零。
+- Stop Condition: 意图未对齐、不是同项目、缺少有效 thread、协作成本不低于收益、责任争议、高风险取舍或权限不足。
+- Route Out: 各 Agent 原 owner、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
-- 只处理 BRT interface；用户可见内容默认中文，只报团队决定、关键 checkpoint、集成证据和风险。
-- Route Out 仅以 BRT interface 为准；末行写 `下一步建议: <一个具体动作>`。
-- 编排不能扩大用户意图、写入面或权限，也不能把普通任务强行拆给多个 Agent。
+- 所有 Agent 平级且保留原任务、写入许可、branch 和完成责任；没有主从、派发或隐式任务转移。
+- 用户可见内容默认中文，只报改变行动的共同决定、依赖、风险和集成证据。Route Out 仅以 BRT interface 为准；末行写 `下一步建议: <一个具体动作>`。
+- 协作必须改善至少一个本地任务且不损害其他任务，或降低共享项目的冲突/回归；否则静默返回各自工作。
 
 ## 进入闸门
 
-BRT 已完成意图对齐和有界会话发现，以 `TEAM_READY` 交接，且本轮具有可用的原生 thread read/send 能力，并满足至少一项：
+BRT 已完成意图对齐和有界发现，以 `PEER_COLLABORATION_READY` 交接；本轮具有原生 thread read/send 能力，并且至少两个现有独立会话存在真实互补、依赖、重叠或共同集成面。
 
-- 现有 Agent 持有可直接复用的相关上下文、实现或证据；
-- 有两个以上可独立交付、写入面可分离且并行能缩短关键路径的 lane；
-- 不同专项视角会实质降低误改、回归或集成风险。
+简单任务、仅目录相似、无共享决定、同一小文件无法并行，或消息/合并成本高于预期收益时不进入。一次建议、状态交换或单一冲突只用 `ccdawn-thread-coordination`。
 
-若单 owner 更快、任务共享同一小文件、候选忙碌/过期、拆分后合并成本不低于收益，则返回原 owner。单次建议、状态交换或冲突处理路由 `ccdawn-thread-coordination`。
+## 平级协作循环
 
-## 编排循环
+### 1. 建立各自与共同事实
 
-### 1. 建立任务真相
+读取每个候选的 `Task / Desired Outcome / Scope / Branch or Worktree / Checkpoint / Blocker / Success Evidence`。区分：各自独占面、共享契约、依赖交付和集成面。代码、Git 和运行证据优先于消息或 registry。
 
-锁定 `Intent / Deliverables / Non-goals / Allowed Actions / Base / Integration Target / Success Evidence`。需要设计方案时先用 `ccdawn-planning` 形成一个可执行方案；不为组队额外制造 TASK_GRAPH。
+### 2. 提出协作而非派发
 
-### 2. 组成最小团队
+任何 Agent 都可提出 `COLLABORATION_PROPOSAL`，但不能改变对方任务。对方以 `PEER_ACCEPT / PEER_ADAPT / PEER_DECLINE` 自主决定。只有接受后才形成 agreement；需要消息结构时读取 `references/team-protocol.md`。
 
-优先复用同项目现有 thread。读取候选的当前任务、checkpoint、scope、branch/worktree 和 blocker，选择 2-4 个有独特贡献且可联系的成员。无合适 thread 时，只在新增会话收益明确时向用户询问一次；未授权不创建，也不停止当前可推进工作。
+agreement 只记录 `Peer Tasks / Shared Surface / Each Scope / Dependency / Integration Owner / Evidence / Exit Condition`。`Coordination Owner` 仅维护共同决定，`Integration Owner` 仅负责合入验证，均不拥有其他 Agent。
 
-coordinator 保留关键路径、共享契约、集成和最终验证。每个成员只有一个明确 owner contract：`Deliverable / Scope / Dependency In / Evidence Out / Return Condition / Do Not Touch`。写入 lane 必须互不重叠；只读审查不得顺带改代码；禁止成员递归派发。
+使用一次 registry claim 原子占用 `lane=collaboration/<topic-key>`，并加入相关 `thread/<agent-id>` 与共享 surface，防止重复提议；拒绝、过期或结束后释放。每个 Agent 继续自己的非冲突工作，不等待可选协作。
 
-邀请前用一次 registry claim 原子占用 `lane=dispatch/<task-key>`，并同时写入 `thread/<agent-id>` 与 `task/<orchestration-id>/<deliverable>` scopes。claim 失败则不发送；拒绝或超时后释放。迟到结果必须匹配仍有效的 dispatch id，否则只作为待复核候选，不能进入 integration queue。
+### 3. 用信息价值降低熵
 
-发送 `TEAM_INVITE` 后只把 `ACCEPTED` 的成员加入 roster；拒绝、忙碌或超时的可选成员不阻塞主线。需要具体消息结构时读取 `references/team-protocol.md`。
+只在共享契约变化、依赖就绪、可行动新证据、结论纠正、真实 blocker 或 `MERGE_READY` 时通信。消息必须说明发送者、原任务、证据、对双方行动的影响和期望回复。
 
-### 3. 事件驱动协作
+不发送无变化进度、逐步思考、重复边界、可自行读取的信息或非阻塞催促。相同事实只保留最新结论；矛盾结论用 `CORRECTION` 明确替代关系。没有新增决策价值时继续各自任务。
 
-成员只在契约变化、依赖就绪、发现会改变他人行动的证据、出现 blocker 或达到 `MERGE_READY` 时发送 checkpoint。coordinator 不固定频率轮询，不转发逐步思考，也不要求无变化状态。
+### 4. 协商冲突与依赖
 
-共享接口、方案或证据产生分歧时，使用 `ccdawn-thread-coordination` 建立一个可复用 discussion；成员回复立场与证据，coordinator 收齐必要意见后形成单一决定并广播。普通重叠先缩 scope 或协商；只有无法拆分且继续写会立即覆盖/回归时才暂停。
+共享接口或实现顺序有分歧时，由 `ccdawn-thread-coordination` 维护 discussion，各方提交立场与证据后形成共同决定。先调整 scope、顺序或接口；只有继续写会立即覆盖/回归且无法拆分时才暂停。暂停方让出 claim，解决后必须恢复，不能因另一方结束而遗留。
 
-### 4. 回收与恢复
+### 5. 协同集成而非收编结果
 
-每个结果必须包含 `Base / Head or Artifact / Changed Scope / Tests / Assumptions / Risks`。迟到结果按最新 base 重验；不能直接覆盖已集成内容。
+每个 Agent 独立报告 `Base / Head or Artifact / Changed Scope / Tests / Assumptions / Risks`。约定的 Integration Owner 用 Git 与测试重验，不把消息当事实源。
 
-成员失活但 lane 可替代时，先保存已有证据，再转派给空闲成员或 coordinator；不要重做已验证工作。coordination owner 失活时使用 `takeover`，并继承全部 `resumePendingAgentIds`。可选成员失败不阻断无依赖主线；关键 lane 失败才进入 BLOCKED 或返修。
+- 同一 checkout 的不重叠修改无需制造 merge；独立 branch/worktree 才进入 integration queue。
+- 有依赖或共享契约时串行集成；冲突由相关 Agent 共同决定，机械冲突才由 Integration Owner 处理。
+- 每项运行窄验证，全部合入后运行一次集成 gate；失败只通知责任 Agent 和受影响依赖方。
+- 不得在未授权时 push、创建/合并远程 PR、发布或直接改受保护 `main`。
 
-### 5. 自动本地集成
+## 完成与降熵门
 
-按依赖顺序建立 integration queue。不要为每个小 lane 新建 worktree；复用现有 branch/worktree，只有独立写入确实需要隔离时才创建。多个写入分支存在时，优先使用一个明确的本地 integration target。
+协作完成不等于替任何 Agent 完成任务。只有各自交付达到原验收、共享决定一致、必要集成验证通过、open coordination 和 `resumePendingAgentIds` 恢复债务清零时，才结束共同 agreement。
 
-在已有 WRITE 授权内，本地集成属于任务本身，不在每个成员完成后询问是否继续。每项合入前由 coordinator 重验提交、diff、base、dirty state、scope 和聚焦测试：
-
-- 无依赖且无共享面可以成组；有依赖或共享契约必须串行。
-- 冲突先退回相关 owner 协商；coordinator 只处理边界明确的机械冲突。
-- 集成操作失败使用对应的 `merge/cherry-pick/rebase --abort` 恢复，不覆盖既有未提交改动。
-- 每项完成后跑窄验证；全部进入目标后跑一次集成 gate。
-- 验证失败按责任 lane 返修，不让所有成员重复诊断同一问题。
-
-不得在未授权时 push、创建/合并远程 PR、发布，或直接改受保护 `main`。本地 integration branch 验证通过后，才把远程动作交给相应 GitHub owner 或用户闸门。
-
-## 完成门
-
-只有以下全部成立才结束：关键 deliverable 已集成；目标分支包含选定提交；集成验证通过或有明确允许的条件证据；open coordination 和恢复债务清零；没有无人接管的失败 lane。
-
-只在已知产生临时 branch/worktree/claim 时路由 `ccdawn-development-cleanup`。普通结束不生成额外总结 skill；跨会话正式交接才使用 `ccdawn-completion-summary`。
+收口前检查：是否减少了重复实现、冲突修改、过期消息和多余 worktree；协作日志是否只保留会改变后续行动的事实。存在真实残留才路由 `ccdawn-development-cleanup`。

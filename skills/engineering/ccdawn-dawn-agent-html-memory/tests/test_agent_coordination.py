@@ -1146,34 +1146,34 @@ class AgentCoordinationTests(unittest.TestCase):
         self.assertEqual(first["id"], second["id"])
         self.assertEqual(1, len(registry["claims"]))
 
-    def test_dispatch_claim_atomically_reserves_target_thread_and_task(self) -> None:
+    def test_collaboration_claim_atomically_reserves_peer_and_topic(self) -> None:
         registry: dict = {"agents": [], "claims": [], "coordinations": [], "recentEvents": []}
         register_agent(registry, "agent-a", "Agent A")
         register_agent(registry, "agent-b", "Agent B")
         first = create_claim(
             registry,
             "agent-a",
-            "dispatch/auth-review",
-            ["thread/agent-reviewer", "task/orch-1/auth-review"],
-            "Dispatch auth review",
+            "collaboration/auth-contract",
+            ["thread/agent-reviewer", "shared/auth-contract"],
+            "Coordinate auth contract",
         )
 
         with self.assertRaises(CoordinationConflict):
             create_claim(
                 registry,
                 "agent-b",
-                "dispatch/duplicate-review",
-                ["thread/agent-reviewer", "task/orch-2/auth-review"],
-                "Duplicate dispatch",
+                "collaboration/duplicate-auth-contract",
+                ["thread/agent-reviewer", "shared/auth-contract"],
+                "Duplicate collaboration proposal",
             )
 
-        release_claim(registry, first["id"], "released", "Dispatch declined")
+        release_claim(registry, first["id"], "released", "Peer declined")
         replacement = create_claim(
             registry,
             "agent-b",
-            "dispatch/reassigned-review",
-            ["thread/agent-reviewer", "task/orch-2/auth-review"],
-            "Reassigned review",
+            "collaboration/new-auth-contract",
+            ["thread/agent-reviewer", "shared/auth-contract"],
+            "New collaboration proposal",
         )
         self.assertEqual("agent-b", replacement["agentId"])
 

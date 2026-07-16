@@ -37,9 +37,11 @@ class BrtActivationTests(unittest.TestCase):
         self.assertIn("before the first tool call", block)
         self.assertIn("MUST NOT start a broad repository scan", block)
         self.assertIn("grouped high-impact questions", block)
-        self.assertIn("bounded same-project thread discovery", block)
+        self.assertIn("existing same-project peer threads", block)
         self.assertIn("ccdawn-multi-agent-orchestration", block)
         self.assertIn("Discovery sends no messages", block)
+        self.assertIn("never creates subagents", block)
+        self.assertIn("keeps ownership of its own task", block)
         self.assertIn("Do not auto-load generic process frameworks", block)
 
     def test_remove_deletes_only_managed_block(self) -> None:

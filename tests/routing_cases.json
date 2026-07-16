@@ -16,7 +16,7 @@
   {"id":"formal-closeout","prompt":"汇总跨三个会话的完成证据、Deferred 风险和 PR 发布准备状态，形成正式交接","primary":"ccdawn-completion-summary","support":[],"forbidden_primary":["ccdawn-development-cleanup","ccdawn-planning"]},
   {"id":"persistent-goal","prompt":"建立一个可持续迭代的目标契约，每轮根据成功证据选择下一步并设置停止条件","primary":"ccdawn-goal-loop","support":[],"forbidden_primary":["ccdawn-planning","ccdawn-score-loop"]},
   {"id":"finite-continuation","prompt":"继续完成刚才已经规划好的三个实现项，全部验证后再汇报","primary":"ccdawn-brt","support":[],"forbidden_primary":["ccdawn-goal-loop","ccdawn-completion-summary"]},
-  {"id":"multi-agent-orchestration","prompt":"需求已经对齐，请主动寻找同项目现有会话，把后端、前端和集成验证组成最小团队，持续协调关键证据并自动合入本地集成分支","primary":"ccdawn-multi-agent-orchestration","support":[],"forbidden_primary":["ccdawn-thread-coordination","ccdawn-planning"]},
+  {"id":"multi-agent-orchestration","prompt":"需求已经对齐，请联系同项目现有后端和前端会话，让各自完成原任务，同时协商共享接口、依赖和集成顺序，减少重复修改与回归","primary":"ccdawn-multi-agent-orchestration","support":[],"forbidden_primary":["ccdawn-thread-coordination","ccdawn-planning"]},
   {"id":"thread-conflict","prompt":"两个 Codex 会话修改同一文件，协调暂停、讨论合并顺序，并在冲突解除后恢复对方","primary":"ccdawn-thread-coordination","support":[],"forbidden_primary":["ccdawn-dawn-agent-html-memory","ccdawn-planning","ccdawn-multi-agent-orchestration"]},
   {"id":"conditional-integration","prompt":"分支聚焦测试已通过，但 pre-commit 因 main 同样存在的 .venv 环境故障失败；请保留证据并协调条件提交、集成后补验，不要无限重建环境","primary":"ccdawn-thread-coordination","support":[],"forbidden_primary":["ccdawn-completion-summary","ccdawn-bug-review"]},
   {"id":"project-memory","prompt":"初始化并同步 .docs/project-memory，让不同会话可恢复决策、blocker 和进度","primary":"ccdawn-dawn-agent-html-memory","support":[],"forbidden_primary":["ccdawn-thread-coordination","ccdawn-completion-summary"]},

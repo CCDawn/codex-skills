@@ -1,49 +1,44 @@
-# Team Protocol
+# Peer Collaboration Protocol
 
-只在形成真实团队后读取。所有消息使用同一个 `Orchestration ID` 和稳定 `Reply To`，先读已有消息再发送。
+只在两个以上现有独立 Codex 会话形成真实协作时读取。所有消息使用同一个 `Collaboration ID` 和稳定 `Reply To`；先读已有消息，再判断是否有新增决策价值。
 
-## 候选判断
-
-按以下顺序筛选：同一项目与事实源、近期仍活跃、任务互补或持有可复用证据、scope 可分离、具备有效 thread id。只读最多 3 个最相关候选；路径相似但项目不明不算同项目。
-
-## TEAM_INVITE
+## COLLABORATION_PROPOSAL
 
 ```text
-Type: TEAM_INVITE
-Orchestration ID:
-From Agent / From Task:
-To Agent / Current Task:
-Why This Agent:
-Deliverable:
-Scope:
-Dependency In:
-Evidence Out:
-Return Condition:
-Do Not Touch:
+Type: COLLABORATION_PROPOSAL
+Collaboration ID:
+From Agent / Own Task:
+To Agent / Own Task:
+Shared Surface or Dependency:
+Why Both Tasks Benefit:
+Proposed Each Scope:
+Evidence To Exchange:
+Integration Owner (if needed):
+Exit Condition:
 Reply To:
 ```
 
-邀请前必须持有一次原子创建的 dispatch claim；消息携带其 id。接收方只回复 `ACCEPTED / ADAPT / DECLINED`，并说明实际 branch/worktree、可接受 scope 和依赖缺口。未收到 `ACCEPTED` 不视为入队；claim 已释放或过期时，迟到 ACK/结果不能恢复原派发。
+接收方回复 `PEER_ACCEPT / PEER_ADAPT / PEER_DECLINE`。接受只代表同意协作边界，不转移原任务 owner、权限或 branch。proposal claim 已释放或过期时，迟到回复只能作为新提议的参考。
 
-## CHECKPOINT
+## VALUE_CHECKPOINT
 
-只发送以下状态：
+只发送：
 
-- `CONTRACT_CHANGE`：任务契约或 scope 必须改变；
-- `DEPENDENCY_READY`：另一成员可以开始；
-- `ACTIONABLE_FINDING`：新证据会改变其他成员行动；
-- `BLOCKED`：需要其他成员独有证据或决定；
-- `MERGE_READY`：交付物已完成并可回收；
-- `CORRECTION`：此前结论错误且会导致误改。
+- `SHARED_CONTRACT_CHANGE`：共同接口或约束变化；
+- `DEPENDENCY_READY`：对方任务依赖已可用；
+- `ACTIONABLE_FINDING`：新证据会改变对方行动；
+- `CORRECTION`：此前结论错误且会导致误改；
+- `BLOCKED_BY_PEER_FACT`：缺少对方独有事实；
+- `MERGE_READY`：自己的交付已达到约定回收条件。
 
-相同证据只保留最新状态；关联 findings 在自然 checkpoint 聚合。无变化进度、过程旁白和非阻塞催促不发送。
+消息包含 `Own Task / New Evidence / Impact On Peer / Requested Decision / Reply To`。无新增决策价值不发送；多个相关 finding 在自然 checkpoint 聚合。
 
 ## MERGE_READY
 
 ```text
 Type: MERGE_READY
-Orchestration ID:
-Agent / Deliverable:
+Collaboration ID:
+Agent / Own Task:
 Base / Head:
 Branch / Worktree:
 Changed Scope:
@@ -53,4 +48,4 @@ Known Risks:
 Suggested Integration Order:
 ```
 
-该消息只是候选证据，coordinator 必须用 Git 和测试重验。集成完成后只广播一次 `INTEGRATED`；失败只通知负责返修的成员和受影响依赖方。
+Integration Owner 必须用 Git 和测试重验。成功只广播一次 `INTEGRATED`；失败只通知责任 Agent 和受影响依赖方。每个 Agent 根据结果继续完成自己的原任务。

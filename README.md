@@ -9,7 +9,7 @@
 
 **让 Codex 先理解你，再决定怎么做。**
 
-27 个中文优先 Agent Skills，支持 Codex 与 Grok Build，覆盖意图对齐、动态路由、多 Agent 编排、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
+27 个中文优先 Agent Skills，支持 Codex 与 Grok Build，覆盖意图对齐、动态路由、多会话平级协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -74,14 +74,14 @@ sh ./install.sh
 | 已安装 GitHub、浏览器、Figma 或文档工具却不会用 | BRT 按当前可用能力直接路由，CCDawn owner 只保留目标与验收 |
 | 简单修改被流程拖慢 | 按子任务风险控制重量，默认优先直接实现和验证 |
 | 审查只给结论、不继续推进 | 形成按依赖排序的行动队列，在边界内连续处理 |
-| 多个 Codex 会话同时开发 | BRT 对齐后主动发现可协作会话，按价值组队并持续回收、本地集成 |
+| 多个 Codex 会话同时开发 | BRT 对齐后发现可互助的平级会话，让各自完成任务并协商共享边界与集成 |
 | 功能完成后残留临时文件和旧分支 | 仅在已知产生残留或用户要求时清理有归属证据的本地资源 |
 | AI 研究和普通开发混用流程 | 分离研究实验、评分循环、严谨性审查和软件 TDD |
 
 ## 精选 Skill
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)：默认适配层，负责意图理解、讨论式对齐、路由和流程重量控制。
-- [`ccdawn-multi-agent-orchestration`](skills/engineering/ccdawn-multi-agent-orchestration/SKILL.md)：需求对齐后自动复用同项目 Agent，组织最小团队、持续讨论、恢复和验证后的本地集成。
+- [`ccdawn-multi-agent-orchestration`](skills/engineering/ccdawn-multi-agent-orchestration/SKILL.md)：连接同项目现有平级会话，让各 Agent 保留原任务，通过低噪声协商减少重复、冲突和集成返工。
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)：共享同项目 Agent 进度，协调冲突、讨论、暂停恢复与快速合并。
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md)：清理开发残留，并安全收尾已合并本地分支、worktree 和 claim。
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
@@ -115,7 +115,7 @@ sh ./install.sh
 6. 使用安装脚本默认可逆停用安装器识别的完整 Superpowers 自动发现入口集，保留原目录和内容，不要删除。
 7. 允许安装器在 ~/.codex/AGENTS.md 中安装受管的 CCDawn BRT 激活块；必须保留用户已有规则，并确保可单独卸载。
 8. 最后用中文汇报：仓库位置、安装目录、安装了哪些 skills、BRT 激活状态、冲突入口处理、验证是否通过、是否需要重启 Codex。
-9. 重点提醒我：最重要入口是 ccdawn-brt；用户正常说需求即可。意图明确时直接推进；意图不清且误解会返工时，BRT 要先说明当前理解和依据，一次集中讨论 2-4 个高影响问题并给出推荐。需求对齐后，若原生 thread 能力可用，BRT 会主动发现同项目可协作会话并按价值路由，不需要用户另行要求。
+9. 重点提醒我：最重要入口是 ccdawn-brt；用户正常说需求即可。意图明确时直接推进；意图不清且误解会返工时，BRT 要先说明当前理解和依据，一次集中讨论 2-4 个高影响问题并给出推荐。需求对齐后，若原生 thread 能力可用，BRT 会发现同项目现有平级会话；只在各自任务受益或能减少全局冲突/返工时协作，不创建子 Agent、不转移任务 owner。
 
 如果遇到 Git、Python、网络、权限问题，只问我一个最关键的阻塞问题。
 ```
@@ -132,7 +132,7 @@ sh ./install.sh
   CCDawn 最重要入口 skill。高置信度任务直接推进；低置信度且误解会返工时，先查证，再用一轮讨论式追问确认结果、范围、非目标和验收。每个问题提供具体推荐、理由和错判影响，用户可以只纠正不对的项。
 
 - **`ccdawn-multi-agent-orchestration`**
-  BRT 对齐并发现高价值协作机会后的团队 owner。自动复用现有同项目会话，分配互不重叠的交付物，按事件交换关键证据，并在验证后完成已授权的本地集成。
+  BRT 对齐并发现双向协作价值后的多会话协议。它不创建子 Agent 或派发任务；各平级 Agent 继续完成自己的原任务，只协商共享契约、依赖、冲突和集成责任。
 
 - **`ccdawn-thread-coordination`**
   同一项目多会话协调 owner。用跨 worktree 的 live registry 共享任务、scope 和 checkpoint；通过收敛讨论、暂停握手和 merge order 减少冲突与回归。
@@ -427,7 +427,7 @@ BRT 会根据意图置信度控制交流成本：
 - 需求存在多种合理解释：先读取可查证的上下文，再用一条消息集中讨论 2-4 个会改变结果的问题。
 - 讨论时 agent 会先说明当前理解、依据和推荐；用户可以回复 `按推荐`，也可以只指出需要修改的编号。
 - 信息足够后立即继续，不重复确认已经对齐的内容；只有缺少不可替代输入时才单独询问阻塞问题。
-- 对齐后的非简单项目任务会在原生 thread 能力可用时静默发现同项目会话；有正收益团队才进入多 Agent 编排，否则原 owner 继续。
+- 对齐后的非简单项目任务会在原生 thread 能力可用时静默发现同项目会话；只有双方原任务都能受益或全局冲突/返工会降低时才建立平级协作。
 
 例如输入 `优化一下这个页面，但我还不确定应该优先改视觉还是操作流程`，BRT 应先结合现有页面形成判断，再与用户讨论目标结果、改动范围和验收方式，而不是直接改代码或只路由到 UI skill。
 

@@ -1,10 +1,10 @@
 # 主动协作
 
-## 派发
+## 平级协作提议
 
-只向相关空闲 Agent 派发独立 lane。发送前用一次 claim 原子占用 `lane=dispatch/<task-key>`，并同时加入 `thread/<agent-id>` 与任务 scope；不要拆成两个 claim。消息带 dispatch id，并给出 `From Agent / From Task / To Agent / To Task / Reply To / Scope / Expected Output / Return Condition`，禁止递归派发。
+只向相关现有会话提出能帮助双方原任务的协作。发送前用一次 claim 原子占用 `lane=collaboration/<topic-key>`，并同时加入双方 `thread/<agent-id>` 与共享 scope；不要拆成多个 claim。消息带 collaboration id，并给出 `From Agent / Own Task / To Agent / Own Task / Reply To / Shared Surface / Mutual Benefit / Expected Evidence / Exit Condition`。
 
-owner 保留关键路径与集成。结果、拒绝或超时后释放 claim；超时标 stale，迟到 ACK/结果不能恢复原派发，只能重新复核。可选协作不 BLOCKED；简单任务、同文件或忙碌 Agent 不派发。
+双方保留各自 owner 和关键路径；接受、调整或拒绝均由对方自主决定。结束、拒绝或超时后释放 claim；超时标 stale，迟到回复不能恢复旧 agreement，只能重新提议。可选协作不 BLOCKED；简单任务、无双向收益或忙碌 Agent 不联系。
 
 ## 同行建议
 
