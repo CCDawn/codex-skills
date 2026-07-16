@@ -1,0 +1,4 @@
+interface:
+  display_name: "CCDawn 多 Agent 编排"
+  short_description: "自动发现并编排同项目 Agent 协作、讨论与本地集成"
+  default_prompt: "使用 $ccdawn-multi-agent-orchestration 在需求对齐后复用可协作的同项目 Agent，建立最小团队，持续交换关键证据，并在验证后完成本地集成。"

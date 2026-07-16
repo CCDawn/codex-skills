@@ -9,7 +9,7 @@
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 26 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, multi-thread coordination, lightweight development, cleanup, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 27 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, multi-agent orchestration, lightweight development, cleanup, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
@@ -21,7 +21,7 @@ CCDawn is a Chinese-first collection of 26 Agent Skills for Codex and Grok Build
 
 ![BRT moving from intent alignment to routing, implementation, and verification](assets/brt-demo.gif)
 
-This is an illustrative workflow: the user describes the task normally; BRT inspects available context, discusses only decisions that change the result, and hands the aligned task to the most specific skill.
+This is an illustrative workflow: the user describes the task normally; BRT inspects available context, discusses only decisions that change the result, and hands the aligned task to the most specific skill. After alignment, it can silently discover useful same-project threads and route only positive-value teams into orchestration.
 
 ## Quick Start
 
@@ -83,13 +83,14 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 | Installed GitHub, browser, Figma, or artifact tools are ignored | BRT routes to currently available capabilities while CCDawn retains intent and acceptance ownership |
 | Small changes trigger heavyweight process | Scale workflow weight per subtask and prefer direct implementation plus verification |
 | Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
-| Multiple Codex threads develop in one project | Share compact progress and coordinate scopes, discussion, pause/resume, and merge order |
+| Multiple Codex threads develop in one project | After alignment, BRT discovers useful peers and routes valuable teams into continuous collaboration and verified local integration |
 | Finished features leave temporary files and stale branches | Clean only known attributable residue or resources covered by an explicit cleanup request |
 | Research experiments get treated like software tests | Separate research, score loops, rigor review, and deterministic software TDD |
 
 ## Featured Skills
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md): intent inference, collaborative alignment, routing, and workflow-weight control.
+- [`ccdawn-multi-agent-orchestration`](skills/engineering/ccdawn-multi-agent-orchestration/SKILL.md): automatic same-project team formation, event-driven discussion, recovery, and verified local integration after alignment.
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md): shared progress, conflict, discussion, pause/resume, and fast-merge coordination for same-project agents.
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md): post-development residue and safe merged local branch, worktree, and claim cleanup.
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md): evidence-driven diagnosis, bounded repair, and verification.
@@ -107,6 +108,7 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 ### Engineering
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)
+- [`ccdawn-multi-agent-orchestration`](skills/engineering/ccdawn-multi-agent-orchestration/SKILL.md)
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md)
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)

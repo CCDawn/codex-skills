@@ -25,6 +25,7 @@ BRT_CORE_MARKERS = [
     "ccdawn-simplification-audit",
     "ccdawn-ai-research-loop",
     "ccdawn-research-rigor-review",
+    "ccdawn-multi-agent-orchestration",
     "ccdawn-thread-coordination",
     "ccdawn-development-cleanup",
     "默认 `AUTO`",
@@ -56,6 +57,7 @@ DIRECT_WRITE_OWNERS = {
     "ccdawn-bug-review",
     "ccdawn-design-system",
     "ccdawn-frontend-engineering",
+    "ccdawn-multi-agent-orchestration",
     "ccdawn-thread-coordination",
     "ccdawn-ui-design",
 }
@@ -76,6 +78,7 @@ TOKEN_BUDGETS = {
     "ccdawn-frontend-engineering": 1500,
     "ccdawn-goal-loop": 1100,
     "ccdawn-huawei-nslb-score-loop": 1200,
+    "ccdawn-multi-agent-orchestration": 1800,
     "ccdawn-planning": 1850,
     "ccdawn-pr-review": 1500,
     "ccdawn-project-review": 1500,
@@ -90,6 +93,7 @@ TOKEN_BUDGETS = {
 }
 
 BRT_REFERENCE_BUDGETS = {
+    "collaboration-discovery.md": 900,
     "routing-practice.md": 2200,
     "capability-routing.md": 1500,
     "runtime.md": 1800,
@@ -97,6 +101,11 @@ BRT_REFERENCE_BUDGETS = {
 }
 
 BRT_REFERENCE_REQUIRED_MARKERS = {
+    "collaboration-discovery.md": [
+        "只读最多 3 个最相关候选",
+        "DISPATCH_DISJOINT_WRITE -> TEAM_READY",
+        "发现时不得发送消息",
+    ],
     "routing-practice.md": [
         "未出现的 skill 不能成为 owner",
         "不完成一个就停下来询问",
@@ -120,6 +129,7 @@ BRT_REFERENCE_REQUIRED_MARKERS = {
 
 BRT_PROFILE_BUDGETS = {
     "alignment": (["SKILL.md", "references/output-forms.md"], 3400),
+    "collaboration": (["SKILL.md", "references/collaboration-discovery.md"], 3500),
     "routing": (["SKILL.md", "references/routing-practice.md"], 4700),
     "long-task": (["SKILL.md", "references/runtime.md"], 4300),
     "maximum": (
@@ -915,7 +925,8 @@ def validate_skill(
             "非 owner 停止自身冲突写入",
             "thread/<agent-id>",
             "dispatch/<task-key>",
-            "迟到结果先复核",
+            "不要拆成两个 claim",
+            "迟到 ACK/结果不能恢复原派发",
             "Silent Conflict Triage",
             "DISCUSSION_REQUIRED",
             "PAUSE_REQUIRED",
@@ -938,6 +949,28 @@ def validate_skill(
         ]:
             if marker not in thread_contract_text:
                 errors.append(f"{label}: thread coordination contract missing marker '{marker}'")
+
+    if name == "ccdawn-multi-agent-orchestration":
+        orchestration_text = text + "\n" + read_text(skill_dir / "references" / "team-protocol.md")
+        for marker in [
+            "## 进入闸门",
+            "## 编排循环",
+            "TEAM_READY",
+            "TEAM_INVITE",
+            "ACCEPTED",
+            "禁止成员递归派发",
+            "一次 registry claim 原子占用",
+            "事件驱动协作",
+            "MERGE_READY",
+            "integration queue",
+            "自动本地集成",
+            "resumePendingAgentIds",
+            "不得在未授权时 push",
+            "集成验证",
+            "单次建议、状态交换或冲突处理路由 `ccdawn-thread-coordination`",
+        ]:
+            if marker not in orchestration_text:
+                errors.append(f"{label}: multi-agent orchestration contract missing marker '{marker}'")
 
     compact_review_contracts = {
         "ccdawn-evaluation": [

@@ -7,6 +7,7 @@
 - **[ccdawn-design-system](./ccdawn-design-system/SKILL.md)** - Cross-consumer design token, theme, component API, variant, and Figma-to-code governance with staged migration.
 - **[ccdawn-frontend-engineering](./ccdawn-frontend-engineering/SKILL.md)** - Production frontend implementation owner for aligned UI contracts, interaction states, responsive behavior, accessibility, and runtime evidence.
 - **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Opt-in durable cross-session decisions and handoffs; it does not own the active execution loop.
+- **[ccdawn-multi-agent-orchestration](./ccdawn-multi-agent-orchestration/SKILL.md)** - Automatic same-project team formation, event-driven collaboration, recovery, and verified local integration after BRT alignment.
 - **[ccdawn-thread-coordination](./ccdawn-thread-coordination/SKILL.md)** - Same-project Agent progress, conflict, discussion, pause/resume, and fast-merge coordination.
 - **[ccdawn-development-cleanup](./ccdawn-development-cleanup/SKILL.md)** - Cleanup only for known residue, merged local branches, disposable worktrees, completed claims, or explicit cleanup requests.
 - **[ccdawn-feature-reuse-research](./ccdawn-feature-reuse-research/SKILL.md)** - Reuse research only when external or in-project candidates can materially change a complex feature plan.
