@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 只读；不修改文件、不卸载依赖、不移动分支、不改 index。
 - Success Evidence: 每个候选都有路径/引用/依赖或调用证据，并说明收益、风险和验证要求。
 - Stop Condition: 审计范围不明、缺少源码/依赖证据、建议涉及行为或架构取舍、或问题主要属于正确性/安全/性能。
-- Route Out: `ccdawn-project-review`、`ccdawn-planning`、对应开发 owner、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `ccdawn-project-review`、`ccdawn-performance-engineering`、`ccdawn-planning`、对应开发 owner、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -30,7 +30,7 @@ license: MIT
 2. 重点检查：重复依赖、标准库/平台已有能力、单实现接口、单产品工厂、只转发的 wrapper、废弃 flag/config、并存的 legacy 路径、重复事实源和跨文件样板。
 3. 排除生成代码、vendored/third-party 代码、迁移期间明确保留的兼容层，以及安全、无障碍、数据恢复和真实平台适配约束。
 4. 每项区分“确认可删”“需 probe”“架构取舍”；证据不足不能写成确定结论。
-5. 正确性、测试、安全、性能和总体项目健康交给 `ccdawn-project-review`；需要实施方案时路由 `ccdawn-planning`。
+5. 正确性、测试、安全和总体健康交 `ccdawn-project-review`；需实测的性能问题交 `ccdawn-performance-engineering`；实施方案交 `ccdawn-planning`。
 
 优先级：`P1 高收益`、`P2 中收益`、`P3 低收益`、`需证据`。
 
@@ -51,7 +51,8 @@ Findings:
 - 1. ... [SAFE_DIRECT / PLAN_THEN_EXECUTE / DEFERRED / BLOCKED]；验证条件...
 
 组合路由:
-- 项目健康/正确性/安全/性能 -> ccdawn-project-review
+- 项目健康/正确性/安全 -> ccdawn-project-review
+- 性能测量 -> ccdawn-performance-engineering
 - 多项结构调整 -> ccdawn-planning
 
 下一步建议: <一个具体动作>

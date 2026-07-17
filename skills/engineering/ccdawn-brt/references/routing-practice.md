@@ -13,7 +13,8 @@
 
 | 用户信号 | Primary owner | 默认重量 | 下一产出 |
 |---|---|---|---|
-| 修 bug、异常、失败测试、性能症状有明确对象 | `ccdawn-bug-review` | FAST/COMPACT | 根因状态、最小修复、验证 |
+| 修 bug、异常、失败测试有明确对象 | `ccdawn-bug-review` | FAST/COMPACT | 根因状态、最小修复、验证 |
+| 性能目标/回归或热路径测量 | `ccdawn-performance-engineering` | PROFILE | baseline、瓶颈、before/after |
 | 审 PR、diff、branch、commit、merge readiness | `ccdawn-pr-review` | COMPACT | findings-first 审阅结论 |
 | 审整仓、架构、技术债、测试体系、接手摸底 | `ccdawn-project-review` | COMPACT | 风险排序 findings 与执行队列 |
 | 评价流程、方案、skill、输出质量，且无更具体 owner | `ccdawn-evaluation` | MICRO/COMPACT | 证据化判断与高 ROI 建议 |

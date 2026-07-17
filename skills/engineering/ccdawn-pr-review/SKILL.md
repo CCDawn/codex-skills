@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 读取 diff/上下文并运行安全检查；不编辑、移动 HEAD/index、合并、推送或发布。
 - Success Evidence: diff 与需求已对照，关键证据已检查，每条 finding 绑定位置、影响和验证条件。
 - Stop Condition: 缺可审对象、审查目标/需求无法推断、关键证据不可得、对象漂移或远程/高风险动作未授权。
-- Route Out: 对应开发 owner、`ccdawn-bug-review`、`ccdawn-planning`、`ccdawn-brt`、提交/PR/合并准备或 BLOCKED。
+- Route Out: 对应开发 owner、`ccdawn-bug-review`、`ccdawn-performance-engineering`、`ccdawn-planning`、`ccdawn-brt`、提交/PR/合并准备或 BLOCKED。
 
 ## 统一调用契约
 
@@ -30,8 +30,10 @@ license: MIT
 2. 从用户要求、PR body、issue/spec、现有行为和项目规则中取得需求来源。只有高影响目标无法推断时才回 BRT 集中对齐，不能只做 owner 路由。
 3. 阅读变更及必要上下文，核对状态/API/数据/配置/迁移/用户流程和保护边界。
 4. 检查最新测试、构建、lint、类型、运行时或手工验收证据；证据不足不能包装成通过。
-5. 按 diff 风险选择相关视角，不固定遍历完整清单；只输出由本次变更引入、暴露或会阻塞集成的问题。
+5. 按 diff 风险选择相关视角，不固定遍历完整清单；只输出由本次变更引入、暴露或会阻塞集成的问题。性能视角只在热路径、规模、查询/I/O、缓存/队列、并发、包体或既有性能契约被触及时启用。
 6. findings 优先；随后给 merge 结论和下一 route。
+
+明显 `N+1`、循环 I/O、重复全量计算或无界资源增长可用结构/确定性计数形成 finding；声称“更快/回归”必须有可比较 baseline。需要实际 profiling 或 before/after 时以本 skill 为 primary、`ccdawn-performance-engineering` 为 support，不把每个 PR 变成性能审计。
 
 ## Findings
 

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "explicit-p99-target",
+    "prompt": "把消息时间线在一万条消息下的 p99 渲染延迟降到 100ms 内，先测 baseline 再优化。",
+    "expected_level": "PROFILE",
+    "expected_primary": "ccdawn-performance-engineering",
+    "measurement_required": true,
+    "user_gate": false
+  },
+  {
+    "id": "measured-memory-regression",
+    "prompt": "这个版本导入十万条记录时峰值内存从 400MB 涨到 1.2GB，请定位并修复回归。",
+    "expected_level": "PROFILE",
+    "expected_primary": "ccdawn-performance-engineering",
+    "measurement_required": true,
+    "user_gate": false
+  },
+  {
+    "id": "new-hot-path-feature",
+    "prompt": "给每条实时事件增加投影计算，这条链路每秒处理五万条事件，需要避免降低吞吐。",
+    "expected_level": "PROFILE",
+    "expected_primary": "ccdawn-performance-engineering",
+    "measurement_required": true,
+    "user_gate": false
+  },
+  {
+    "id": "obvious-n-plus-one",
+    "prompt": "新增列表接口时发现循环里逐项查询数据库，直接改成批量查询并验证查询次数。",
+    "expected_level": "CHECK",
+    "expected_primary": "current-owner",
+    "measurement_required": false,
+    "user_gate": false
+  },
+  {
+    "id": "bounded-local-computation",
+    "prompt": "在已有设置表单里增加一个最多处理十个选项的本地排序。",
+    "expected_level": "CHECK",
+    "expected_primary": "current-owner",
+    "measurement_required": false,
+    "user_gate": false
+  },
+  {
+    "id": "routine-feature",
+    "prompt": "按照现有模式增加一个布尔设置字段并运行相关测试。",
+    "expected_level": "FAST",
+    "expected_primary": "current-owner",
+    "measurement_required": false,
+    "user_gate": false
+  },
+  {
+    "id": "future-scale-speculation",
+    "prompt": "先增加低频管理员备注字段，以后用户可能会变多。",
+    "expected_level": "FAST",
+    "expected_primary": "current-owner",
+    "measurement_required": false,
+    "user_gate": false
+  },
+  {
+    "id": "performance-pr-review",
+    "prompt": "审查这个声称吞吐提升 30% 的 PR，并复核 benchmark 是否可比较。",
+    "expected_level": "PROFILE",
+    "expected_primary": "ccdawn-pr-review",
+    "measurement_required": true,
+    "user_gate": false
+  }
+]

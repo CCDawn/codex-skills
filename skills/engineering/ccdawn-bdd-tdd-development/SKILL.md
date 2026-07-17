@@ -28,7 +28,7 @@ license: MIT
 
 按子任务判断，不给整个请求贴 TDD 标签。机械替换、样式/文案、普通配置、生成代码、小适配，或已有验证足够时直接轻量实现。
 
-Bug、异常、失败测试、构建失败或性能症状仍需寻找根因时，Primary owner 是 `ccdawn-bug-review`；即使最终使用 RED/GREEN，也不二次加载本 skill。只有预期行为和 owning surface 已明确的新增/变更契约，或用户明确要求 TDD，才由本 skill 主责。
+Bug、异常、失败测试或构建失败由 `ccdawn-bug-review` 主责；可测性能目标/回归由 `ccdawn-performance-engineering` 主责。两者即使使用 RED/GREEN 也不加载本 skill。只有预期行为和 owning surface 已明确的新增/变更契约，或用户明确要求 TDD，才由本 skill 主责。
 
 分数下降、metric 未提升、candidate reject 或 online worse 是实验结果，不是 TDD RED，返回 `ccdawn-score-loop`。只有预期输入输出明确的 harness/parser/schema/seed/shape/NaN/打包 bug 留在这里。
 

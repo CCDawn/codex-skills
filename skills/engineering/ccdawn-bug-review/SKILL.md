@@ -1,6 +1,6 @@
 ---
 name: ccdawn-bug-review
-description: "Use when a bug, regression, failing test, build failure, abnormal behavior, performance symptom, or suspected root cause needs Chinese-first diagnosis, bounded repair, and evidence-based verification without loading a heavyweight debugging workflow."
+description: "Use when a bug, correctness regression, failing test, build failure, abnormal behavior, or suspected root cause needs Chinese-first diagnosis, bounded repair, and evidence-based verification; measurable performance work uses ccdawn-performance-engineering."
 license: MIT
 ---
 
@@ -8,7 +8,7 @@ license: MIT
 
 ## 目标
 
-直接承接 bug 诊断与契约内修复：先用证据定位根因，再做最小修复和风险相称的验证。相信模型能自行选择调试手段，不要求展示固定阶段、长检查表或完整思维过程。
+直接承接 bug 诊断与契约内修复：先用证据定位根因，再做最小修复和风险相称的验证。不要求展示固定阶段、长检查表或完整思维过程。
 
 ## BRT interface
 
@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 用户要求修复且边界清楚时可直接读取、复现、修改和验证；只要求审查时保持只读。
 - Success Evidence: 失败可复现或有等价证据，根因与修复存在因果联系，目标验证通过且未越界。
 - Stop Condition: 缺少必要对象/权限、根因仍不稳定且写入会扩大误改、需要破坏性动作、需求冲突或风险越过当前授权。
-- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-planning`、`ccdawn-development-cleanup`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 契约内修复、`root-cause-tracing`、`ccdawn-performance-engineering`、`ccdawn-planning`、`ccdawn-development-cleanup`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -29,9 +29,10 @@ license: MIT
 1. 写清 `Expected / Actual / Scope`，先读本地可得的代码、日志、失败测试和近期 diff。
 2. 优先复用现有失败测试或稳定复现；无法直接运行时，用调用链、状态变化或日志建立最窄证据链。
 3. 定位 owning surface，沿数据流或控制流追到最早错误来源。来源藏在深层链路时才加载 `root-cause-tracing`。
-4. 标记根因：`CONFIRMED / HYPOTHESIS / ENVIRONMENT / TEST_ISSUE / REQUIREMENT_MISMATCH`。只有 `CONFIRMED` 才进入行为修复；其他状态继续低风险 probe 或路由正确 owner。
-5. 用户已授权修复且根因、边界、回滚和验证清楚时，直接做最小修复；不为流程形式停下确认。
-6. 运行能证明因果关系的窄验证，再按影响面决定是否扩展。区分实现失败、测试意图过期、环境失败和需求不一致。
+4. 主问题是可测延迟、吞吐或资源时路由 `ccdawn-performance-engineering`；需先排除正确性、环境或失败重试时继续诊断。
+5. 标记根因：`CONFIRMED / HYPOTHESIS / ENVIRONMENT / TEST_ISSUE / REQUIREMENT_MISMATCH`。只有 `CONFIRMED` 才进入行为修复；其他状态继续低风险 probe 或路由正确 owner。
+6. 用户已授权修复且根因、边界、回滚和验证清楚时，直接做最小修复；不为流程形式停下确认。
+7. 运行能证明因果关系的窄验证，再按影响面决定是否扩展。区分实现失败、测试意图过期、环境失败和需求不一致。
 
 ## Bug 测试锚点
 

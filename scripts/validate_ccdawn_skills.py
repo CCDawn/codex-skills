@@ -23,6 +23,7 @@ BRT_CORE_MARKERS = [
     "FULL_FLOW",
     "ccdawn-simplification-review",
     "ccdawn-simplification-audit",
+    "ccdawn-performance-engineering",
     "ccdawn-ai-research-loop",
     "ccdawn-research-rigor-review",
     "ccdawn-multi-agent-orchestration",
@@ -44,6 +45,8 @@ BRT_CORE_MARKERS = [
     "COORDINATE_OVERLAP",
     "PEER_CONTEXT_REVIEW",
     "Silent Conflict Triage",
+    "FAST / CHECK / PROFILE",
+    "不为每次开发建立 benchmark",
 ]
 
 UNIFIED_CONTRACT_MARKERS = [
@@ -59,6 +62,7 @@ DIRECT_WRITE_OWNERS = {
     "ccdawn-design-system",
     "ccdawn-frontend-engineering",
     "ccdawn-multi-agent-orchestration",
+    "ccdawn-performance-engineering",
     "ccdawn-thread-coordination",
     "ccdawn-ui-design",
 }
@@ -80,6 +84,7 @@ TOKEN_BUDGETS = {
     "ccdawn-goal-loop": 1100,
     "ccdawn-huawei-nslb-score-loop": 1200,
     "ccdawn-multi-agent-orchestration": 1800,
+    "ccdawn-performance-engineering": 1500,
     "ccdawn-planning": 1850,
     "ccdawn-pr-review": 1500,
     "ccdawn-project-review": 1500,
@@ -638,6 +643,70 @@ def validate_feature_reuse_cases(repo_root: Path, errors: list[str]) -> None:
         errors.append("tests/feature_reuse_cases.json: expected at least six positive/negative cases")
 
 
+def validate_performance_routing_cases(repo_root: Path, errors: list[str]) -> None:
+    path = repo_root / "tests" / "performance_routing_cases.json"
+    label = "tests/performance_routing_cases.json"
+    try:
+        cases = json.loads(read_text(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{label}: cannot read valid JSON: {exc}")
+        return
+
+    required = {
+        "id", "prompt", "expected_level", "expected_primary",
+        "measurement_required", "user_gate",
+    }
+    levels = {"FAST", "CHECK", "PROFILE"}
+    primaries = {"current-owner", "ccdawn-performance-engineering", "ccdawn-pr-review"}
+    seen: set[str] = set()
+    seen_levels: set[str] = set()
+    has_performance_owner = False
+    has_pr_support = False
+    for index, case in enumerate(cases if isinstance(cases, list) else []):
+        case_label = f"{label}[{index}]"
+        if not isinstance(case, dict) or set(case) != required:
+            errors.append(f"{case_label}: expected fields {sorted(required)}")
+            continue
+        if not case["id"] or case["id"] in seen:
+            errors.append(f"{case_label}: id must be non-empty and unique")
+        seen.add(case["id"])
+        if not contains_cjk(case["prompt"]):
+            errors.append(f"{case_label}: prompt must be Chinese-first")
+        level = case["expected_level"]
+        primary = case["expected_primary"]
+        if level not in levels:
+            errors.append(f"{case_label}: unsupported expected_level '{level}'")
+        else:
+            seen_levels.add(level)
+        if primary not in primaries:
+            errors.append(f"{case_label}: unsupported expected_primary '{primary}'")
+        if level in {"FAST", "CHECK"} and primary != "current-owner":
+            errors.append(f"{case_label}: FAST/CHECK must stay with current-owner")
+        if level == "PROFILE" and primary not in {
+            "ccdawn-performance-engineering", "ccdawn-pr-review"
+        }:
+            errors.append(f"{case_label}: PROFILE must use performance owner or PR review primary")
+        if not isinstance(case["measurement_required"], bool):
+            errors.append(f"{case_label}: measurement_required must be boolean")
+        if level != "PROFILE" and case["measurement_required"] is not False:
+            errors.append(f"{case_label}: FAST/CHECK must not require measurement")
+        if level == "PROFILE" and case["measurement_required"] is not True:
+            errors.append(f"{case_label}: PROFILE must require measurement evidence")
+        if case["user_gate"] is not False:
+            errors.append(f"{case_label}: efficiency routing must not add a user gate")
+        has_performance_owner = has_performance_owner or primary == "ccdawn-performance-engineering"
+        has_pr_support = has_pr_support or primary == "ccdawn-pr-review"
+
+    if (
+        not isinstance(cases, list)
+        or len(cases) < 7
+        or seen_levels != levels
+        or not has_performance_owner
+        or not has_pr_support
+    ):
+        errors.append(f"{label}: expected FAST/CHECK/PROFILE plus performance and PR routes")
+
+
 def validate_peer_collaboration_cases(repo_root: Path, errors: list[str]) -> None:
     path = repo_root / "tests" / "peer_collaboration_cases.json"
     label = "tests/peer_collaboration_cases.json"
@@ -871,6 +940,20 @@ def validate_skill(
             if marker not in text:
                 errors.append(f"{label}: frontend implementation owner missing marker '{marker}'")
 
+    if name == "ccdawn-performance-engineering":
+        for marker in [
+            "## 三档边界",
+            "FAST / CHECK / PROFILE",
+            "不加载本 skill、不建 benchmark",
+            "## 最小测量循环",
+            "一个主要限制点",
+            "只撤销本轮自己的优化",
+            "目标达到即停止",
+            "不默认生成性能报告",
+        ]:
+            if marker not in text:
+                errors.append(f"{label}: lightweight performance contract missing marker '{marker}'")
+
     if name == "ccdawn-design-system":
         for marker in ["## 系统闸门", "## 事实源与契约", "## 渐进迁移", "代表性消费者", "Figma/code"]:
             if marker not in text:
@@ -1001,6 +1084,7 @@ def validate_skill(
             "由本次变更引入、暴露或会阻塞集成",
             "READY_CONDITIONAL",
             "只做一次限时环境 probe",
+            "不把每个 PR 变成性能审计",
         ],
     }
     for marker in compact_review_contracts.get(name, []):
@@ -1043,7 +1127,7 @@ def validate_skill(
 
     route_regressions = {
         "ccdawn-planning": {
-            "required": ["默认 `DIRECT_IMPLEMENTATION`", "在当前方案内使用 `TASK_GRAPH`", "默认连续执行 Critical Path"],
+            "required": ["默认 `DIRECT_IMPLEMENTATION`", "在当前方案内使用 `TASK_GRAPH`", "默认连续执行 Critical Path", "只有 BRT 判为 `PROFILE`"],
             "forbidden": ["ccdawn-task-splitting", "默认路由到 `ccdawn-completion-summary`"],
         },
         "ccdawn-completion-summary": {
@@ -1212,6 +1296,7 @@ def main() -> int:
     validate_live_routing_cases(repo_root, set(path.name for path in skill_dirs), errors)
     validate_conditional_merge_cases(repo_root, errors)
     validate_feature_reuse_cases(repo_root, errors)
+    validate_performance_routing_cases(repo_root, errors)
     validate_peer_collaboration_cases(repo_root, errors)
     validate_conflict_triage_cases(repo_root, errors)
     validate_peer_advice_message_cases(repo_root, errors)

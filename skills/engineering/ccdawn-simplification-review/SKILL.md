@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 只读；不修改文件、不移动 HEAD、不改 index、不合并或推送。
 - Success Evidence: 每条 finding 都绑定文件/行号或 diff 证据，且说明删除或替代后如何保持行为。
 - Stop Condition: 没有可审 diff、需求边界不明、建议会改变用户行为、或发现问题主要属于正确性/安全/性能。
-- Route Out: `ccdawn-pr-review`、对应开发 owner、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `ccdawn-pr-review`、`ccdawn-performance-engineering`、对应开发 owner、`ccdawn-planning`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -30,7 +30,7 @@ license: MIT
 2. 优先寻找：可删除代码、标准库/平台原生替代、单实现抽象、单调用转发层、无人使用的配置能力、重复逻辑和不必要依赖。
 3. 只报告净收益明确且不会破坏已确认行为、信任边界、无障碍、兼容、迁移、恢复或必要测试的项。
 4. 不为减少行数牺牲可读性、错误处理、类型约束或真实扩展需求；无法证明时写“保留”，不要强行给 finding。
-5. 正确性、安全、性能或需求偏离交给 `ccdawn-pr-review`；两类问题同时存在时组合路由，不互相替代。
+5. 正确性、安全或需求偏离交 `ccdawn-pr-review`；需实测的性能问题交 `ccdawn-performance-engineering`。两类问题可组合，不互相替代。
 
 标签：`删除`、`标准库`、`原生能力`、`暂不需要`、`收缩`。
 
@@ -50,7 +50,8 @@ Findings:
 - 看似复杂但必须保留的约束及证据。
 
 组合路由:
-- 正确性/安全/性能问题 -> ccdawn-pr-review
+- 正确性/安全问题 -> ccdawn-pr-review
+- 性能测量 -> ccdawn-performance-engineering
 - 可直接精简 -> 对应开发 owner
 
 下一步建议: <一个具体动作>

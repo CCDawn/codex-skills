@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 默认只读；不编辑文件、移动分支或修改 index。用户要求修复时由 BRT 建立执行契约。
 - Success Evidence: finding 绑定文件/命令/运行证据、影响、最小动作和验证条件。
 - Stop Condition: 范围不明、对象变成 PR/具体 bug、关键证据缺失、需要写入或高风险决策。
-- Route Out: `ccdawn-simplification-audit`、`ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: `ccdawn-simplification-audit`、`ccdawn-planning`、`ccdawn-bug-review`、`ccdawn-performance-engineering`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 

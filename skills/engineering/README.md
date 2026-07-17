@@ -6,6 +6,7 @@
 - **[ccdawn-ui-review](./ccdawn-ui-review/SKILL.md)** - Findings-first review of existing UI flows, visual hierarchy, states, responsive behavior, accessibility, and runtime evidence.
 - **[ccdawn-design-system](./ccdawn-design-system/SKILL.md)** - Cross-consumer design token, theme, component API, variant, and Figma-to-code governance with staged migration.
 - **[ccdawn-frontend-engineering](./ccdawn-frontend-engineering/SKILL.md)** - Production frontend implementation owner for aligned UI contracts, interaction states, responsive behavior, accessibility, and runtime evidence.
+- **[ccdawn-performance-engineering](./ccdawn-performance-engineering/SKILL.md)** - Evidence-driven profiling and minimal optimization for explicit performance goals, regressions, hot paths, and resource budgets; routine features stay with their current owner.
 - **[ccdawn-dawn-agent-html-memory](./ccdawn-dawn-agent-html-memory/SKILL.md)** - Opt-in durable cross-session decisions and handoffs; it does not own the active execution loop.
 - **[ccdawn-multi-agent-orchestration](./ccdawn-multi-agent-orchestration/SKILL.md)** - Peer negotiation among existing same-project Codex threads so each finishes its own task with less duplication, conflict, and integration rework.
 - **[ccdawn-thread-coordination](./ccdawn-thread-coordination/SKILL.md)** - Same-project Agent progress, conflict, discussion, pause/resume, and fast-merge coordination.

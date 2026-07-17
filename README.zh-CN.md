@@ -3,13 +3,13 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-26-2f81f7)](#完整-skill-目录)
+[![Skills](https://img.shields.io/badge/skills-28-2f81f7)](#完整-skill-目录)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **让 Codex 先理解你，再决定怎么做。**
 
-27 个中文优先 Agent Skills，支持 Codex 与 Grok Build，覆盖意图对齐、动态路由、多会话平级协作、轻量开发、开发清理、代码审查、UI 设计和 AI 研究工作流。
+28 个中文优先 Agent Skills，支持 Codex 与 Grok Build，覆盖意图对齐、动态路由、多会话平级协作、轻量开发、性能工程、开发清理、代码审查、UI 设计和 AI 研究工作流。
 
 - 用户正常说需求即可，不需要主动输入 `/brt` 或记忆流程命令。
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) 会在意图明确时直接推进，在高影响歧义出现时集中讨论并给出推荐。
@@ -73,6 +73,7 @@ sh ./install.sh
 | Skill 很多但不会自动选 | BRT 选择最具体 owner，并可动态组合多个意图 |
 | 已安装 GitHub、浏览器、Figma 或文档工具却不会用 | BRT 按当前可用能力直接路由，CCDawn owner 只保留目标与验收 |
 | 简单修改被流程拖慢 | 按子任务风险控制重量，默认优先直接实现和验证 |
+| 新功能可能引入低效代码 | 普通功能静默检查明显低效；只有真实热路径或指标问题才测量和优化 |
 | 审查只给结论、不继续推进 | 形成按依赖排序的行动队列，在边界内连续处理 |
 | 多个 Codex 会话同时开发 | BRT 对齐后发现可互助的平级会话，让各自完成任务并协商共享边界与集成 |
 | 功能完成后残留临时文件和旧分支 | 仅在已知产生残留或用户要求时清理有归属证据的本地资源 |
@@ -85,6 +86,7 @@ sh ./install.sh
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)：共享同项目 Agent 进度，协调冲突、讨论、暂停恢复与快速合并。
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md)：清理开发残留，并安全收尾已合并本地分支、worktree 和 claim。
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md)：从症状和失败证据定位根因，完成有界修复与验证。
+- [`ccdawn-performance-engineering`](skills/engineering/ccdawn-performance-engineering/SKILL.md)：只在性能目标、回归或关键热路径需要测量时定位瓶颈并验证最小优化。
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)：按风险排序审查 PR、diff、分支和合并准备度。
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)：处理 UI/UX、响应式、无障碍和浏览器视觉验证。
 - [`ccdawn-visual-design`](skills/engineering/ccdawn-visual-design/SKILL.md)：建立符合产品语境的品牌表达、视觉方向和可实施界面语言。
@@ -182,6 +184,9 @@ sh ./install.sh
 - **`ccdawn-bug-review`**
   紧凑 bug owner，直接完成证据收集、根因定位、最小修复和验证；必要 RED/GREEN 作为内部测试锚点，不再切换 TDD owner。
 
+- **`ccdawn-performance-engineering`**
+  只承接 `PROFILE`：以代表性负载建立 baseline、定位主要瓶颈、实施一个最小优化并同负载复测；普通功能留在当前 owner 的 `FAST/CHECK`，不强制 benchmark。
+
 - **`ccdawn-evaluation`**
   CCDawn 评估适配器，只在没有更具体的 review、debug、planning、verification、feedback 或 goal skill 承接时使用。
 
@@ -273,6 +278,7 @@ skills/
     ccdawn-simplification-review/
     ccdawn-simplification-audit/
     ccdawn-bug-review/
+    ccdawn-performance-engineering/
     ccdawn-evaluation/
     ccdawn-goal-loop/
   research/
