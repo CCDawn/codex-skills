@@ -766,7 +766,7 @@ def validate_autonomous_collaboration_cases(repo_root: Path, errors: list[str]) 
     }
     states = {
         "ASK_ENABLE", "DISCOVER", "AGREEMENT", "RUNNING", "NEGOTIATING",
-        "MERGE_READY", "INTEGRATING", "INTEGRATED", "CLOSED",
+        "RECOVERY_PENDING_EVIDENCE", "MERGE_READY", "INTEGRATING", "INTEGRATED", "CLOSED",
     }
     seen: set[str] = set()
     seen_states: set[str] = set()
@@ -792,7 +792,10 @@ def validate_autonomous_collaboration_cases(repo_root: Path, errors: list[str]) 
         if case["remote_allowed"] and "已单独授权" not in case["situation"]:
             errors.append(f"{label}: remote action requires explicit separate authorization")
 
-    required_states = {"ASK_ENABLE", "RUNNING", "NEGOTIATING", "MERGE_READY", "INTEGRATING", "CLOSED"}
+    required_states = {
+        "ASK_ENABLE", "RUNNING", "NEGOTIATING", "RECOVERY_PENDING_EVIDENCE",
+        "MERGE_READY", "INTEGRATING", "CLOSED",
+    }
     if not isinstance(cases, list) or len(cases) < 10 or not required_states.issubset(seen_states):
         errors.append(f"{label}: expected at least ten cases covering enable, progress, conflict, integration, and closeout")
 
@@ -973,6 +976,12 @@ def validate_skill(
             "send_message_to_thread",
             "幂等 outbox",
             "`takeover`",
+            "消息默认只发差量",
+            "From/Task / Changed Fact / Action Impact / Evidence Pointer / Reply Needed",
+            "不能继承证据所有权",
+            "MERGE_READY_RECOVERED",
+            "RECOVERY_PENDING_EVIDENCE",
+            "聊天中的采纳、计划、进度或草稿",
             "resumePendingAgentIds",
             "MERGE_READY",
             "合入本地 `main`",

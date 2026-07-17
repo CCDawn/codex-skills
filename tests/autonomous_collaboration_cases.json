@@ -63,6 +63,24 @@
     "remote_allowed": false
   },
   {
+    "id": "stale-peer-chat-only-evidence",
+    "situation": "失活 peer 只有聊天中的采纳和草稿，没有正式交付、commit 或新鲜验证，接管者不得替它宣告完成。",
+    "expected_state": "RECOVERY_PENDING_EVIDENCE",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "stale-peer-independent-evidence",
+    "situation": "失活 peer 没有正式状态，但已有可定位 artifact、scope 和新鲜验证，接管者重验后可恢复交付状态。",
+    "expected_state": "MERGE_READY",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
     "id": "all-peers-merge-ready",
     "situation": "全部 peer 提交了 branch、依赖、测试和风险证据，进入集成队列。",
     "expected_state": "MERGE_READY",
