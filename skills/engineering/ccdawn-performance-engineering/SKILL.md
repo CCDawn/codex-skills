@@ -30,7 +30,7 @@ license: MIT
 BRT 使用 `FAST / CHECK / PROFILE`：
 
 - `FAST`：低频、低规模、机械修改，直接开发和验证，不输出性能检查。
-- `CHECK`：当前 owner 静默检查循环 I/O、重复全量计算、隐藏高阶复杂度、无界缓存/队列/监听器和明显资源增长；能从结构或确定性计数确认时直接修复，不加载本 skill、不建 benchmark。
+- `CHECK`：当前 owner 静默检查循环 I/O、重复全量计算、隐藏高阶复杂度、无界缓存/队列/监听器和明显资源增长；能从结构或确定性计数确认时直接修复，不加载本 skill、不建 benchmark，也不因“发现问题”切到 bug owner。只有存在已观察到的故障、正确性回归或待诊断根因时才路由 `ccdawn-bug-review`。
 - `PROFILE`：明确性能目标/回归，或功能进入高频热路径、大数据量、并发、缓存、批处理、流式 I/O、持久化、包体/启动关键面时，才进入本 skill。
 
 文件多、描述长、可能“以后会扩展”或一般性最佳实践不触发 `PROFILE`。PR/diff 审查仍由 `ccdawn-pr-review` 主责，本 skill 只在需要性能测量证据时作为 support。

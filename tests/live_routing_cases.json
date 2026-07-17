@@ -11,6 +11,17 @@
     "timeout_seconds": 120
   },
   {
+    "id": "feature-local-n-plus-one",
+    "prompt": "你负责新增一个列表接口。实现时发现循环里逐项查询数据库，请直接改成批量查询并验证查询次数，不执行实际写入，只说明准备使用的 owner 和处理方式。",
+    "smoke": false,
+    "expected_skill_reads": [],
+    "forbidden_skill_reads": ["ccdawn-bug-review", "ccdawn-performance-engineering"],
+    "max_commands": 6,
+    "expected_final_any": ["当前 owner", "功能实现 owner", "保持原 owner"],
+    "forbidden_final_any": ["benchmark", "性能报告"],
+    "timeout_seconds": 120
+  },
+  {
     "id": "explicit-working-tree-review",
     "prompt": "只读审查当前工作树 diff，按严重程度列出回归风险和缺失验证，不修改代码。",
     "smoke": false,
