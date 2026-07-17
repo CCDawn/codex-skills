@@ -12,12 +12,12 @@
   },
   {
     "id": "feature-local-n-plus-one",
-    "prompt": "你负责新增一个列表接口。实现时发现循环里逐项查询数据库，请直接改成批量查询并验证查询次数，不执行实际写入，只说明准备使用的 owner 和处理方式。",
+    "prompt": "这个列表接口存在 N+1 查询。请在不改变返回行为的前提下改为一次批量查询，并补查询次数回归测试。当前仅测试路由，不执行实际写入；说明 owner 和处理方式。",
     "smoke": false,
     "expected_skill_reads": [],
     "forbidden_skill_reads": ["ccdawn-bug-review", "ccdawn-performance-engineering"],
     "max_commands": 6,
-    "expected_final_any": ["当前 owner", "功能实现 owner", "保持原 owner"],
+    "expected_final_any": ["当前 owner", "实现 owner", "保持原 owner"],
     "forbidden_final_any": ["benchmark", "性能报告"],
     "timeout_seconds": 120
   },
