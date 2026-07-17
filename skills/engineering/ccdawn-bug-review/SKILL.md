@@ -1,6 +1,6 @@
 ---
 name: ccdawn-bug-review
-description: "Use when a bug, correctness regression, failing test, build failure, abnormal behavior, or suspected root cause needs Chinese-first diagnosis, bounded repair, and evidence-based verification; measurable performance work uses ccdawn-performance-engineering."
+description: "Use when an observed bug, correctness regression, failing test, build failure, abnormal behavior, or unresolved root cause needs Chinese-first diagnosis and bounded repair; obvious local inefficiency found during feature work stays with its owner, while measurable performance work uses ccdawn-performance-engineering."
 license: MIT
 ---
 
@@ -29,7 +29,7 @@ license: MIT
 1. 写清 `Expected / Actual / Scope`，先读本地可得的代码、日志、失败测试和近期 diff。
 2. 优先复用现有失败测试或稳定复现；无法直接运行时，用调用链、状态变化或日志建立最窄证据链。
 3. 定位 owning surface，沿数据流或控制流追到最早错误来源。来源藏在深层链路时才加载 `root-cause-tracing`。
-4. 主问题是可测延迟、吞吐或资源时路由 `ccdawn-performance-engineering`；需先排除正确性、环境或失败重试时继续诊断。
+4. 可直接确认的 N+1、循环 I/O、重复计算等明显低效留给当前 owner；已观察故障、正确性回归或根因不明才由本 skill 诊断；可测性能问题路由 `ccdawn-performance-engineering`。
 5. 标记根因：`CONFIRMED / HYPOTHESIS / ENVIRONMENT / TEST_ISSUE / REQUIREMENT_MISMATCH`。只有 `CONFIRMED` 才进入行为修复；其他状态继续低风险 probe 或路由正确 owner。
 6. 用户已授权修复且根因、边界、回滚和验证清楚时，直接做最小修复；不为流程形式停下确认。
 7. 运行能证明因果关系的窄验证，再按影响面决定是否扩展。区分实现失败、测试意图过期、环境失败和需求不一致。
@@ -42,10 +42,7 @@ Bug 修复不转交 TDD owner。已有失败测试或稳定复现直接作为 RE
 
 ## 流程重量
 
-- 简单、局部、可逆问题：当前 owner 直接修复并验证，不 planning、不拆分、不创建 worktree。
-- 确定性行为存在明显回归、状态/数据/权限/迁移或公共契约风险：由当前 Bug owner 使用紧凑测试锚点，不发生 owner 切换。
-- 真实设计分叉、跨系统迁移或修复边界无法在当前上下文稳定表达：进入 `ccdawn-planning`。
-- 多文件或复杂调用链本身不触发额外流程；能由一个根因修复统一解决就保持一个实现单元。
+简单、局部、可逆问题直接修复并验证，不 planning、拆分或创建 worktree。只有真实设计分叉、跨系统迁移或边界不稳才进入 `ccdawn-planning`；多文件或复杂调用链本身不升级流程。
 
 ## 输出
 

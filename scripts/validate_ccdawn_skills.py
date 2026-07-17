@@ -471,8 +471,8 @@ def validate_live_routing_cases(
 
         expected = case["expected_skill_reads"]
         forbidden = case["forbidden_skill_reads"]
-        if not isinstance(expected, list) or not expected:
-            errors.append(f"{case_label}: expected_skill_reads must be a non-empty list")
+        if not isinstance(expected, list):
+            errors.append(f"{case_label}: expected_skill_reads must be a list")
             expected = []
         if not isinstance(forbidden, list) or not forbidden:
             errors.append(f"{case_label}: forbidden_skill_reads must be a non-empty list")
@@ -921,7 +921,7 @@ def validate_skill(
                 errors.append(f"{label}: compact TDD profile missing marker '{marker}'")
 
     if name == "ccdawn-bug-review":
-        for marker in ["不要求展示固定阶段", "根因状态", "只有 `CONFIRMED`", "Bug 修复不转交 TDD owner"]:
+        for marker in ["不要求展示固定阶段", "根因状态", "只有 `CONFIRMED`", "Bug 修复不转交 TDD owner", "明显低效留给当前 owner"]:
             if marker not in text:
                 errors.append(f"{label}: compact debugging owner missing marker '{marker}'")
 
@@ -945,6 +945,7 @@ def validate_skill(
             "## 三档边界",
             "FAST / CHECK / PROFILE",
             "不加载本 skill、不建 benchmark",
+            "不因“发现问题”切到 bug owner",
             "## 最小测量循环",
             "一个主要限制点",
             "只撤销本轮自己的优化",

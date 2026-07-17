@@ -40,6 +40,8 @@ class BrtActivationTests(unittest.TestCase):
         self.assertIn("existing same-project peer threads", block)
         self.assertIn("ccdawn-multi-agent-orchestration", block)
         self.assertIn("FAST / CHECK / PROFILE", block)
+        self.assertIn("even when it is described as a discovered problem", block)
+        self.assertIn("observed failure, correctness regression, or unresolved root cause", block)
         self.assertIn("ccdawn-performance-engineering", block)
         self.assertIn("Do not benchmark routine changes", block)
         self.assertIn("Discovery sends no messages", block)
