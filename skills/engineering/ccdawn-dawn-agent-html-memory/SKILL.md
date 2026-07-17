@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 只操作 memory/dashboard 与协调工具；不修改业务代码或伪造 claim、进度和验证。
 - Success Evidence: 来源可追溯，delta 写入正确 lane，索引/HTML/registry 一致且不覆盖并行改动。
 - Stop Condition: 用户/规则未要求、事实源不明、ownership 冲突、脚本缺失、渲染失败或写入会覆盖他人状态。
-- Route Out: 原任务 owner、`ccdawn-thread-coordination`、`ccdawn-completion-summary`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 原任务 owner、`ccdawn-autonomous-collaboration-loop`、`ccdawn-thread-coordination`、`ccdawn-completion-summary`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -34,7 +34,7 @@ license: MIT
 
 现有 `.docs/project-memory` 存在时先读规则和索引；无目录且未触发 INIT 时直接返回原 owner。
 
-Memory 不接管执行循环。当前动作和短期续接留在 BRT Runtime；只有已确认决定、跨会话 blocker、正式 handoff 或会改变未来行动的验证结论才写入。一次执行阶段最多在形成 durable delta 时同步，不为每个 task、测试或 checkpoint 重写并渲染。
+Memory 不接管执行循环。自动闭环由 `ccdawn-autonomous-collaboration-loop` 持有，memory 只提供可恢复状态载体；当前动作和短期续接留在 BRT Runtime。只有已确认决定、跨会话 blocker、正式 handoff 或会改变未来行动的验证结论才写入，不为每个 task、测试或 checkpoint 重写并渲染。
 
 ## 事实与结构
 

@@ -1,6 +1,7 @@
 # Engineering Skills
 
 - **[ccdawn-brt](./ccdawn-brt/SKILL.md)** - Capability-aware entrypoint that trusts model reasoning and adds only the constraints, artifacts, and routes that prevent concrete errors.
+- **[ccdawn-autonomous-collaboration-loop](./ccdawn-autonomous-collaboration-loop/SKILL.md)** - Opt-in closed loop that keeps peer threads progressing, recovers coordination, integrates verified work into local main, and closes residue without repeated gates.
 - **[ccdawn-ui-design](./ccdawn-ui-design/SKILL.md)** - UI/UX design, interaction-state, responsive, accessibility, and browser-based visual QA owner.
 - **[ccdawn-visual-design](./ccdawn-visual-design/SKILL.md)** - Context-aware brand expression, typography, color, composition, imagery, iconography, and motion direction.
 - **[ccdawn-ui-review](./ccdawn-ui-review/SKILL.md)** - Findings-first review of existing UI flows, visual hierarchy, states, responsive behavior, accessibility, and runtime evidence.

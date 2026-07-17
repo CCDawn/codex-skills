@@ -1,6 +1,7 @@
 {
     "skills":  [
                    "./skills/engineering/ccdawn-brt",
+                   "./skills/engineering/ccdawn-autonomous-collaboration-loop",
                    "./skills/engineering/ccdawn-ui-design",
                    "./skills/engineering/ccdawn-visual-design",
                    "./skills/engineering/ccdawn-design-system",

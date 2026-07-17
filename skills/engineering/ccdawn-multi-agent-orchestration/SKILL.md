@@ -17,7 +17,7 @@ license: MIT
 - Allowed Action: 读取/发送 thread 消息、使用现有 registry、协商和执行已授权的本地集成；不得替对方改任务状态，新建会话、远程 Git、发布和破坏性动作需授权。
 - Success Evidence: 每个 Agent 的原任务保持 owner、共享边界无矛盾、重复工作被消除、目标分支验证通过且恢复债务清零。
 - Stop Condition: 意图未对齐、不是同项目、缺少有效 thread、协作成本不低于收益、责任争议、高风险取舍或权限不足。
-- Route Out: 各 Agent 原 owner、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 各 Agent 原 owner、`ccdawn-autonomous-collaboration-loop`、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -30,6 +30,8 @@ license: MIT
 BRT 已完成意图对齐和有界发现，以 `PEER_COLLABORATION_READY` 交接；本轮具有原生 thread read/send 能力，并且至少两个现有独立会话存在真实互补、依赖、重叠或共同集成面。
 
 简单任务、仅目录相似、无共享决定、同一小文件无法并行，或消息/合并成本高于预期收益时不进入。一次建议、状态交换或单一冲突只用 `ccdawn-thread-coordination`。
+
+本 skill 维护平级协作协议，不负责持续驱动。用户已确认自动推进所有 peer、恢复冲突并合入本地 `main` 时，以 `ccdawn-autonomous-collaboration-loop` 为 primary，本 skill 只提供 agreement 支持。
 
 ## 平级协作循环
 

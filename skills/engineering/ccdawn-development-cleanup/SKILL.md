@@ -19,7 +19,7 @@ license: MIT
 - Allowed Action: 先只读审计；只删除已证明属于本轮且可重建的本地残留。删除本地 branch/worktree 还需当前用户明确清理请求或项目长期策略。远程分支、push、合并、发布和无法归属的文件不自动处理。
 - Success Evidence: 清理后 `git status`、branch/worktree inventory 和 coordination registry 与预期一致；源代码、用户改动、未合并提交和必要证据仍存在。
 - Stop Condition: 根目录或 integration target 不明、工作区 dirty 且归属不清、branch 未吸收、worktree 被占用、claim 仍 active、路径安全无法证明、删除需要远程或 force 动作。
-- Route Out: 当前开发 owner、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 当前开发 owner、`ccdawn-autonomous-collaboration-loop`、`ccdawn-thread-coordination`、`ccdawn-pr-review`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
@@ -32,6 +32,7 @@ license: MIT
 - 没有已知候选时直接收口，不扫描全仓寻找可能的噪音，也不输出 `NOOP`。
 - 合并前清理开发残留，但保留仍用于 PR/合并的 branch/worktree，状态为 `DEFERRED_INTEGRATION`；合并后再次收尾这些 Git 资源。
 - 纯规划、只读审查、研究结果归档或尚未通过验证的开发不进入删除阶段。
+- 由 `ccdawn-autonomous-collaboration-loop` 调用时，沿用其本轮安全本地清理授权；已证明被本地 `main` 吸收的任务 branch/worktree 和已完成 claim 不再逐项询问。
 
 ## 审计与分类
 
