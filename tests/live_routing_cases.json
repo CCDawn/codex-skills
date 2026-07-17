@@ -17,7 +17,7 @@
     "expected_skill_reads": [],
     "forbidden_skill_reads": ["ccdawn-bug-review", "ccdawn-performance-engineering"],
     "max_commands": 6,
-    "expected_final_any": ["批量", "查询次数", "当前 owner"],
+    "expected_final_any": ["当前 owner", "功能实现 owner", "保持原 owner"],
     "forbidden_final_any": ["benchmark", "性能报告"],
     "timeout_seconds": 120
   },
