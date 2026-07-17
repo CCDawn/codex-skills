@@ -26,6 +26,7 @@ BRT_CORE_MARKERS = [
     "ccdawn-performance-engineering",
     "ccdawn-ai-research-loop",
     "ccdawn-research-rigor-review",
+    "ccdawn-autonomous-collaboration-loop",
     "ccdawn-multi-agent-orchestration",
     "ccdawn-thread-coordination",
     "ccdawn-development-cleanup",
@@ -57,6 +58,7 @@ UNIFIED_CONTRACT_MARKERS = [
 ]
 
 DIRECT_WRITE_OWNERS = {
+    "ccdawn-autonomous-collaboration-loop",
     "ccdawn-bdd-tdd-development",
     "ccdawn-bug-review",
     "ccdawn-design-system",
@@ -69,6 +71,7 @@ DIRECT_WRITE_OWNERS = {
 
 TOKEN_BUDGETS = {
     "ccdawn-ai-research-loop": 2200,
+    "ccdawn-autonomous-collaboration-loop": 2200,
     "ccdawn-bdd-tdd-development": 1350,
     "ccdawn-brt": 2500,
     "ccdawn-bug-review": 1200,
@@ -748,6 +751,55 @@ def validate_peer_collaboration_cases(repo_root: Path, errors: list[str]) -> Non
         errors.append(f"{label}: expected at least six cases covering peer collaboration, no collaboration, and create-thread prompt")
 
 
+def validate_autonomous_collaboration_cases(repo_root: Path, errors: list[str]) -> None:
+    path = repo_root / "tests" / "autonomous_collaboration_cases.json"
+    label = "tests/autonomous_collaboration_cases.json"
+    try:
+        cases = json.loads(read_text(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{label}: cannot read valid JSON: {exc}")
+        return
+
+    required = {
+        "id", "situation", "expected_state", "ask_user", "owner_continues",
+        "local_main_allowed", "remote_allowed",
+    }
+    states = {
+        "ASK_ENABLE", "DISCOVER", "AGREEMENT", "RUNNING", "NEGOTIATING",
+        "RECOVERY_PENDING_EVIDENCE", "MERGE_READY", "INTEGRATING", "INTEGRATED", "CLOSED",
+    }
+    seen: set[str] = set()
+    seen_states: set[str] = set()
+    for case in cases if isinstance(cases, list) else []:
+        if not isinstance(case, dict) or set(case) != required:
+            errors.append(f"{label}: every case must use exactly {sorted(required)}")
+            continue
+        if not case["id"] or case["id"] in seen:
+            errors.append(f"{label}: id must be non-empty and unique")
+        seen.add(case["id"])
+        if not contains_cjk(case["situation"]):
+            errors.append(f"{label}: situation must be Chinese-first")
+        if case["expected_state"] not in states:
+            errors.append(f"{label}: invalid expected_state '{case['expected_state']}'")
+        seen_states.add(case["expected_state"])
+        for field in ["ask_user", "owner_continues", "local_main_allowed", "remote_allowed"]:
+            if not isinstance(case[field], bool):
+                errors.append(f"{label}: {field} must be boolean")
+        if case["expected_state"] == "ASK_ENABLE" and case["ask_user"] is not True:
+            errors.append(f"{label}: initial enable gate must ask the user")
+        if case["expected_state"] != "ASK_ENABLE" and "远程" not in case["situation"] and case["ask_user"] is not False:
+            errors.append(f"{label}: normal autonomous states must not add repeated user gates")
+        if case["remote_allowed"] and "已单独授权" not in case["situation"]:
+            errors.append(f"{label}: remote action requires explicit separate authorization")
+
+    required_states = {
+        "ASK_ENABLE", "RUNNING", "NEGOTIATING", "RECOVERY_PENDING_EVIDENCE",
+        "MERGE_READY", "INTEGRATING", "CLOSED",
+    }
+    if not isinstance(cases, list) or len(cases) < 10 or not required_states.issubset(seen_states):
+        errors.append(f"{label}: expected at least ten cases covering enable, progress, conflict, integration, and closeout")
+
+
 def validate_conflict_triage_cases(repo_root: Path, errors: list[str]) -> None:
     path = repo_root / "tests" / "conflict_triage_cases.json"
     label = "tests/conflict_triage_cases.json"
@@ -914,6 +966,33 @@ def validate_skill(
         for marker in BRT_CORE_MARKERS:
             if marker not in text:
                 errors.append(f"{label}: BRT missing core marker '{marker}'")
+
+    if name == "ccdawn-autonomous-collaboration-loop":
+        for marker in [
+            "是否开启自动化协作开发闭环",
+            "不在每个阶段、task、普通冲突或恢复动作后询问是否继续",
+            "Loop Owner",
+            "Recovery Dispatcher",
+            "send_message_to_thread",
+            "幂等 outbox",
+            "`takeover`",
+            "消息默认只发差量",
+            "From/Task / Changed Fact / Action Impact / Evidence Pointer / Reply Needed",
+            "不能继承证据所有权",
+            "MERGE_READY_RECOVERED",
+            "RECOVERY_PENDING_EVIDENCE",
+            "聊天中的采纳、计划、进度或草稿",
+            "测试缓存不阻塞 `MERGE_READY`",
+            "不更换多种命令追查",
+            "resumePendingAgentIds",
+            "MERGE_READY",
+            "合入本地 `main`",
+            "远程 push",
+            "同一 blocker 经两轮不同恢复策略仍失败",
+            "最后只做一次整体汇报",
+        ]:
+            if marker not in text:
+                errors.append(f"{label}: autonomous collaboration contract missing marker '{marker}'")
 
     if name == "ccdawn-bdd-tdd-development":
         for marker in ["## 紧凑 TDD", "只有预期行为和 owning surface 已明确", "默认不派发子代理", "分数下降"]:
@@ -1299,6 +1378,7 @@ def main() -> int:
     validate_feature_reuse_cases(repo_root, errors)
     validate_performance_routing_cases(repo_root, errors)
     validate_peer_collaboration_cases(repo_root, errors)
+    validate_autonomous_collaboration_cases(repo_root, errors)
     validate_conflict_triage_cases(repo_root, errors)
     validate_peer_advice_message_cases(repo_root, errors)
 

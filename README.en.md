@@ -3,13 +3,13 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-28-2f81f7)](#skill-catalog)
+[![Skills](https://img.shields.io/badge/skills-29-2f81f7)](#skill-catalog)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 28 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, peer collaboration across existing threads, lightweight development, performance engineering, cleanup, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 29 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, peer collaboration and opt-in autonomous closure across existing threads, lightweight development, performance engineering, cleanup, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
@@ -85,12 +85,14 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 | New features may introduce inefficient code | Check obvious inefficiency silently; measure only real hot paths, regressions, or performance targets |
 | Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
 | Multiple Codex threads develop in one project | BRT connects useful peer threads so each keeps its own task while negotiating shared contracts, dependencies, and integration |
+| Multi-thread work stalls after a conflict | One opt-in enables a recoverable loop that resumes paused peers and verifies integration into local `main` |
 | Finished features leave temporary files and stale branches | Clean only known attributable residue or resources covered by an explicit cleanup request |
 | Research experiments get treated like software tests | Separate research, score loops, rigor review, and deterministic software TDD |
 
 ## Featured Skills
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md): intent inference, collaborative alignment, routing, and workflow-weight control.
+- [`ccdawn-autonomous-collaboration-loop`](skills/engineering/ccdawn-autonomous-collaboration-loop/SKILL.md): one opt-in drives peer completion, conflict recovery, verified local-main integration, and cleanup without repeated gates.
 - [`ccdawn-multi-agent-orchestration`](skills/engineering/ccdawn-multi-agent-orchestration/SKILL.md): low-noise peer negotiation across existing same-project threads; it creates no subagents and transfers no task ownership.
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md): shared progress, conflict, discussion, pause/resume, and fast-merge coordination for same-project agents.
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md): post-development residue and safe merged local branch, worktree, and claim cleanup.
@@ -110,6 +112,7 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 ### Engineering
 
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md)
+- [`ccdawn-autonomous-collaboration-loop`](skills/engineering/ccdawn-autonomous-collaboration-loop/SKILL.md)
 - [`ccdawn-multi-agent-orchestration`](skills/engineering/ccdawn-multi-agent-orchestration/SKILL.md)
 - [`ccdawn-thread-coordination`](skills/engineering/ccdawn-thread-coordination/SKILL.md)
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md)

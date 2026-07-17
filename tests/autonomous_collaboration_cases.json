@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ask-enable-once",
+    "situation": "多个现有会话可并行完成共同目标，但用户还没有开启自动闭环。",
+    "expected_state": "ASK_ENABLE",
+    "ask_user": true,
+    "owner_continues": true,
+    "local_main_allowed": false,
+    "remote_allowed": false
+  },
+  {
+    "id": "confirmed-discovery",
+    "situation": "用户已确认自动闭环，开始只读发现同项目最相关会话。",
+    "expected_state": "DISCOVER",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "agreement-established",
+    "situation": "相关会话已确认各自任务、共享接口、依赖和集成责任。",
+    "expected_state": "AGREEMENT",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "parallel-running",
+    "situation": "各 Agent 在不重叠 scope 继续自己的原任务，无需逐任务确认。",
+    "expected_state": "RUNNING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "ordinary-overlap-negotiation",
+    "situation": "两个 Agent 发现普通文件重叠，先协商顺序并继续各自安全工作。",
+    "expected_state": "NEGOTIATING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "maximum-conflict-surface-pause",
+    "situation": "继续写共享接口会立即覆盖对方且无法拆分，只暂停冲突 surface 并登记恢复债务。",
+    "expected_state": "NEGOTIATING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "stale-coordinator-takeover",
+    "situation": "原 Loop Owner 失活，另一活跃参与者接管租约、outbox、恢复和集成义务。",
+    "expected_state": "RUNNING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "stale-peer-chat-only-evidence",
+    "situation": "失活 peer 只有聊天中的采纳和草稿，没有正式交付、commit 或新鲜验证，接管者不得替它宣告完成。",
+    "expected_state": "RECOVERY_PENDING_EVIDENCE",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "stale-peer-independent-evidence",
+    "situation": "失活 peer 没有正式状态，但已有可定位 artifact、scope 和新鲜验证，接管者重验后可恢复交付状态。",
+    "expected_state": "MERGE_READY",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "all-peers-merge-ready",
+    "situation": "全部 peer 提交了 branch、依赖、测试和风险证据，进入集成队列。",
+    "expected_state": "MERGE_READY",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "rebuildable-test-cache",
+    "situation": "peer 的 tracked 交付和验证有效，仅残留可重建的未跟踪测试缓存，留给最终统一清理而不阻塞交付。",
+    "expected_state": "MERGE_READY",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "local-main-integration",
+    "situation": "Integration Owner 按依赖顺序重验交付并合入本地 main。",
+    "expected_state": "INTEGRATING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "integration-failure-routed-back",
+    "situation": "集成测试只在一个交付后失败，责任 peer 修复，其他已完成任务保持安全。",
+    "expected_state": "RUNNING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "remote-push-separate-gate",
+    "situation": "本地集成已完成，但用户尚未对远程 push 和 PR 发布单独授权。",
+    "expected_state": "INTEGRATED",
+    "ask_user": true,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "remote-push-authorized",
+    "situation": "用户已单独授权远程 push，自动闭环可以执行约定的远程动作。",
+    "expected_state": "INTEGRATED",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": true
+  },
+  {
+    "id": "closed-after-cleanup",
+    "situation": "各原任务验收、本地 main 集成门、恢复债务和安全清理均已完成。",
+    "expected_state": "CLOSED",
+    "ask_user": false,
+    "owner_continues": false,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  }
+]

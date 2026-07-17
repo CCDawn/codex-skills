@@ -8,7 +8,7 @@ license: MIT
 
 ## 目标
 
-用 registry 和 thread 消息协调平级会话的建议、scope、冲突和合并。代码/Git 是实现事实源；无新增决策价值不通信。
+用 registry 和 thread 消息协调平级会话的 scope、冲突和合并。代码/Git 是事实源；无决策价值不通信。
 
 ## BRT interface
 
@@ -17,24 +17,24 @@ license: MIT
 - Allowed Action: 使用 `read_thread`、`send_message_to_thread` 与 `agent_coordination.py`；创建/归档或远程 Git 需授权。
 - Success Evidence: registry revision、thread 回执、Git/测试及协调闭环。
 - Stop Condition: thread 不明、owner 争议、暂停未确认、状态漂移或未授权。
-- Route Out: 原 owner、`ccdawn-multi-agent-orchestration`、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-dawn-agent-html-memory`、`ccdawn-brt` 或 BLOCKED。
+- Route Out: 原 owner、`ccdawn-autonomous-collaboration-loop`、`ccdawn-multi-agent-orchestration`、`ccdawn-pr-review`、`ccdawn-development-cleanup`、`ccdawn-dawn-agent-html-memory`、`ccdawn-brt` 或 BLOCKED。
 
 ## 统一调用契约
 
-- 只处理 BRT interface；不匹配时回 `ccdawn-brt` 或具体 owner。
+- 只处理 BRT interface；不匹配时回具体 owner。
 - 用户可见内容默认中文；只报产出、证据和风险；Route Out 仅以 BRT interface 为准，末行写 `下一步建议: <一个具体动作>`。
 
 ## 接入与所有权
 
-BRT 首次写入前调用 `preflight`；`CLEAR/PEERS_NO_OVERLAP` 返回原 owner。`OVERLAP` 先静默分诊；只 claim 最小 scope，仅在状态转换时 `update`。
+BRT 首次写入前调用 `preflight`；`CLEAR/PEERS_NO_OVERLAP` 返回原 owner。`OVERLAP` 静默分诊；只 claim 最小 scope。
 
 owner 顺序：用户指定 > 有效 claim/registry > 更早 owner。非 owner 停止自身冲突写入，不要求既有 owner 暂停；争议面只读。
 
 ## 主动协作
 
-需要提出协作或同行建议时读取 `references/proactive-collaboration.md`；普通冲突不加载。提议不转移 owner、不夺权、不暂停，双方继续各自安全工作。
+提出协作或同行建议时读取 `references/proactive-collaboration.md`；普通冲突不加载。提议不转移 owner，双方继续安全工作。
 
-本 skill 只提供单次协作和协调原语。多个现有平级会话需持续互助并共同集成时，路由 `ccdawn-multi-agent-orchestration`；不得建立主从关系。
+本 skill 只提供协调原语。持续互助交 `ccdawn-multi-agent-orchestration`；已开启自动闭环则由 `ccdawn-autonomous-collaboration-loop` 驱动并继承恢复债务。不得建立主从关系。
 
 无合适会话且新会话收益明确时，向用户说明边界并询问是否创建；未授权不创建，也不停止当前工作。
 
@@ -60,7 +60,7 @@ pause 产生 `resumePendingAgentIds`；债务清零才能 `complete`：
 
 讨论优先于暂停；同一 participants + surface 存在则复用，不重复发送。
 
-各 Agent 独立返回 `MERGE_READY`（branch/base/head/dirty/scopes/dependency/tests/risks）。约定的 Integration Owner 用 Git 重验；无重叠可成组，共享面串行。逐分支窄验证，集成后完整 gate；失败通知责任方，成功广播。不自动 push、发布或清理。
+各 Agent 独立返回 `MERGE_READY`（branch/base/head/dirty/scopes/dependency/tests/risks）。约定的 Integration Owner 用 Git 重验；无重叠可成组，共享面串行。逐分支窄验证，集成后完整 gate；失败通知责任方，成功广播。standalone 调用不自动 push、发布或清理；自动闭环调用遵循其已授权的本地集成与恢复契约。
 
 ### 条件合入快线
 
