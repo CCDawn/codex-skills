@@ -56,6 +56,7 @@ license: MIT
 - 只按明确的 literal path 删除，不使用 `git clean -fdx`、仓库根目录递归删除或宽泛通配符。
 - `git clean -ndX` 只能用于预览；`node_modules`、`.venv`、下载缓存、模型/数据、密钥、用户日志和共享依赖默认保留。
 - 临时 patch、scratch 脚本、测试/构建缓存、过期截图和日志只有在本轮创建或项目规则明确可丢弃时才删除。
+- 多会话的可重建测试缓存最终统一处理；删除受阻且不影响 tracked 交付时，记录候选并停止换命令。
 - accepted plan、迁移、lockfile、fixture、snapshot、基准结果和失败复现不是噪音，除非已有替代且用户明确同意。
 - 不修改 `.gitignore` 来隐藏无法解释的残留；先判断它为何存在。
 

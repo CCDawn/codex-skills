@@ -8,7 +8,7 @@ license: MIT
 
 ## 目标
 
-用户确认一次后，持续驱动同项目现有平级会话完成各自任务，自动协商普通冲突、恢复暂停任务、验证并合入本地 `main`，最后清理真实残留。它不创建主从团队，也不接管其他 Agent 的任务。
+用户确认一次后，驱动同项目平级会话完成各自任务、恢复冲突、验证并合入本地 `main`。不创建主从团队或接管其他任务。
 
 ## BRT interface
 
@@ -21,7 +21,7 @@ license: MIT
 
 ## 统一调用契约
 
-- 用户可见内容默认中文；只报告改变行动的决定、真实 blocker 和最终证据。Route Out 仅以 BRT interface 为准；正文末行写 `下一步建议: <一个具体动作>`。
+- 用户可见内容默认中文；只报行动决定、blocker 和最终证据。Route Out 仅以 BRT interface 为准；末行写 `下一步建议: <一个具体动作>`。
 - 各 Agent 保留自己的任务、scope、branch 和完成责任；Loop Owner 只维护闭环，不成为其他任务的 owner。
 - 开启后不在每个阶段、task、普通冲突或恢复动作后询问是否继续。
 
@@ -29,7 +29,7 @@ license: MIT
 
 BRT 仅在非简单目标确有两个以上会话协作价值时询问一次：“是否开启自动化协作开发闭环？”用户确认后，本次共同目标获得持续授权，直到完成、取消或触发自然闸门。
 
-持续授权包括：联系现有相关会话、协商边界、继续安全开发、本地提交、将验证通过的交付按序合入本地 `main`、集成验证和已知安全残留清理。拒绝时回原 owner；一次建议或冲突仍可使用 `ccdawn-thread-coordination`。
+持续授权包括联系现有会话、协商边界、安全开发、本地提交、按序合入本地 `main`、验证和安全清理。拒绝时回原 owner。
 
 没有合适现有会话时，说明收益和任务边界后只询问一次是否创建新会话。远程 push、创建或合并 PR、发布、force/破坏性操作不继承本授权。
 
@@ -59,7 +59,7 @@ DISCOVER -> AGREEMENT -> RUNNING -> NEGOTIATING
 
 各 peer 继续自己的非冲突任务。只在共享契约变化、依赖就绪、可行动证据、纠错、blocker 或 `MERGE_READY` 时通信；不轮询式催促，不发送无变化进度。
 
-消息默认只发差量：`From/Task / Changed Fact / Action Impact / Evidence Pointer / Reply Needed`。接收方已有的背景、完整方案、测试清单和未变化字段不重复；能用文件、commit、测试或上一消息指针表达时不粘贴正文。普通消息控制在完成协商所需的最短长度，只有首次共享契约或安全关键语义需要展开。
+消息默认只发差量：`From/Task / Changed Fact / Action Impact / Evidence Pointer / Reply Needed`。不重复背景、完整方案、测试清单或未变化字段；优先使用文件、commit、测试和消息指针。仅首次共享契约或安全关键语义展开。
 
 ### 3. 冲突协商
 
@@ -87,6 +87,8 @@ DISCOVER -> AGREEMENT -> RUNNING -> NEGOTIATING
 2. 每项合入前重验窄测试和 scope；机械冲突可自动解决，语义冲突回相关 peer 讨论。
 3. 合入本地 `main` 后运行一次集成 gate；失败只重开责任任务和受影响依赖。
 4. 不用远程 CI 替代本地证据，也不在未授权时 push 或操作远程 PR。
+
+可重建的 ignored/untracked 测试缓存不阻塞 `MERGE_READY`，统一留给 final cleanup；删除受阻且不影响 tracked 交付时保留，不更换多种命令追查。
 
 ### 6. 收尾
 

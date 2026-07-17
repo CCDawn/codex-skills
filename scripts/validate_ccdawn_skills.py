@@ -982,6 +982,8 @@ def validate_skill(
             "MERGE_READY_RECOVERED",
             "RECOVERY_PENDING_EVIDENCE",
             "聊天中的采纳、计划、进度或草稿",
+            "测试缓存不阻塞 `MERGE_READY`",
+            "不更换多种命令追查",
             "resumePendingAgentIds",
             "MERGE_READY",
             "合入本地 `main`",
