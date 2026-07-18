@@ -27,17 +27,15 @@ license: MIT
 
 ## 开启与授权
 
-BRT 仅在非简单目标确有两个以上会话协作价值时询问一次：“是否开启自动化协作开发闭环？”用户确认后，本次共同目标获得持续授权，直到完成、取消或触发自然闸门。
+BRT 仅在非简单目标确有多会话协作价值时询问一次：“是否开启自动化协作开发闭环？”确认后持续授权联系现有会话、协商、安全开发、本地提交与 `main` 集成、验证和清理，直到完成、取消或自然闸门。
 
-持续授权包括联系现有会话、协商边界、安全开发、本地提交、按序合入本地 `main`、验证和安全清理。拒绝时回原 owner。
-
-没有合适现有会话时，说明收益和任务边界后只询问一次是否创建新会话。远程 push、创建或合并 PR、发布、force/破坏性操作不继承本授权。
+没有合适会话时，只询问一次是否创建。远程 push、PR 或破坏性操作不继承授权。
 
 ## 角色与持久状态
 
-- `Loop Owner`：维护状态、租约、待发送 outbox、恢复债务和完成门；不替 peer 写任务结论。
-- `Peer Owner`：完成自己的原任务，提供 scope、依赖和 `MERGE_READY` 证据。
-- `Integration Owner`：按依赖顺序重验并合入本地 `main`，失败回送责任 owner。
+- `Loop Owner`：维护状态、租约、outbox、恢复债务和完成门，不代写 peer 结论。
+- `Peer Owner`：完成任务，提供 scope、依赖和 `MERGE_READY`。
+- `Integration Owner`：专职维护当前队列、按依赖重验并合入 `main`，不能同时承担独立用户实现任务；变忙时先转交队列。
 - `Recovery Dispatcher`：任何活跃参与者在 Loop Owner 租约过期时可 `takeover`，继承 outbox、恢复和集成义务，但不能继承或伪造 peer 的完成声明。
 
 状态只保留会改变后续动作的最小事实：
@@ -47,13 +45,13 @@ DISCOVER -> AGREEMENT -> RUNNING -> NEGOTIATING
          -> MERGE_READY -> INTEGRATING -> INTEGRATED -> CLOSED
 ```
 
-每个 peer 记录 `Task / Scope / Branch or Worktree / Dependency / Checkpoint / Tests / Blocker / Resume Debt`。有现成 registry 时使用它；跨会话恢复确有需要时由 `ccdawn-dawn-agent-html-memory` 提供状态载体，但 memory 不是执行 owner。
+每个 peer 记录 `Task / Scope / Branch or Worktree / Dependency / Checkpoint / Tests / Blocker / Resume Debt`。优先现成 registry；跨会话恢复才使用 memory，memory 不接管执行。
 
 ## 自动循环
 
 ### 1. 发现与约定
 
-只读最多 3 个最相关的同项目现有 thread。确认双向收益、写入边界、共享契约、依赖和 Integration Owner；用 `ccdawn-multi-agent-orchestration` 建立 peer agreement。无正收益候选则结束自动编排，当前 owner 继续。
+只读最多 3 个相关 thread。确认双向收益、写入边界、共享契约、依赖和 Integration Owner；用 `ccdawn-multi-agent-orchestration` 建立 agreement。无收益则当前 owner 继续。
 
 ### 2. 并行推进
 
@@ -67,11 +65,13 @@ DISCOVER -> AGREEMENT -> RUNNING -> NEGOTIATING
 
 只有继续写会立即覆盖或回归且无法拆分时，暂停冲突 surface，不暂停整个任务。记录 `resumePendingAgentIds`；解决后主动发送 `CONFLICT_RESOLVED`，由当前 Loop Owner 或接管者确认对方恢复。发起者完成或退出不取消恢复义务。
 
+`main` 变化、合入顺序或高成本 gate 可能 stale 不属于暂停条件。Peer 在自己的 branch/worktree 完成实现、聚焦验证并提交 `MERGE_READY` 后即可结束执行，由 Integration Owner 排队集成；不等待 stable main，不反复 closeout，也不需要再次唤醒原 peer。
+
 ### 4. 故障与接管
 
 `send_message_to_thread` 不是硬中断，消息可能延迟到对方下个 checkpoint。Loop Owner 必须维护租约和幂等 outbox；租约失活时，任一活跃参与者执行 `takeover` 后继续，不依赖原发起会话重新出现。
 
-自动恢复先分类为任务失败、依赖失败、集成失败或环境失败；把可行动证据发给责任 owner，其他 peer 继续安全工作。只有产品取舍、权限/安全/迁移风险，或同一 blocker 经两轮不同恢复策略仍失败，才询问用户。
+自动恢复先分类为任务、依赖、集成或环境失败；证据发给 owner，其他 peer 继续。只有高风险取舍或同一 blocker 经两轮不同恢复策略仍失败才询问用户。
 
 接管者只继承推进义务，不能继承证据所有权。失活 peer 没有正式 `MERGE_READY` 时：
 
@@ -84,9 +84,11 @@ DISCOVER -> AGREEMENT -> RUNNING -> NEGOTIATING
 每个 peer 用 `MERGE_READY` 提交 `Base / Head or Artifact / Changed Scope / Tests / Dependencies / Risks`。`MERGE_READY_RECOVERED` 也必须满足相同证据门。Integration Owner 以 Git 和新鲜测试为事实源：
 
 1. 无依赖且不重叠的交付可成组；共享契约或依赖项串行。
-2. 每项合入前重验窄测试和 scope；机械冲突可自动解决，语义冲突回相关 peer 讨论。
-3. 合入本地 `main` 后运行一次集成 gate；失败只重开责任任务和受影响依赖。
+2. Peer 只需聚焦验证；Integration Owner 对过期 base 变基或应用提交，重验受影响窄面。机械冲突可处理，语义冲突才回相关 peer。
+3. 全部预期交付合入本地 `main` 后只运行一次完整集成 gate；失败才重开责任任务和受影响依赖。
 4. 不用远程 CI 替代本地证据，也不在未授权时 push 或操作远程 PR。
+
+gate 期间若无关任务推进 `main`，不冻结全项目：比较新增提交与本轮 scope；无重叠则在最终 HEAD 补受影响的窄验证，有语义重叠才重跑对应 gate。不得因无关漂移重跑整套门禁。
 
 可重建的 ignored/untracked 测试缓存不阻塞 `MERGE_READY`，统一留给 final cleanup；删除受阻且不影响 tracked 交付时保留，不更换多种命令追查。
 

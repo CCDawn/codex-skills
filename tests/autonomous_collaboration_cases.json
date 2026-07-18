@@ -90,6 +90,15 @@
     "remote_allowed": false
   },
   {
+    "id": "main-moving-does-not-pause-peer",
+    "situation": "main 仍有其他交付排队；当前 peer 完成聚焦验证后提交 MERGE_READY，由 Integration Owner 最终只跑一次完整 gate。",
+    "expected_state": "MERGE_READY",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
     "id": "rebuildable-test-cache",
     "situation": "peer 的 tracked 交付和验证有效，仅残留可重建的未跟踪测试缓存，留给最终统一清理而不阻塞交付。",
     "expected_state": "MERGE_READY",
@@ -101,6 +110,15 @@
   {
     "id": "local-main-integration",
     "situation": "Integration Owner 按依赖顺序重验交付并合入本地 main。",
+    "expected_state": "INTEGRATING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "unrelated-main-drift-during-final-gate",
+    "situation": "最终 gate 期间 main 被无关 UI 提交推进；Integration Owner 比较 scope 后只在最终 HEAD 补窄验证，不冻结全项目或重跑整套门禁。",
     "expected_state": "INTEGRATING",
     "ask_user": false,
     "owner_continues": true,
