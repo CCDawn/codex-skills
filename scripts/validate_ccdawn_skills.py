@@ -46,7 +46,10 @@ BRT_CORE_MARKERS = [
     "PEER_COLLABORATION_READY",
     "COORDINATE_OVERLAP",
     "PEER_CONTEXT_REVIEW",
+    "ASK_CREATE",
     "Silent Conflict Triage",
+    "READ / WRITE / REMOTE_WRITE / DESTRUCTIVE",
+    "写入可分离且收益高于协调成本才并行",
     "FAST / CHECK / PROFILE",
     "不为每次开发建立 benchmark",
     "STAY / CHECK / SPLIT",
@@ -76,7 +79,7 @@ TOKEN_BUDGETS = {
     "ccdawn-ai-research-loop": 2200,
     "ccdawn-autonomous-collaboration-loop": 2200,
     "ccdawn-bdd-tdd-development": 1350,
-    "ccdawn-brt": 2500,
+    "ccdawn-brt": 2700,
     "ccdawn-bug-review": 1200,
     "ccdawn-code-structure-guard": 1100,
     "ccdawn-competition-research-lifecycle": 2500,
@@ -107,7 +110,7 @@ TOKEN_BUDGETS = {
 
 BRT_REFERENCE_BUDGETS = {
     "collaboration-discovery.md": 900,
-    "routing-practice.md": 2200,
+    "routing-practice.md": 2400,
     "capability-routing.md": 1500,
     "runtime.md": 1800,
     "output-forms.md": 900,
@@ -143,7 +146,7 @@ BRT_REFERENCE_REQUIRED_MARKERS = {
 BRT_PROFILE_BUDGETS = {
     "alignment": (["SKILL.md", "references/output-forms.md"], 3400),
     "collaboration": (["SKILL.md", "references/collaboration-discovery.md"], 3500),
-    "routing": (["SKILL.md", "references/routing-practice.md"], 4700),
+    "routing": (["SKILL.md", "references/routing-practice.md"], 5100),
     "long-task": (["SKILL.md", "references/runtime.md"], 4300),
     "maximum": (
         [

@@ -18,17 +18,19 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 输入 -> 意图与证据 -> 置信度 -> Owner -> 协作 -> 方案与重量 -> 行动
 ```
 
-- 涉及项目状态时先读会改变判断的证据。“修复/添加/优化/删除/调整”提供执行许可；目标、写入面和验收清楚时直接推进。
-- 下游继承许可；切换 owner 不重复询问。范围扩大、高风险或真实取舍才确认。
+- 涉及项目或运行状态时，先读会改变判断的本地证据。
+- “修复/添加/优化/删除/调整”提供执行许可；目标、写入面和验收清楚且无自然闸门时直接推进。
+- 下游继承已有许可；切换 owner 不重复询问。范围扩大、高风险或真实取舍才确认。
 - `HIGH`：行动；`MEDIUM`：声明低风险假设后行动；`LOW`：probe/讨论；`BLOCKED`：只问不可约问题。
-- 输出用 `SILENT / MICRO / ALIGN / FULL`，默认最短且不展示内部账本。
+- 输出用 `SILENT / MICRO / ALIGN / FULL`，默认最短；不展示内部账本。
 - 用户说“继续/确认/按推荐来”时承接路线，不重开需求发现或逐任务询问。
 
 ## 讨论式意图收敛
 
-开发、规划或高影响审查前锁定结果、owning surface、非目标和证据。多个解释会明显返工时用 `One-Turn Alignment` 说明理解、动作、非目标和验收。低置信度不得带着未确认的高影响假设写入。
+开发、规划或高影响审查前，内部锁定结果、owning surface、非目标和证据。多个解释会明显返工时使用 `One-Turn Alignment`，说明当前理解、动作、非目标和验收。低置信度不得带着未确认的高影响假设写入。
 
-- agent 先给推荐；一次集中提出 2-4 个相关的高影响问题，给出答案、差异和错判影响。
+- agent 先给推荐，不让用户重写需求。
+- 一次集中提出 2-4 个彼此相关的高影响问题；每项给推荐答案、行为差异和错判影响。
 - 用户可回复“按推荐”或纠错；信息足够即结束追问。
 - 自然闸门仅包括：意图变化、范围扩大、不可安全恢复的失败、高风险/破坏性/权限/迁移/发布动作、冲突或真实取舍。
 
@@ -36,7 +38,7 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 
 ## Owner 与组合
 
-扫描最多 3 个候选，选择能直接产生下一证据的最具体 owner。内部 `Route Contract` 仅含 `Owner / Mode / Next Output / Allowed Action / Success Evidence / Stop Condition`。
+扫描最多 3 个候选，选择能直接产生下一证据的最具体 owner。内部 `Route Contract` 仅含：`Owner / Mode / Next Output / Allowed Action / Success Evidence / Stop Condition`；动作分 `READ / WRITE / REMOTE_WRITE / DESTRUCTIVE`。
 
 - bug/失败测试：`ccdawn-bug-review`；PR/diff：`ccdawn-pr-review`；整仓/架构：`ccdawn-project-review`。
 - UI/UX 与交互方向：`ccdawn-ui-design`；品牌表达或视觉语言：`ccdawn-visual-design`；契约明确后的生产前端实现：`ccdawn-frontend-engineering`；已有界面或截图审查：`ccdawn-ui-review`；跨组件 token、主题或组件治理：`ccdawn-design-system`。
@@ -47,30 +49,30 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 - 真实设计分叉：`ccdawn-planning`；无专项 owner 的评价：`ccdawn-evaluation`。
 - GitHub、浏览器、Figma、OpenAI 文档、图片和办公制品按需读 `references/capability-routing.md`。
 
-无法仲裁才读 `references/routing-practice.md`。以 Available skills 为准；未安装 skill 不能成为 owner。
+无法仲裁才读 `references/routing-practice.md`。以本轮 Available skills 为准；未安装 skill 不能成为 owner，外部候选仅在安装/调研时读取。
 
-多个独立交付物、owner 或验证边界才建 `Primary / Secondary / Deferred`；“实现并验证”仍是一个任务。
+多个独立交付物、owner 或验证边界才建 `Primary / Secondary / Deferred`；“实现并验证”仍是一个任务。写入可分离且收益高于协调成本才并行。
 
 ### Collaboration Discovery
 
-意图收敛并选出 owner 后判断现有对话能否帮助任务。`FAST_PATH`、单 owner 更快或无原生 thread/list 能力时为 `NONE`；有独立 lane、可复用上下文或专项互补时，读 `references/collaboration-discovery.md`。
+意图收敛并选出功能 owner 后，BRT 主动判断现有对话能否帮助任务。`FAST_PATH`、单 owner 更快或本轮无原生 thread/list 能力时为 `NONE`；出现独立 lane、可复用上下文或专项互补时，读 `references/collaboration-discovery.md` 做一次有界发现。
 
-结果为 `NONE / PEER_CONTEXT_REVIEW / PEER_READ_ONLY / PEER_DISJOINT_WRITE / COORDINATE_OVERLAP`。单次协作交 `ccdawn-thread-coordination`；多个平级会话能互助且降低返工时升为 `PEER_COLLABORATION_READY`，交 `ccdawn-multi-agent-orchestration`。
+结果为 `NONE / PEER_CONTEXT_REVIEW / PEER_READ_ONLY / PEER_DISJOINT_WRITE / COORDINATE_OVERLAP`。单次协作交 `ccdawn-thread-coordination`；两个以上现有平级会话能互助完成各自任务并降低全局冲突/返工，升为 `PEER_COLLABORATION_READY`，交 `ccdawn-multi-agent-orchestration`。无候选但新会话收益明确时为 `ASK_CREATE`，集中询问一次。
 
-发现阶段不发消息或暂停；无正收益即回原 owner。BRT 不参与后续讨论或合并。
+发现阶段不发消息或暂停；无正收益候选时回原 owner。BRT 不参与后续讨论或合并。
 
 非简单共同目标适合持续并行、冲突恢复和本地集成时，询问一次“是否开启自动化协作开发闭环？”。确认后路由 `ccdawn-autonomous-collaboration-loop`，继承本地写入、提交、`main` 集成、验证和收尾许可，不逐阶段询问；新建会话和远程动作仍单独授权。
 
 ## 最小充分方案
 
-按首个充分层级停止：`NO_BUILD -> PROJECT_REUSE -> STANDARD_NATIVE -> INSTALLED_DEPENDENCY -> MINIMAL_BUILD`。先查最窄本地复用；外部候选会改变路径、依赖或风险时才用 `ccdawn-feature-reuse-research`：
+按首个充分层级停止：`NO_BUILD -> PROJECT_REUSE -> STANDARD_NATIVE -> INSTALLED_DEPENDENCY -> MINIMAL_BUILD`。先查最窄本地复用；外部候选会改变路径、依赖、成本或风险时才用 `ccdawn-feature-reuse-research`：
 
 - 成熟引擎/标准类复杂能力、重要新依赖、跨模块子系统，或项目内无稳定模式；
 - 用户明确要求外部复用，或 QUICK 搜索可显著避免高成本自研。
 
 文件多不是触发条件。普通 CRUD、样式、小 bug、机械改动和已有模式直接实施；结论稳定后回原 owner。
 
-自动精简默认 `AUTO`：简单任务 `LITE`，非平凡实现 `FULL`，目标就是删减时 `ULTRA`。不得删除用户要求、安全、数据、无障碍、兼容或迁移约束。
+自动精简默认 `AUTO`：简单任务 `LITE`，非平凡实现 `FULL`，用户目标就是删减时 `ULTRA`。不得删除用户要求、信任边界、安全、数据保护、无障碍、兼容或迁移约束。
 
 效率闸门为 `FAST / CHECK / PROFILE`：普通任务 `FAST`；已定位 N+1 等局部低效及批量修复/次数断言留给 owner `CHECK`，不转 bug/performance。仅故障、正确性回归或根因不明交 `ccdawn-bug-review`；需 profiling 的目标/回归、热路径、规模、并发或资源风险才 `PROFILE`，交 `ccdawn-performance-engineering`。不为每次开发建立 benchmark。
 
@@ -90,7 +92,7 @@ BDD/TDD 按子任务判断，只给确定性行为回归或重大契约风险；
 
 ## 能力感知与阶段折叠
 
-高能力模型可内部完成局部规划和自审；同一 owner 且无自然闸门时可折叠对齐、实现和验证。
+高能力模型可内部完成局部规划、依赖排序和自审；同一 owner 且无自然闸门时可折叠对齐、实现和验证。
 
 - **Skill Budget**：默认一个 primary owner；support skill 只有补充独有知识、工具或独立证据时才加载。
 - artifact 只有会被审阅、交接、恢复或高风险决策复用时才生成。
