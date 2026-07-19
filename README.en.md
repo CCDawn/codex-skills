@@ -3,13 +3,13 @@
 [![Release](https://img.shields.io/github/v/release/CCDawn/codex-skills?display_name=tag)](https://github.com/CCDawn/codex-skills/releases)
 [![Validate](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/CCDawn/codex-skills/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/CCDawn/codex-skills)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-29-2f81f7)](#skill-catalog)
+[![Skills](https://img.shields.io/badge/skills-30-2f81f7)](#skill-catalog)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-1f883d)](https://agentskills.io/)
 [![skills.sh](https://skills.sh/b/CCDawn/codex-skills)](https://skills.sh/CCDawn/codex-skills)
 
 **Let Codex understand what you mean before deciding how to work.**
 
-CCDawn is a Chinese-first collection of 29 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, peer collaboration and opt-in autonomous closure across existing threads, lightweight development, performance engineering, cleanup, code review, UI design, and AI research workflows.
+CCDawn is a Chinese-first collection of 30 Agent Skills for Codex and Grok Build, covering intent alignment, dynamic routing, peer collaboration and opt-in autonomous closure across existing threads, lightweight development, code-structure guards, performance engineering, cleanup, code review, UI design, and AI research workflows.
 
 - Users describe the task normally. They do not need to invoke `/brt` or memorize a workflow.
 - [`ccdawn-brt`](skills/engineering/ccdawn-brt/SKILL.md) proceeds immediately when intent is clear and starts a focused discussion only when ambiguity could materially change the result.
@@ -83,6 +83,7 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 | Installed GitHub, browser, Figma, or artifact tools are ignored | BRT routes to currently available capabilities while CCDawn retains intent and acceptance ownership |
 | Small changes trigger heavyweight process | Scale workflow weight per subtask and prefer direct implementation plus verification |
 | New features may introduce inefficient code | Check obvious inefficiency silently; measure only real hot paths, regressions, or performance targets |
+| Development keeps producing giant source files | Apply a `STAY/CHECK/SPLIT` gate to touched hand-written code and split only around durable responsibility boundaries |
 | Reviews stop after listing findings | Build a dependency-aware action queue and continue within the agreed boundary |
 | Multiple Codex threads develop in one project | BRT connects useful peer threads so each keeps its own task while negotiating shared contracts, dependencies, and integration |
 | Multi-thread work stalls after a conflict | One opt-in enables a recoverable loop that resumes paused peers and verifies integration into local `main` |
@@ -98,6 +99,7 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 - [`ccdawn-development-cleanup`](skills/engineering/ccdawn-development-cleanup/SKILL.md): post-development residue and safe merged local branch, worktree, and claim cleanup.
 - [`ccdawn-bug-review`](skills/engineering/ccdawn-bug-review/SKILL.md): evidence-driven diagnosis, bounded repair, and verification.
 - [`ccdawn-performance-engineering`](skills/engineering/ccdawn-performance-engineering/SKILL.md): measured bottleneck diagnosis and minimal optimization only for real performance targets, regressions, or hot paths.
+- [`ccdawn-code-structure-guard`](skills/engineering/ccdawn-code-structure-guard/SKILL.md): lightweight protection against multi-responsibility giant files without mechanical line-count splitting.
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md): risk-ranked PR and diff review with merge-readiness evidence.
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md): UI/UX direction, responsive behavior, accessibility, and browser visual QA.
 - [`ccdawn-visual-design`](skills/engineering/ccdawn-visual-design/SKILL.md): context-aware brand expression, typography, color, composition, imagery, and motion direction.
@@ -120,6 +122,7 @@ Run `py -3 scripts\run_brt_routing_eval.py` after installation for a low-cost, r
 - [`ccdawn-pr-review`](skills/engineering/ccdawn-pr-review/SKILL.md)
 - [`ccdawn-project-review`](skills/engineering/ccdawn-project-review/SKILL.md)
 - [`ccdawn-performance-engineering`](skills/engineering/ccdawn-performance-engineering/SKILL.md)
+- [`ccdawn-code-structure-guard`](skills/engineering/ccdawn-code-structure-guard/SKILL.md)
 - [`ccdawn-ui-design`](skills/engineering/ccdawn-ui-design/SKILL.md)
 - [`ccdawn-visual-design`](skills/engineering/ccdawn-visual-design/SKILL.md)
 - [`ccdawn-frontend-engineering`](skills/engineering/ccdawn-frontend-engineering/SKILL.md)

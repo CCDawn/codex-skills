@@ -15,6 +15,7 @@
 |---|---|---|---|
 | 修 bug、异常、失败测试有明确对象 | `ccdawn-bug-review` | FAST/COMPACT | 根因状态、最小修复、验证 |
 | 性能目标/回归或热路径测量 | `ccdawn-performance-engineering` | PROFILE | baseline、瓶颈、before/after |
+| 多职责巨型文件、结构妨碍导航/测试/协作，或明确要求职责拆分 | `ccdawn-code-structure-guard` | FAST/COMPACT | STAY/CHECK/SPLIT 与最小结构修改 |
 | 审 PR、diff、branch、commit、merge readiness | `ccdawn-pr-review` | COMPACT | findings-first 审阅结论 |
 | 审整仓、架构、技术债、测试体系、接手摸底 | `ccdawn-project-review` | COMPACT | 风险排序 findings 与执行队列 |
 | 评价流程、方案、skill、输出质量，且无更具体 owner | `ccdawn-evaluation` | MICRO/COMPACT | 证据化判断与高 ROI 建议 |
@@ -39,32 +40,33 @@
 | 当前 diff/PR 是否过度设计 | `ccdawn-simplification-review` | COMPACT | 可删与保留判断 |
 | 整仓/子系统冗余复杂度与依赖膨胀 | `ccdawn-simplification-audit` | COMPACT | 排序后的精简队列 |
 
-系统或插件 skill 仅在本轮 Available skills 中真实存在且比 CCDawn fallback 更具体时使用，例如官方文档、浏览器、GitHub、PDF、表格或图像工具。候选安装资料属于 `github-skill-candidates.md`，不属于运行时路由表。
+系统或插件 skill 只有本轮真实存在且更具体时使用。候选安装资料属于 `github-skill-candidates.md`，不属于运行时路由。
 
 ## 相邻边界
 
-- PR/diff 正确性由 PR review 主责；只有目标明确指向删减时才叠加 simplification review。
+- PR/diff 正确性由 PR review 主责；明确删减才叠加 simplification review。
+- 普通功能仍由开发 owner 主责；结构守卫只处理本轮职责膨胀，行数不能单独抢占 owner。明确拆巨型文件时由其主责；整仓技术债交 project review。
 - UI PR 仍由 PR review 主责；只有需要真实界面证据时才把 UI review 作为 support，不重复审查同一代码风险。
 - 单页面或单组件问题不升级为 design system；只有共享事实源、多个消费者或迁移契约成为主要问题时才进入该 owner。
-- UI design 决定任务、结构和交互；visual design 决定品牌与视觉表达。普通产品 UI 不因“更好看”自动加载两个 owner。
-- “设计并实现”由主要设计 owner 贯穿落地和一次浏览器验收，不再串联 Frontend Engineering；只有方案单独交付、跨 owner handoff，或进入时契约已确定才由 Frontend Engineering 主责。
-- Design System 负责契约和代表性消费者，不把同一迁移机械拆给页面 owner；只有剩余页面形成独立交付边界时才切换。
+- UI design 决定任务、结构和交互；visual design 决定品牌表达。普通 UI 不因“更好看”加载两个 owner。
+- “设计并实现”由设计 owner 贯穿并做一次浏览器验收；契约已确定或独立 handoff 才由 Frontend Engineering 主责。
+- Design System 负责契约和代表性消费者；剩余页面形成独立交付时才切换。
 - 具体 bug 交给 bug owner；整仓测试健康度和架构风险交给 project review。
 - Bug Review 持有从根因到修复的完整闭环；必要 RED/GREEN 是其内部测试锚点，不再二次加载 TDD skill。TDD 只主责已明确的新行为或实现契约。
 - planning 解决设计分叉，并仅在真实独立边界存在时内嵌 `TASK_GRAPH`；`NO_SPLIT` 不产生额外阶段。
-- BRT 负责对齐后的有界会话发现；现有平级会话的持续协商和共同集成由 multi-agent orchestration 主责；单次建议、冲突或恢复只用 thread coordination。
-- orchestration 不创建子 Agent、不接管任何会话任务；每个 Agent 保留 bug、UI、研究或测试专项 owner，没有双向正收益时各自继续。
+- BRT 负责有界会话发现；持续协商/集成交 orchestration，单次建议、冲突或恢复交 coordination。
+- orchestration 不创建子 Agent或接管任务；没有双向收益时各自继续。
 - 实验 metric 未提升不是 TDD RED；确定性 harness/parser/schema bug 才进入工程 TDD。
-- UI 文件的机械修改可留在 FAST_PATH；产品、交互或视觉结果未定时由 UI design 主责，结果已定且主要工作是生产实现时由 frontend engineering 主责。
+- UI 机械修改留在 FAST_PATH；结果未定交 UI design，已定的生产实现交 frontend engineering。
 - 普通完成由当前 owner 收口；正式跨阶段证据包才进入 completion summary。
 
 ## 多动作推进
 
 同一请求产生多个后续动作时：
 
-- 按依赖、用户价值、误改风险和验证成本排序，不按严重度机械排序。
+- 按依赖、用户价值、误改风险和验证成本排序。
 - `SAFE_DIRECT` 在已有执行许可下依次修复并验证，不完成一个就停下来询问。
-- `PLAN_THEN_EXECUTE` 先形成必要方案，再自动回到执行。
+- `PLAN_THEN_EXECUTE` 形成必要方案后自动执行。
 - `DEFERRED` 只记录触发条件；`BLOCKED` 才停止并问一个问题。
 - 只有用户必须选择顺序、范围或高风险动作时才展示选项。
 

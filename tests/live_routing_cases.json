@@ -22,6 +22,28 @@
     "timeout_seconds": 120
   },
   {
+    "id": "giant-file-structure-route",
+    "prompt": "当前仅测试路由，不修改文件。一个九百行的手写 TypeScript service 同时负责鉴权、持久化和通知，新增需求还要修改三个远距离区段。请判断 owner，并说明 STAY/CHECK/SPLIT 和处理边界。",
+    "smoke": false,
+    "expected_skill_reads": ["ccdawn-code-structure-guard"],
+    "forbidden_skill_reads": ["ccdawn-performance-engineering", "ccdawn-planning"],
+    "max_commands": 6,
+    "expected_final_any": ["SPLIT", "代码结构守卫", "ccdawn-code-structure-guard"],
+    "forbidden_final_any": ["已修改"],
+    "timeout_seconds": 120
+  },
+  {
+    "id": "generated-cohesive-file-stays",
+    "prompt": "当前仅测试路由，不修改文件。一个九百行的 OpenAPI 自动生成客户端因接口更新需要重新生成，但它职责内聚。请说明 owner 和结构处理方式。",
+    "smoke": false,
+    "expected_skill_reads": [],
+    "forbidden_skill_reads": ["ccdawn-code-structure-guard", "ccdawn-performance-engineering", "ccdawn-planning"],
+    "max_commands": 4,
+    "expected_final_any": ["STAY", "保持", "不拆分", "生成"],
+    "forbidden_final_any": ["已修改"],
+    "timeout_seconds": 120
+  },
+  {
     "id": "explicit-working-tree-review",
     "prompt": "只读审查当前工作树 diff，按严重程度列出回归风险和缺失验证，不修改代码。",
     "smoke": false,
