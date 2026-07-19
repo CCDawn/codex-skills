@@ -24,6 +24,7 @@ BRT_CORE_MARKERS = [
     "ccdawn-simplification-review",
     "ccdawn-simplification-audit",
     "ccdawn-performance-engineering",
+    "ccdawn-code-structure-guard",
     "ccdawn-ai-research-loop",
     "ccdawn-research-rigor-review",
     "ccdawn-autonomous-collaboration-loop",
@@ -45,9 +46,13 @@ BRT_CORE_MARKERS = [
     "PEER_COLLABORATION_READY",
     "COORDINATE_OVERLAP",
     "PEER_CONTEXT_REVIEW",
+    "ASK_CREATE",
     "Silent Conflict Triage",
+    "READ / WRITE / REMOTE_WRITE / DESTRUCTIVE",
+    "写入可分离且收益高于协调成本才并行",
     "FAST / CHECK / PROFILE",
     "不为每次开发建立 benchmark",
+    "STAY / CHECK / SPLIT",
 ]
 
 UNIFIED_CONTRACT_MARKERS = [
@@ -61,6 +66,7 @@ DIRECT_WRITE_OWNERS = {
     "ccdawn-autonomous-collaboration-loop",
     "ccdawn-bdd-tdd-development",
     "ccdawn-bug-review",
+    "ccdawn-code-structure-guard",
     "ccdawn-design-system",
     "ccdawn-frontend-engineering",
     "ccdawn-multi-agent-orchestration",
@@ -73,8 +79,9 @@ TOKEN_BUDGETS = {
     "ccdawn-ai-research-loop": 2200,
     "ccdawn-autonomous-collaboration-loop": 2200,
     "ccdawn-bdd-tdd-development": 1350,
-    "ccdawn-brt": 2500,
+    "ccdawn-brt": 2700,
     "ccdawn-bug-review": 1200,
+    "ccdawn-code-structure-guard": 1100,
     "ccdawn-competition-research-lifecycle": 2500,
     "ccdawn-completion-summary": 2400,
     "ccdawn-creative-toolbox": 1400,
@@ -103,7 +110,7 @@ TOKEN_BUDGETS = {
 
 BRT_REFERENCE_BUDGETS = {
     "collaboration-discovery.md": 900,
-    "routing-practice.md": 2200,
+    "routing-practice.md": 2400,
     "capability-routing.md": 1500,
     "runtime.md": 1800,
     "output-forms.md": 900,
@@ -139,7 +146,7 @@ BRT_REFERENCE_REQUIRED_MARKERS = {
 BRT_PROFILE_BUDGETS = {
     "alignment": (["SKILL.md", "references/output-forms.md"], 3400),
     "collaboration": (["SKILL.md", "references/collaboration-discovery.md"], 3500),
-    "routing": (["SKILL.md", "references/routing-practice.md"], 4700),
+    "routing": (["SKILL.md", "references/routing-practice.md"], 5100),
     "long-task": (["SKILL.md", "references/runtime.md"], 4300),
     "maximum": (
         [
@@ -1038,6 +1045,20 @@ def validate_skill(
         ]:
             if marker not in text:
                 errors.append(f"{label}: lightweight performance contract missing marker '{marker}'")
+
+    if name == "ccdawn-code-structure-guard":
+        for marker in [
+            "## 三档结构闸门",
+            "STAY",
+            "CHECK",
+            "SPLIT",
+            "不能单独触发 `SPLIT`",
+            "不扫描全仓排行榜",
+            "没有降低耦合、认知负担或未来冲突",
+            "不默认生成规划文档",
+        ]:
+            if marker not in text:
+                errors.append(f"{label}: lightweight code-structure contract missing marker '{marker}'")
 
     if name == "ccdawn-design-system":
         for marker in ["## 系统闸门", "## 事实源与契约", "## 渐进迁移", "代表性消费者", "Figma/code"]:

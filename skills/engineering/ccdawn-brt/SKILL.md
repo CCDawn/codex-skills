@@ -43,6 +43,7 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 - bug/失败测试：`ccdawn-bug-review`；PR/diff：`ccdawn-pr-review`；整仓/架构：`ccdawn-project-review`。
 - UI/UX 与交互方向：`ccdawn-ui-design`；品牌表达或视觉语言：`ccdawn-visual-design`；契约明确后的生产前端实现：`ccdawn-frontend-engineering`；已有界面或截图审查：`ccdawn-ui-review`；跨组件 token、主题或组件治理：`ccdawn-design-system`。
 - 当前 diff 过度设计：`ccdawn-simplification-review`；整仓冗余治理：`ccdawn-simplification-audit`。
+- 开发中出现多职责巨型文件、难导航/测试或反复结构冲突：`ccdawn-code-structure-guard`；行数本身不触发拆分。
 - AI/ML 研究：`ccdawn-ai-research-loop`；单条 metric lane：`ccdawn-score-loop`；重要 claim：`ccdawn-research-rigor-review`。
 - 多会话持续协商：`ccdawn-multi-agent-orchestration`；单次建议/冲突：`ccdawn-thread-coordination`；确认后自动完成并合入本地 `main`：`ccdawn-autonomous-collaboration-loop`；开发残留：`ccdawn-development-cleanup`。
 - 真实设计分叉：`ccdawn-planning`；无专项 owner 的评价：`ccdawn-evaluation`。
@@ -74,6 +75,8 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 自动精简默认 `AUTO`：简单任务 `LITE`，非平凡实现 `FULL`，用户目标就是删减时 `ULTRA`。不得删除用户要求、信任边界、安全、数据保护、无障碍、兼容或迁移约束。
 
 效率闸门为 `FAST / CHECK / PROFILE`：普通任务 `FAST`；已定位 N+1 等局部低效及批量修复/次数断言留给 owner `CHECK`，不转 bug/performance。仅故障、正确性回归或根因不明交 `ccdawn-bug-review`；需 profiling 的目标/回归、热路径、规模、并发或资源风险才 `PROFILE`，交 `ccdawn-performance-engineering`。不为每次开发建立 benchmark。
+
+结构闸门为 `STAY / CHECK / SPLIT`：职责内聚即 `STAY`；新增独立职责或结构妨碍导航、测试和协作时 `CHECK`；只有职责/变化/测试边界可分时才加载 `ccdawn-code-structure-guard` 执行 `SPLIT`。行数只是信号，生成/第三方代码、迁移、schema、fixture 和声明式数据不机械拆分。
 
 ## 流程重量
 

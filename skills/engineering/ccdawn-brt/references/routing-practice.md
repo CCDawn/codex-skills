@@ -15,6 +15,7 @@
 |---|---|---|---|
 | 修 bug、异常、失败测试有明确对象 | `ccdawn-bug-review` | FAST/COMPACT | 根因状态、最小修复、验证 |
 | 性能目标/回归或热路径测量 | `ccdawn-performance-engineering` | PROFILE | baseline、瓶颈、before/after |
+| 多职责巨型文件、结构妨碍导航/测试/协作，或明确要求职责拆分 | `ccdawn-code-structure-guard` | FAST/COMPACT | STAY/CHECK/SPLIT 与最小结构修改 |
 | 审 PR、diff、branch、commit、merge readiness | `ccdawn-pr-review` | COMPACT | findings-first 审阅结论 |
 | 审整仓、架构、技术债、测试体系、接手摸底 | `ccdawn-project-review` | COMPACT | 风险排序 findings 与执行队列 |
 | 评价流程、方案、skill、输出质量，且无更具体 owner | `ccdawn-evaluation` | MICRO/COMPACT | 证据化判断与高 ROI 建议 |
@@ -44,6 +45,8 @@
 ## 相邻边界
 
 - PR/diff 正确性由 PR review 主责；只有目标明确指向删减时才叠加 simplification review。
+- 普通功能仍由当前开发 owner 主责；代码结构守卫只在本轮目标文件出现职责膨胀证据时辅助，行数或“以后可能变大”不能单独抢占 owner。
+- 明确要求拆分巨型文件时由代码结构守卫主责；整仓寻找大文件和技术债仍交 project review，当前 diff 的无效抽象仍交 simplification review。
 - UI PR 仍由 PR review 主责；只有需要真实界面证据时才把 UI review 作为 support，不重复审查同一代码风险。
 - 单页面或单组件问题不升级为 design system；只有共享事实源、多个消费者或迁移契约成为主要问题时才进入该 owner。
 - UI design 决定任务、结构和交互；visual design 决定品牌与视觉表达。普通产品 UI 不因“更好看”自动加载两个 owner。
