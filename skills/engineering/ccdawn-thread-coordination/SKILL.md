@@ -8,12 +8,12 @@ license: MIT
 
 ## 目标
 
-用 registry 和 thread 消息协调平级会话的 scope、冲突和合并。代码/Git 是事实源；无决策价值不通信。
+以 registry/thread 协调 scope、冲突和合并；代码/Git 为事实源，无价值不通信。
 
 ## BRT interface
 
-- Context Boundary: 项目、thread、branch/worktree、scope、claim、coordination。
-- Output Contract: ownership、协调决定、验证和恢复债务。
+- Context Boundary: 项目/thread/branch/worktree/scope/claim/coordination。
+- Output Contract: ownership、决定、验证、恢复债务。
 - Allowed Action: 使用 `read_thread`、`send_message_to_thread` 与 `agent_coordination.py`；创建/归档或远程 Git 需授权。
 - Success Evidence: registry revision、thread 回执、Git/测试及协调闭环。
 - Stop Condition: thread 不明、owner 争议、暂停未确认、状态漂移或未授权。
@@ -29,6 +29,8 @@ license: MIT
 BRT 首次写入前调用 `preflight`；`CLEAR/PEERS_NO_OVERLAP` 返回 owner，`OVERLAP` 静默分诊；只 claim 最小 scope。
 
 owner 顺序：用户指定 > 有效 claim/registry > 更早 owner。非 owner 停止自身冲突写入，不要求既有 owner 暂停；争议面只读。
+
+文件/集成 owner 分开。`MERGE_READY` 时读 `references/integration-ownership.md`，按 claim 认领或退回交付者。
 
 ## 主动协作
 
@@ -48,9 +50,9 @@ Silent Conflict Triage 核验 claim、真实写入和替代工作；优先 `SELF
 
 修复后 `resolve` 并主动发送 `CONFLICT_RESOLVED`；对方重读状态，`resume` 后回复 `RESUMED`。不要随后调用 registry `respond --status RESUMED`。
 
-`send_message_to_thread` 不能中断系统命令；消息不是抢占机制。
+发送前读目标；忙于其他用户任务则留待 idle，禁发“继续”。消息不是抢占机制。
 
-`main` 推进、合入排队或 gate 可能 stale 不属于 `PAUSE_REQUIRED`。Peer 完成聚焦验证并返回 `MERGE_READY`，由 Integration Owner 串行应用交付；不要求 peer 等稳定窗口或重复 full gate。只有集成失败需要其独有判断时才唤醒原 owner。
+`main` 推进、合入排队或 gate 可能 stale 不属于 `PAUSE_REQUIRED`。Peer 完成聚焦验证并返回 `MERGE_READY`，由有效 integration claim 的 owner 串行应用交付；不要求 peer 等稳定窗口或重复 full gate。只有集成失败需要其独有判断时才唤醒原 owner。
 
 pause 产生 `resumePendingAgentIds`；债务清零才能 `complete`：
 
@@ -62,7 +64,7 @@ pause 产生 `resumePendingAgentIds`；债务清零才能 `complete`：
 
 讨论优先于暂停；同一 participants + surface 存在则复用，不重复发送。
 
-各 Agent 独立返回 `MERGE_READY`（branch/base/head/scopes/dependency/tests/risks）。Integration Owner 用 Git 重验；无重叠成组，共享面串行，全部进入目标分支后只跑一次完整 gate。失败通知责任方，成功广播。standalone 不自动 push、发布或清理。
+各 Agent 返回 `MERGE_READY`（branch/base/head/scopes/dependency/tests/risks）。Integration Owner 用 Git 重验；无重叠成组，共享面串行，全部进入目标分支后只跑一次完整 gate。失败通知责任方，成功广播并释放 integration claim、关闭关联 merge coordination。standalone 不自动 push、发布或清理。
 
 ### 条件合入快线
 

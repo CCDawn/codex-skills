@@ -54,6 +54,11 @@ class BrtActivationTests(unittest.TestCase):
         self.assertIn("Discovery sends no messages", block)
         self.assertIn("never creates subagents", block)
         self.assertIn("keeps ownership of its own task", block)
+        self.assertIn("integration/<target-key>", block)
+        self.assertIn("proactively claim the queue", block)
+        self.assertIn("baseline failures or a dirty main", block)
+        self.assertIn("do not independently chase main", block)
+        self.assertIn("read the live local `SKILL.md`", block)
         self.assertIn("Do not auto-load generic process frameworks", block)
 
     def test_remove_deletes_only_managed_block(self) -> None:

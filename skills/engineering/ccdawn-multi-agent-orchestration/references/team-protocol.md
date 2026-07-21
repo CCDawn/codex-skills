@@ -13,7 +13,8 @@ Shared Surface or Dependency:
 Why Both Tasks Benefit:
 Proposed Each Scope:
 Evidence To Exchange:
-Integration Owner (if needed):
+Integration Target:
+Current Integration Claim (optional):
 Exit Condition:
 Reply To:
 ```
@@ -49,3 +50,19 @@ Suggested Integration Order:
 ```
 
 Integration Owner 必须用 Git 和测试重验。成功只广播一次 `INTEGRATED`；失败只通知责任 Agent 和受影响依赖方。每个 Agent 根据结果继续完成自己的原任务。
+
+## INTEGRATION_CLAIMED
+
+首个 `MERGE_READY` 出现且 `integration/<target-key>` 为空时，由合格 Agent 原子认领后发送一次：
+
+```text
+Type: INTEGRATION_CLAIMED
+Collaboration ID:
+Agent / Thread:
+Target:
+Queued Deliveries:
+Lease / Next Checkpoint:
+Reply Needed: NO
+```
+
+其他 Agent 看到有效 claim 后停止独立合并，只继续原任务或提交 `MERGE_READY`。负责人不能及时推进时发送 `INTEGRATION_HANDOFF` 并释放 claim；失活接管必须引用旧 claim、Git 现状和新 lease。完成后广播一次 `INTEGRATED`，释放 claim 并关闭关联 merge coordination。

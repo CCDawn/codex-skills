@@ -11,6 +11,28 @@
     "timeout_seconds": 120
   },
   {
+    "id": "feature-behavior-needs-active-alignment",
+    "prompt": "给项目增加批量删除功能，直接开始做。当前仅测试路由，不修改文件；请决定是否需要先确认删除范围、失败处理和恢复行为。",
+    "smoke": false,
+    "expected_skill_reads": ["ccdawn-brt"],
+    "forbidden_skill_reads": ["ccdawn-planning", "ccdawn-bdd-tdd-development"],
+    "max_commands": 4,
+    "expected_final_any": ["按推荐", "删除范围", "失败", "恢复"],
+    "forbidden_final_any": ["已经修改", "开始实现"],
+    "timeout_seconds": 120
+  },
+  {
+    "id": "single-outcome-small-change-skips-questions",
+    "prompt": "当前仅测试路由，不修改文件。把按钮文案从‘提交’改成‘保存’，目标位置和验收都已明确；说明应采用的流程重量。",
+    "smoke": false,
+    "expected_skill_reads": [],
+    "forbidden_skill_reads": ["ccdawn-planning", "ccdawn-bdd-tdd-development"],
+    "max_commands": 3,
+    "expected_final_any": ["FAST_PATH", "直接"],
+    "forbidden_final_any": ["需要确认", "请问", "按推荐"],
+    "timeout_seconds": 120
+  },
+  {
     "id": "feature-local-n-plus-one",
     "prompt": "这个列表接口存在 N+1 查询。请在不改变返回行为的前提下改为一次批量查询，并补查询次数回归测试。当前仅测试路由，不执行实际写入；说明 owner 和处理方式。",
     "smoke": false,

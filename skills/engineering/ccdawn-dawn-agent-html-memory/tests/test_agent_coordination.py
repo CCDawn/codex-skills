@@ -860,6 +860,72 @@ class AgentCoordinationTests(unittest.TestCase):
             self.assertEqual(12, len(registry["agents"]))
             self.assertEqual(12, registry["revision"])
 
+    def test_concurrent_integration_claim_has_one_owner_then_allows_handoff(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp) / "project"
+            project.mkdir()
+            codex_home = Path(temp) / "codex-home"
+
+            for agent_id in ("agent-a", "agent-b"):
+                run_coordination(
+                    project,
+                    codex_home,
+                    "join",
+                    "--agent",
+                    agent_id,
+                    "--agent-id",
+                    agent_id,
+                    "--task",
+                    "Integrate merge-ready delivery",
+                    "--scope",
+                    "target/main",
+                    "--json",
+                )
+
+            def claim(agent_id: str) -> subprocess.CompletedProcess[str]:
+                return run_coordination(
+                    project,
+                    codex_home,
+                    "claim",
+                    "--lane",
+                    "integration/main",
+                    "--scope",
+                    "target/main",
+                    "--agent-id",
+                    agent_id,
+                    "--task",
+                    "Own local main integration",
+                    "--json",
+                    check=False,
+                )
+
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                results = list(executor.map(claim, ("agent-a", "agent-b")))
+
+            winners = [result for result in results if result.returncode == 0]
+            blocked = [result for result in results if result.returncode != 0]
+            self.assertEqual(1, len(winners))
+            self.assertEqual(1, len(blocked))
+
+            winning_claim = json.loads(winners[0].stdout)["claim"]
+            winner_id = winning_claim["agentId"]
+            next_owner_id = "agent-b" if winner_id == "agent-a" else "agent-a"
+
+            run_coordination(
+                project,
+                codex_home,
+                "release",
+                "--claim-id",
+                winning_claim["id"],
+                "--status",
+                "released",
+                "--reason",
+                "Explicit integration handoff",
+                "--json",
+            )
+            replacement = json.loads(claim(next_owner_id).stdout)["claim"]
+            self.assertEqual(next_owner_id, replacement["agentId"])
+
     def test_pause_yields_claim_and_resume_rechecks_overlap(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp) / "project"

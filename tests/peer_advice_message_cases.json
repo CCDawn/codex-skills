@@ -1,5 +1,12 @@
 [
   {
+    "id": "active-thread-different-user-task",
+    "situation": "目标会话正在处理另一条用户请求，当前协作方只有泛化的继续消息。",
+    "prior_state": "TARGET_BUSY_OTHER_TASK",
+    "expected": "SILENT",
+    "message_type": ""
+  },
+  {
     "id": "initial-actionable-finding",
     "situation": "首次发现对方共享事件实现缺少幂等保护，证据会改变其实现和测试。",
     "prior_state": "OPEN",

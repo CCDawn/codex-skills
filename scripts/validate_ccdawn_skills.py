@@ -38,6 +38,10 @@ BRT_CORE_MARKERS = [
     "约束用于防错",
     "Superpowers 默认不参与自动路由",
     "## 讨论式意图收敛",
+    "Alignment Value Gate",
+    "一次窄范围只读 probe",
+    "不得静默替用户决定产品行为",
+    "不得询问本地证据已经回答的问题",
     "低置信度不得带着未确认的高影响假设写入",
     "一次集中提出 2-4 个",
     "Collaboration Discovery",
@@ -140,6 +144,8 @@ BRT_REFERENCE_REQUIRED_MARKERS = {
     "output-forms.md": [
         "已有执行许可时连续推进 `SAFE_DIRECT`",
         "只有自然闸门才提供 2-3 个具体选项",
+        "触发 `Alignment Value Gate` 时等待用户回复",
+        "提问前先摘要已查到的项目惯例",
     ],
 }
 
@@ -988,7 +994,9 @@ def validate_skill(
             "不等待 stable main",
             "不反复 closeout",
             "全部预期交付合入本地 `main` 后只运行一次完整集成 gate",
-            "不能同时承担独立用户实现任务",
+            "主动原子认领",
+            "INTEGRATION_CLAIMED",
+            "integration/<target-key>",
             "不得因无关漂移重跑整套门禁",
             "不能继承证据所有权",
             "MERGE_READY_RECOVERED",
@@ -1091,7 +1099,13 @@ def validate_skill(
                 errors.append(f"{label}: competition lifecycle ownership boundary missing marker '{marker}'")
 
     if name == "ccdawn-thread-coordination":
-        thread_contract_text = text + "\n" + read_text(skill_dir / "references" / "proactive-collaboration.md")
+        thread_contract_text = (
+            text
+            + "\n"
+            + read_text(skill_dir / "references" / "proactive-collaboration.md")
+            + "\n"
+            + read_text(skill_dir / "references" / "integration-ownership.md")
+        )
         for marker in [
             "CONFLICT_PAUSE_REQUEST",
             "`preflight`",
@@ -1105,6 +1119,8 @@ def validate_skill(
             "sync_project_memory.py --coordination-id",
             "send_message_to_thread",
             "read_thread",
+            "目标正处理不同用户任务时留待 idle",
+            "不发送泛化“继续”",
             "resumePendingAgentIds",
             "`takeover`",
             "不要随后调用 registry `respond --status RESUMED`",
@@ -1162,6 +1178,9 @@ def validate_skill(
             "不得在未授权时 push",
             "集成验证",
             "一次建议、状态交换或单一冲突只用 `ccdawn-thread-coordination`",
+            "动态认领集成责任",
+            "INTEGRATION_CLAIMED",
+            "integration/<target-key>",
         ]:
             if marker not in orchestration_text:
                 errors.append(f"{label}: multi-agent orchestration contract missing marker '{marker}'")

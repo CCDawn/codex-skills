@@ -90,6 +90,33 @@
     "remote_allowed": false
   },
   {
+    "id": "first-merge-ready-proactive-integration-claim",
+    "situation": "首个 peer 已提交 MERGE_READY，目标 main 没有有效 integration claim；具备权限且能立即处理的活跃 Agent 主动原子认领集成义务。",
+    "expected_state": "INTEGRATING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "existing-integration-owner-stops-duplicate-merge",
+    "situation": "目标 main 已有有效 Integration Owner；其他 peer 只提交 MERGE_READY，不再自行等待窗口、rebase、重复 full gate 或合并。",
+    "expected_state": "MERGE_READY",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
+    "id": "blocked-integration-still-claims-owner",
+    "situation": "首个交付已 ready，但 dirty main 和可在 clean base 复现的无关测试失败暂时阻塞合入；有本地权限的 Agent 仍主动认领集成队列，不把无关基线修复抛给用户。",
+    "expected_state": "INTEGRATING",
+    "ask_user": false,
+    "owner_continues": true,
+    "local_main_allowed": true,
+    "remote_allowed": false
+  },
+  {
     "id": "main-moving-does-not-pause-peer",
     "situation": "main 仍有其他交付排队；当前 peer 完成聚焦验证后提交 MERGE_READY，由 Integration Owner 最终只跑一次完整 gate。",
     "expected_state": "MERGE_READY",

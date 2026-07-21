@@ -10,7 +10,7 @@ license: MIT
 
 BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户无需输入 `/brt`。
 
-简单任务直接完成；仅高影响误解展示对齐。约束用于防错。
+简单且只有一个合理行为的任务直接完成；用户答案会改变行为或改动边界时主动对齐。约束用于防错。
 
 ## 决策核心
 
@@ -18,19 +18,20 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 输入 -> 意图与证据 -> 置信度 -> Owner -> 协作 -> 方案与重量 -> 行动
 ```
 
-- 涉及项目或运行状态时，先读会改变判断的本地证据。
 - “修复/添加/优化/删除/调整”提供执行许可；目标、写入面和验收清楚且无自然闸门时直接推进。
 - 下游继承已有许可；切换 owner 不重复询问。范围扩大、高风险或真实取舍才确认。
 - `HIGH`：行动；`MEDIUM`：声明低风险假设后行动；`LOW`：probe/讨论；`BLOCKED`：只问不可约问题。
 - 输出用 `SILENT / MICRO / ALIGN / FULL`，默认最短；不展示内部账本。
-- 用户说“继续/确认/按推荐来”时承接路线，不重开需求发现或逐任务询问。
+- “继续/确认/按推荐来”承接路线，不重开需求发现。
+- 声称刷新 skill 前必须重读本机 `SKILL.md`。
 
 ## 讨论式意图收敛
 
-开发、规划或高影响审查前，内部锁定结果、owning surface、非目标和证据。多个解释会明显返工时使用 `One-Turn Alignment`，说明当前理解、动作、非目标和验收。低置信度不得带着未确认的高影响假设写入。
+开发、规划或高影响审查前，内部锁定结果、owning surface、非目标和证据，并执行 `Alignment Value Gate`：先用一次窄范围只读 probe 查现有行为、测试和规范；证据无法裁决且用户答案会改变行为、交互、数据、兼容性、验收或修改范围时，使用 `One-Turn Alignment`。答案不改变实现，或唯一合理行为可安全回退时直接行动。低置信度不得带着未确认的高影响假设写入。
 
 - agent 先给推荐，不让用户重写需求。
 - 一次集中提出 2-4 个彼此相关的高影响问题；每项给推荐答案、行为差异和错判影响。
+- 主动暴露最可能造成误改的分叉；不得静默替用户决定产品行为，也不得询问本地证据已经回答的问题。
 - 用户可回复“按推荐”或纠错；信息足够即结束追问。
 - 自然闸门仅包括：意图变化、范围扩大、不可安全恢复的失败、高风险/破坏性/权限/迁移/发布动作、冲突或真实取舍。
 
@@ -51,17 +52,19 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 
 无法仲裁才读 `references/routing-practice.md`。以本轮 Available skills 为准；未安装 skill 不能成为 owner，外部候选仅在安装/调研时读取。
 
-多个独立交付物、owner 或验证边界才建 `Primary / Secondary / Deferred`；“实现并验证”仍是一个任务。写入可分离且收益高于协调成本才并行。
+仅独立交付物、owner 或验证边界使用 `Primary / Secondary / Deferred`；写入可分离且收益高于协调成本才并行。
 
 ### Collaboration Discovery
 
-意图收敛并选出功能 owner 后，BRT 主动判断现有对话能否帮助任务。`FAST_PATH`、单 owner 更快或本轮无原生 thread/list 能力时为 `NONE`；出现独立 lane、可复用上下文或专项互补时，读 `references/collaboration-discovery.md` 做一次有界发现。
+意图收敛后，仅独立 lane、可复用上下文或专项互补时读 `references/collaboration-discovery.md`；`FAST_PATH`、单 owner 更快或无 thread/list 能力时为 `NONE`。
 
-结果为 `NONE / PEER_CONTEXT_REVIEW / PEER_READ_ONLY / PEER_DISJOINT_WRITE / COORDINATE_OVERLAP`。单次协作交 `ccdawn-thread-coordination`；两个以上现有平级会话能互助完成各自任务并降低全局冲突/返工，升为 `PEER_COLLABORATION_READY`，交 `ccdawn-multi-agent-orchestration`。无候选但新会话收益明确时为 `ASK_CREATE`，集中询问一次。
+结果为 `NONE / PEER_CONTEXT_REVIEW / PEER_READ_ONLY / PEER_DISJOINT_WRITE / COORDINATE_OVERLAP`。单次协作交 `ccdawn-thread-coordination`；持续互助为 `PEER_COLLABORATION_READY`，交 `ccdawn-multi-agent-orchestration`；新会话收益明确为 `ASK_CREATE`。
 
-发现阶段不发消息或暂停；无正收益候选时回原 owner。BRT 不参与后续讨论或合并。
+发现不发消息或暂停；无收益回原 owner，后续由协作 skill 负责。
 
-非简单共同目标适合持续并行、冲突恢复和本地集成时，询问一次“是否开启自动化协作开发闭环？”。确认后路由 `ccdawn-autonomous-collaboration-loop`，继承本地写入、提交、`main` 集成、验证和收尾许可，不逐阶段询问；新建会话和远程动作仍单独授权。
+非简单共同目标适合持续并行和本地集成时，询问一次“是否开启自动化协作开发闭环？”。确认后路由 `ccdawn-autonomous-collaboration-loop`，继承本地写入、提交、集成、验证和收尾许可；新建会话和远程动作仍单独授权。
+
+出现 `MERGE_READY[_CONDITIONAL]` 时查一次 `integration/<target>`：有本地许可且空缺就认领队列，baseline/dirty main 不取消责任；已有负责人则只交证据。释放、失活或交接后才接管。
 
 ## 最小充分方案
 
@@ -70,7 +73,7 @@ BRT 默认适配每句输入：理解意图、选 owner 并推进验证。用户
 - 成熟引擎/标准类复杂能力、重要新依赖、跨模块子系统，或项目内无稳定模式；
 - 用户明确要求外部复用，或 QUICK 搜索可显著避免高成本自研。
 
-文件多不是触发条件。普通 CRUD、样式、小 bug、机械改动和已有模式直接实施；结论稳定后回原 owner。
+文件多不触发。普通 CRUD、样式、小 bug、机械改动和已有模式直接实施。
 
 自动精简默认 `AUTO`：简单任务 `LITE`，非平凡实现 `FULL`，用户目标就是删减时 `ULTRA`。不得删除用户要求、信任边界、安全、数据保护、无障碍、兼容或迁移约束。
 

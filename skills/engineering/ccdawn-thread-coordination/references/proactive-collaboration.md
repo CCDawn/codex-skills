@@ -1,5 +1,7 @@
 # 主动协作
 
+`send_message_to_thread` 前即时 `read_thread`；目标正处理不同用户任务时留待 idle，不发送泛化“继续”。
+
 ## 平级协作提议
 
 只向相关现有会话提出能帮助双方原任务的协作。发送前用一次 claim 原子占用 `lane=collaboration/<topic-key>`，并同时加入双方 `thread/<agent-id>` 与共享 scope；不要拆成多个 claim。消息带 collaboration id，并给出 `From Agent / Own Task / To Agent / Own Task / Reply To / Shared Surface / Mutual Benefit / Expected Evidence / Exit Condition`。

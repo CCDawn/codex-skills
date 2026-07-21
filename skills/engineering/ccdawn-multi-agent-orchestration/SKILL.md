@@ -43,23 +43,27 @@ BRT 已完成意图对齐和有界发现，以 `PEER_COLLABORATION_READY` 交接
 
 任何 Agent 都可提出 `COLLABORATION_PROPOSAL`，但不能改变对方任务。对方以 `PEER_ACCEPT / PEER_ADAPT / PEER_DECLINE` 自主决定。只有接受后才形成 agreement；需要消息结构时读取 `references/team-protocol.md`。
 
-agreement 只记录 `Peer Tasks / Shared Surface / Each Scope / Dependency / Integration Owner / Evidence / Exit Condition`。`Coordination Owner` 仅维护共同决定，`Integration Owner` 仅负责合入验证，均不拥有其他 Agent。
+agreement 只记录 `Peer Tasks / Shared Surface / Each Scope / Dependency / Integration Target / Current Integration Claim / Evidence / Exit Condition`。`Coordination Owner` 仅维护共同决定，`Integration Owner` 仅负责合入验证，均不拥有其他 Agent。开始协作时可以没有 Integration Owner。
 
 使用一次 registry claim 原子占用 `lane=collaboration/<topic-key>`，并加入相关 `thread/<agent-id>` 与共享 surface，防止重复提议；拒绝、过期或结束后释放。每个 Agent 继续自己的非冲突工作，不等待可选协作。
 
-### 3. 用信息价值降低熵
+### 3. 动态认领集成责任
+
+首个交付进入 integration queue 时，相关 Agent 只检查一次 `lane=integration/<target-key>`。无有效 claim 时，有本地权限的 peer 应主动原子认领队列，即使暂受 baseline/dirty main 阻塞；已有 claim 时，其余 Agent只发 `MERGE_READY`，不重复 rebase/gate/merge。用户指定优先；负责人无法维护队列才交接释放。细节交 `ccdawn-thread-coordination`。
+
+### 4. 用信息价值降低熵
 
 只在共享契约变化、依赖就绪、可行动新证据、结论纠正、真实 blocker 或 `MERGE_READY` 时通信。消息必须说明发送者、原任务、证据、对双方行动的影响和期望回复。
 
 不发送无变化进度、逐步思考、重复边界、可自行读取的信息或非阻塞催促。相同事实只保留最新结论；矛盾结论用 `CORRECTION` 明确替代关系。没有新增决策价值时继续各自任务。
 
-### 4. 协商冲突与依赖
+### 5. 协商冲突与依赖
 
 共享接口或实现顺序有分歧时，由 `ccdawn-thread-coordination` 维护 discussion，各方提交立场与证据后形成共同决定。先调整 scope、顺序或接口；只有继续写会立即覆盖/回归且无法拆分时才暂停。暂停方让出 claim，解决后必须恢复，不能因另一方结束而遗留。
 
-### 5. 协同集成而非收编结果
+### 6. 协同集成而非收编结果
 
-每个 Agent 独立报告 `Base / Head or Artifact / Changed Scope / Tests / Assumptions / Risks`。约定的 Integration Owner 用 Git 与测试重验，不把消息当事实源。
+每个 Agent 独立报告 `Base / Head or Artifact / Changed Scope / Tests / Assumptions / Risks`。当前有效 integration claim 的 owner 用 Git 与测试重验，不把消息当事实源；队列已有交付但 claim 为空时，先完成动态认领，不把合并义务留给用户。
 
 - 同一 checkout 的不重叠修改无需制造 merge；独立 branch/worktree 才进入 integration queue。
 - 有依赖或共享契约时串行集成；冲突由相关 Agent 共同决定，机械冲突才由 Integration Owner 处理。
@@ -68,6 +72,6 @@ agreement 只记录 `Peer Tasks / Shared Surface / Each Scope / Dependency / Int
 
 ## 完成与降熵门
 
-协作完成不等于替任何 Agent 完成任务。只有各自交付达到原验收、共享决定一致、必要集成验证通过、open coordination 和 `resumePendingAgentIds` 恢复债务清零时，才结束共同 agreement。
+协作完成不等于替任何 Agent 完成任务。只有各自交付达到原验收、共享决定一致、必要集成验证通过、integration claim 已释放、open coordination 和 `resumePendingAgentIds` 恢复债务清零时，才结束共同 agreement。
 
 收口前检查：是否减少了重复实现、冲突修改、过期消息和多余 worktree；协作日志是否只保留会改变后续行动的事实。存在真实残留才路由 `ccdawn-development-cleanup`。
